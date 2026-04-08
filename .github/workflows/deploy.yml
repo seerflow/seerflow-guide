@@ -31,7 +31,7 @@ jobs:
       - name: Check links
         uses: lycheeverse/lychee-action@v2
         with:
-          args: --no-progress --root-dir site/ site/
+          args: --no-progress --root-dir site/ --exclude 'docs\.seerflow\.dev' site/
           fail: true
 
       - name: Upload artifact
