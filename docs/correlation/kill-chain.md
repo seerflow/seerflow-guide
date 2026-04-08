@@ -15,12 +15,12 @@
 
     | Time | Stage | Signal |
     |------|-------|--------|
-    | T+0  | **Deploy** | New image `api-service:v2.3.1` rolled out |
+    | T+0  | **Deploy** | New image `api-gateway:v2.3.1` rolled out |
     | T+12 | **Error spike** | 500 error rate jumps from 1% to 8% (CUSUM change point) |
     | T+18 | **Resource exhaustion** | `postgres-primary` connection pool saturated (Sigma rule) |
-    | T+30 | **Crash** | `api-service` pod OOM killed (HST + system log anomaly) |
+    | T+30 | **Crash** | `api-gateway` pod OOM killed (HST + system log anomaly) |
 
-    Seerflow tracks this as an operational kill chain: each stage accumulates risk score on the `api-service` entity. By T+18, the combined score crosses the alert threshold — 12 minutes before the OOM crash. See the [Ops Primer](../ops-primer/ops-correlation.md) for the full entity graph view.
+    Seerflow tracks this as an operational kill chain: each stage accumulates risk score on the `api-gateway` entity. By T+18, the combined score crosses the alert threshold — 12 minutes before the OOM crash. See the [Ops Primer](../ops-primer/ops-correlation.md) for the full entity graph view.
 
 ## Theory
 

@@ -15,13 +15,13 @@
 
     ```mermaid
     graph LR
-        A[api-service] -->|DB queries| B[postgres-primary]
+        A[api-gateway] -->|DB queries| B[postgres-primary]
         A -->|cache reads| C[redis-cache]
         B -.->|pool exhaustion<br/>propagates back| A
         A -.->|timeout errors<br/>cascade to| C
     ```
 
-    `api-service` errors cause connection pool pressure on `postgres-primary`, which in turn increases `api-service` latency, which cascades timeouts to `redis-cache`. Seerflow detects this through fan-out analysis — `api-service` suddenly has anomalous edge weights to both `postgres-primary` and `redis-cache`, a pattern that doesn't appear during normal operation. See the [Ops Primer](../ops-primer/ops-correlation.md) for the full cross-source correlation walkthrough.
+    `api-gateway` errors cause connection pool pressure on `postgres-primary`, which in turn increases `api-gateway` latency, which cascades timeouts to `redis-cache`. Seerflow detects this through fan-out analysis — `api-gateway` suddenly has anomalous edge weights to both `postgres-primary` and `redis-cache`, a pattern that doesn't appear during normal operation. See the [Ops Primer](../ops-primer/ops-correlation.md) for the full cross-source correlation walkthrough.
 
 ## Theory
 
