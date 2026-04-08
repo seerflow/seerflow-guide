@@ -1,0 +1,17 @@
+# Lychee link checker configuration
+# https://lychee.cli.rs/usage/config/
+
+# Exclude the custom domain until DNS is configured
+exclude = ["docs\\.seerflow\\.dev"]
+
+# Don't check mailto links
+exclude_mail = true
+
+# Accept common success codes
+accept = [200, 204, 301, 302, 403, 429]
+
+# Timeout per request
+timeout = 10
+
+# Max retries
+max_retries = 2

@@ -31,7 +31,7 @@ jobs:
       - name: Check links
         uses: lycheeverse/lychee-action@v2
         with:
-          args: --no-progress site/
+          args: --no-progress --root-dir site/ site/
           fail: true
 
       - name: Upload artifact
