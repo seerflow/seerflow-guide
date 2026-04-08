@@ -41,6 +41,12 @@ nav:
   - Home: index.md
   - Security Primer:
     - security-primer/index.md
+    - What is a SIEM?: security-primer/siem-basics.md
+    - MITRE ATT&CK: security-primer/mitre-attack.md
+    - Cyber Kill Chain: security-primer/kill-chain.md
+    - IOCs & Entities: security-primer/iocs-entities.md
+    - Sigma Rules: security-primer/sigma-rules.md
+    - Anomaly Detection: security-primer/anomaly-detection.md
   - Architecture:
     - architecture/index.md
     - Receivers: architecture/receivers.md
