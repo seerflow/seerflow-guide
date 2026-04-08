@@ -1,0 +1,104 @@
+site_name: Seerflow Guide
+site_url: https://docs.seerflow.dev
+site_description: "Comprehensive guide to Seerflow — streaming log intelligence"
+repo_url: https://github.com/seerflow/seerflow
+repo_name: seerflow/seerflow
+
+theme:
+  name: material
+  logo: assets/logo-light.png
+  favicon: assets/favicon.png
+  font:
+    text: Inter
+    code: IBM Plex Mono
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.path
+    - navigation.top
+    - search.highlight
+    - search.suggest
+    - content.code.copy
+    - content.tabs.link
+
+nav:
+  - Home: index.md
+  - Security Primer:
+    - security-primer/index.md
+  - Architecture:
+    - architecture/index.md
+    - Receivers: architecture/receivers.md
+    - Parsing: architecture/parsing.md
+  - Entity Graph:
+    - entity-graph/index.md
+  - Detection:
+    - detection/index.md
+    - Half-Space Trees: detection/hst.md
+    - Holt-Winters: detection/holt-winters.md
+    - CUSUM: detection/cusum.md
+    - Markov Chains: detection/markov.md
+    - DSPOT: detection/dspot.md
+    - Scoring & Attack Mapping: detection/scoring.md
+  - Correlation:
+    - correlation/index.md
+    - Sigma Rules: correlation/sigma.md
+    - Kill Chain: correlation/kill-chain.md
+    - Graph-Structural: correlation/graph-structural.md
+  - Operations:
+    - operations/index.md
+    - Alerting: operations/alerting.md
+    - Tuning: operations/tuning.md
+    - Testing: operations/testing.md
+  - Reference:
+    - Configuration: reference/config.md
+    - CLI: reference/cli.md
+    - Glossary: reference/glossary.md
+
+plugins:
+  - search
+  - social
+  - privacy
+  - tags
+
+markdown_extensions:
+  - pymdownx.highlight
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - admonition
+  - pymdownx.details
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+
+extra_css:
+  - assets/stylesheets/extra.css
+
+extra_javascript: []
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/seerflow/seerflow
