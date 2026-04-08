@@ -14,7 +14,7 @@ The problem gets worse at scale. The security community constantly discovers new
 
 ## Sigma: A Universal Language for Log Detection
 
-**Sigma** is an open, vendor-neutral format for writing log detection rules. It was created in 2017 by Florian Roth and Thomas Patzke specifically to solve the vendor lock-in problem. Sigma rules are written in **YAML** (a human-readable data format) and can be converted — or "compiled" — into the query language of any supported SIEM.
+**[Sigma](https://sigmahq.io/)** is an open, vendor-neutral format for writing log detection rules. It was created in 2017 by [Florian Roth](https://github.com/Neo23x0) and [Thomas Patzke](https://github.com/thomaspatzke) specifically to solve the vendor lock-in problem. Sigma rules are written in **YAML** (a human-readable data format) and can be converted — or "compiled" — into the query language of any supported SIEM.
 
 Think of Sigma as the Esperanto of security detection. You write the rule once, and a compiler translates it into SPL, KQL, EQL, or whatever your SIEM understands.
 
@@ -69,7 +69,7 @@ Each section answers a specific question. Here is a reference table:
 | Section | Key Question It Answers | Example from This Rule |
 |---------|------------------------|------------------------|
 | **title / description** | What does this rule detect, in plain language? | "Detects the addition of a new user to a privileged group" |
-| **tags** | Which ATT&CK tactics and techniques does this map to? | Privilege Escalation (tactic), T1136.001 — Create Local Account (technique) |
+| **tags** | Which ATT&CK tactics and techniques does this map to? | [Privilege Escalation](https://attack.mitre.org/tactics/TA0004/) (tactic), [T1136.001](https://attack.mitre.org/techniques/T1136/001/) — Create Local Account (technique) |
 | **logsource** | Which logs should be searched? | Linux system logs (`product: linux`) |
 | **detection** | What specific patterns indicate the threat? | Log line contains "new user" AND a privileged UID/GID |
 | **condition** | How do the detection patterns combine? | `all of selection_*` — every selection block must match |
@@ -81,7 +81,7 @@ The **condition** field is where Sigma's logic lives. Common operators include `
 
 Individual Sigma rules are useful. Thousands of them are transformative.
 
-**SigmaHQ** is the official community repository of peer-reviewed Sigma rules. As of 2026, it contains over **3,000 rules** covering:
+**[SigmaHQ](https://github.com/SigmaHQ/sigma)** is the official community repository of peer-reviewed Sigma rules. As of 2026, it contains over **3,000 rules** covering:
 
 - **Linux** — privilege escalation, persistence, suspicious process execution
 - **Windows** — PowerShell abuse, registry manipulation, lateral movement, credential access
@@ -90,6 +90,8 @@ Individual Sigma rules are useful. Thousands of them are transformative.
 - **Cloud** — AWS, Azure, and GCP misconfigurations, suspicious API calls
 
 Every rule in SigmaHQ goes through community review, is tagged with MITRE ATT&CK references, and includes false positive guidance. It is the largest open-source collection of detection logic in the world.
+
+For the complete list of rules that ship with Seerflow, see the [Bundled Sigma Rules](../reference/sigma-rules.md) reference page.
 
 ## Running Example: Catching a Backdoor User
 
@@ -116,6 +118,21 @@ Now, does our Sigma rule fire? Let's check both selections:
 2. **`selection_uids_gids`** — Does it contain any of `GID=0,`, `UID=0,`, `GID=10,`, or `GID=27,`? Yes: both `UID=0,` and `GID=0,` appear. **Match.**
 
 3. **`condition: all of selection_*`** — Both selections matched. **The rule fires.**
+
+```mermaid
+graph TD
+    L["Log line arrives:<br/><code>new user: name=svc_backup, UID=0, GID=0</code>"]:::input
+    L --> S1{"selection_new_user<br/>Contains 'new user'?"}
+    S1 -->|Yes| S2{"selection_uids_gids<br/>Contains GID=0, UID=0,<br/>GID=10, or GID=27?"}
+    S1 -->|No| NM[No match]:::skip
+    S2 -->|Yes| C{"condition:<br/>all of selection_*"}
+    S2 -->|No| NM
+    C -->|Both matched| A["ALERT: Privileged User<br/>Has Been Created<br/>Severity: HIGH"]:::alert
+
+    classDef input fill:#e3f2fd,stroke:#1565c0,color:#0d47a1
+    classDef alert fill:#c62828,stroke:#b71c1c,color:#fff
+    classDef skip fill:#e0e0e0,stroke:#9e9e9e,color:#616161
+```
 
 The result is a **high-severity alert**: "Privileged User Has Been Created." Because the rule carries ATT&CK tags, the alert automatically inherits those classifications — Privilege Escalation, Persistence, T1136.001, T1098. Downstream systems (and humans) immediately know what category of attack behavior this represents.
 
