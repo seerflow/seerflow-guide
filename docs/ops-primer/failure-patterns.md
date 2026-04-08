@@ -174,6 +174,6 @@ Three services, three log streams, one cascade. `checkout-service` retries again
 
     For the full algorithm details, see the [Detection section &rarr;](../detection/index.md).
 
----
+    In our deployment scenario --- the v2.3.1 release from the introduction --- the first sign is an error cascade. HTTP 500 errors climb from 1% to 8% within minutes of the new version rolling out. Let's see what happens next.
 
-In our deployment scenario --- the v2.3.1 release from the introduction --- the first sign is an error cascade. HTTP 500 errors climb from 1% to 8% within minutes of the new version rolling out. Let's see what happens next in [The Deployment Risk Window &rarr;](deployment-risk.md).
+    **Next:** [The Deployment Risk Window &rarr;](deployment-risk.md)
