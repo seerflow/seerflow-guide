@@ -93,7 +93,7 @@ Every rule in SigmaHQ goes through community review, is tagged with MITRE ATT&CK
 
 ## Running Example: Catching a Backdoor User
 
-Let's return to our running attack scenario. The attacker has already brute-forced an SSH login and gained a foothold on a Linux server. Now they want to ensure they can get back in even if the compromised password is changed. Their next move: create a **backdoor user** — a hidden account with root-level privileges.
+Let's return to our running attack scenario. Our attacker — still operating from `198.51.100.23` on `web-prod-01` — has already brute-forced an SSH login and gained a foothold. Now they want to ensure they can get back in even if the compromised password is changed. Their next move: create a **backdoor user** — a hidden account with root-level privileges.
 
 The attacker runs:
 

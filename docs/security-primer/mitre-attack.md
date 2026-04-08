@@ -26,7 +26,7 @@ The hierarchy works like a zoom lens. At the tactic level you see the big pictur
 The full ATT&CK matrix arranges tactics as columns and techniques as rows beneath each tactic. Imagine a spreadsheet where each column header is a goal and each cell underneath is a method for achieving that goal. The table below shows 6 of the 14 tactics --- the ones most relevant to what Seerflow detects in log data.
 
 !!! note "Scope"
-    The full ATT&CK matrix has 14 tactics and 200+ techniques. This table highlights the 6 tactics most relevant to Seerflow's detection capabilities.
+    The full ATT&CK matrix has 14 tactics and 200+ techniques. This table highlights 6 of them. Notably, **Credential Access (TA0006)** — where our T1110 brute-force example lives — is also covered by Seerflow but omitted here for space. See the [reference glossary](../reference/glossary.md) for complete coverage details.
 
 | Initial Access (TA0001) | Execution (TA0002) | Persistence (TA0003) | Privilege Escalation (TA0004) | Lateral Movement (TA0008) | Command & Control (TA0011) |
 |---|---|---|---|---|---|

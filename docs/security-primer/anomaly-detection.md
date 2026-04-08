@@ -87,7 +87,7 @@ graph LR
 
 **Markov Chains (Sequence Anomaly)** — Learns the typical order of events. If `ssh_login` is normally followed by `sudo_command` then `file_read`, a sequence jumping to `data_exfiltration` gets flagged.
 
-**DSPOT (Auto-Threshold)** — Uses **Extreme Value Theory** to calculate dynamic thresholds from recent score distributions, replacing static human-chosen cutoffs. Adapts automatically as your environment changes.
+**DSPOT (Auto-Threshold)** — Uses **Extreme Value Theory (EVT)** — a branch of statistics that models the behavior of extreme outliers rather than averages — to calculate dynamic thresholds from recent score distributions, replacing static human-chosen cutoffs. Adapts automatically as your environment changes.
 
 **Blended Score** — All four outputs combine into a single score from 0.0 (normal) to 1.0 (highly anomalous). When multiple models agree, signal amplification pushes the blended score higher.
 
