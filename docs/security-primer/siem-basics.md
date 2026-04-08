@@ -41,19 +41,19 @@ These three pillars form a loop. Collection feeds detection, detection triggers 
 Let's go back to that 3 AM attack. Here is what those SSH brute-force attempts actually look like in your server's logs. These are **syslog**-formatted lines — the standard format most Linux servers use to record events.
 
 ```syslog
-Mar 12 03:07:14 web-prod-03 sshd[28410]: Failed password for invalid user admin from 198.51.100.47 port 44821 ssh2
-Mar 12 03:07:15 web-prod-03 sshd[28412]: Failed password for invalid user root from 198.51.100.47 port 44822 ssh2
-Mar 12 03:07:15 web-prod-03 sshd[28414]: Failed password for invalid user ubuntu from 198.51.100.47 port 44823 ssh2
-Mar 12 03:07:16 web-prod-03 sshd[28416]: Failed password for invalid user deploy from 198.51.100.47 port 44824 ssh2
-Mar 12 03:07:17 web-prod-03 sshd[28418]: Failed password for invalid user postgres from 198.51.100.47 port 44825 ssh2
-Mar 12 03:07:17 web-prod-03 sshd[28420]: Failed password for invalid user test from 198.51.100.47 port 44826 ssh2
+Mar 12 03:07:14 web-prod-01 sshd[28410]: Failed password for invalid user admin from 198.51.100.23 port 44821 ssh2
+Mar 12 03:07:15 web-prod-01 sshd[28412]: Failed password for invalid user root from 198.51.100.23 port 44822 ssh2
+Mar 12 03:07:15 web-prod-01 sshd[28414]: Failed password for invalid user ubuntu from 198.51.100.23 port 44823 ssh2
+Mar 12 03:07:16 web-prod-01 sshd[28416]: Failed password for invalid user deploy from 198.51.100.23 port 44824 ssh2
+Mar 12 03:07:17 web-prod-01 sshd[28418]: Failed password for invalid user postgres from 198.51.100.23 port 44825 ssh2
+Mar 12 03:07:17 web-prod-01 sshd[28420]: Failed password for invalid user test from 198.51.100.23 port 44826 ssh2
 ```
 
-Each line contains a **timestamp** (`Mar 12 03:07:14`), a **hostname** (`web-prod-03`), a **process name and ID** (`sshd[28410]`), and a **message** describing what happened. The attacker's IP address — `198.51.100.47` — appears in every line.
+Each line contains a **timestamp** (`Mar 12 03:07:14`), a **hostname** (`web-prod-01`), a **process name and ID** (`sshd[28410]`), and a **message** describing what happened. The attacker's IP address — `198.51.100.23` — appears in every line.
 
 One failed login is routine. Six in three seconds, all from the same IP, cycling through common usernames? That is a brute-force attack. A SIEM sees this pattern and fires an alert.
 
-Without a SIEM, these six lines sit buried among the millions of other log lines that `web-prod-03` generated that night. They would not be noticed until long after the damage was done — if they were noticed at all.
+Without a SIEM, these six lines sit buried among the millions of other log lines that `web-prod-01` generated that night. They would not be noticed until long after the damage was done — if they were noticed at all.
 
 ---
 
@@ -63,7 +63,7 @@ Fair question. Three practical reasons:
 
 **Volume.** Fifty servers producing logs around the clock means hundreds of gigabytes per month. No human can keep up, and critical events get drowned out by routine noise.
 
-**Correlation.** The attacker might brute-force SSH on `web-prod-03`, then pivot to `db-prod-01`, then exfiltrate data through `api-prod-02`. Each server only sees its own piece. A SIEM correlates events across sources so you see the full chain. **Correlation** means linking related events from different sources and times into a single narrative — turning scattered clues into a coherent story.
+**Correlation.** The attacker might brute-force SSH on `web-prod-01`, then pivot to `db-prod-01`, then exfiltrate data through `api-prod-02`. Each server only sees its own piece. A SIEM correlates events across sources so you see the full chain. **Correlation** means linking related events from different sources and times into a single narrative — turning scattered clues into a coherent story.
 
 **Speed.** In a brute-force attack, the window between "first failed login" and "successful login" can be minutes. A SIEM detects and alerts in real time. An analyst reviewing logs the next morning is already too late.
 

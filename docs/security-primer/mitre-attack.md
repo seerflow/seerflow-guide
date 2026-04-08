@@ -59,7 +59,7 @@ The attacker hammered our SSH server with thousands of password attempts. In ATT
 1. **Tactic:** Credential Access (TA0006) --- the attacker's goal is to steal working credentials
 2. **Technique:** T1110 --- Brute Force --- the method is to try many passwords
 3. **Sub-technique:** T1110.001 --- Password Guessing --- the variant involves guessing passwords for a known username (`root`)
-4. **Procedure:** The attacker used an automated tool that generated 4,312 failed SSH login attempts from IP `198.51.100.47` over 23 minutes
+4. **Procedure:** The attacker used an automated tool that generated 4,312 failed SSH login attempts from IP `198.51.100.23` over 23 minutes
 
 This mapping does more than label the event. It connects a single noisy log line to a body of knowledge: which threat groups use this technique, what they typically do next, and what other techniques tend to accompany it. For instance, ATT&CK data shows that brute-force attacks (T1110) are frequently followed by lateral movement (TA0008) --- the attacker uses stolen credentials to hop to other machines. That knowledge shapes what Seerflow watches for after detecting the initial attack.
 

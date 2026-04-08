@@ -75,7 +75,7 @@ graph LR
 
 **Raw Log Event** — An unprocessed log line arrives from any source: syslog, CloudWatch, Kafka, or an OpenTelemetry receiver.
 
-**Drain3 (Template Extraction)** — A streaming parser that strips variable parts (timestamps, IPs, filenames) and extracts a **template** — the fixed structure. `Failed password for root from 198.51.100.47` and `Failed password for admin from 203.0.113.12` both become `Failed password for <*> from <*>`, turning millions of unique lines into a manageable set of patterns.
+**Drain3 (Template Extraction)** — A streaming parser that strips variable parts (timestamps, IPs, filenames) and extracts a **template** — the fixed structure. `Failed password for root from 198.51.100.23` and `Failed password for admin from 203.0.113.12` both become `Failed password for <*> from <*>`, turning millions of unique lines into a manageable set of patterns.
 
 **Feature Engineering** — Computes numeric features from each event: template frequency, time since last occurrence, entity count, byte count, and other signals. These are what the ML models consume.
 
