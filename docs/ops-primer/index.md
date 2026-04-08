@@ -21,7 +21,7 @@ Seerflow detects both. It treats infrastructure issues, application errors, and 
     - **HST content** — spots unusual log message patterns (e.g., error messages that have never appeared before)
     - **Holt-Winters volume** — detects abnormal log volume spikes or drops (e.g., a service suddenly going silent)
     - **Markov sequence** — catches out-of-order event sequences (e.g., a startup routine that skips steps)
-    - **Autoencoder pattern** — identifies complex structural anomalies that simpler models miss
+    - **CUSUM change-point** — catches gradual drifts and sustained mean shifts (e.g., memory slowly climbing before an OOM kill)
 
     **Security mode** activates 5 threat-focused detectors. **Both mode** runs all 9 in parallel. Most production deployments use `both`.
 

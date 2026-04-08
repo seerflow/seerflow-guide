@@ -95,7 +95,7 @@ gantt
         p99 latency 800ms→2s     :crit, 14:24, 6min
     section System Logs
         Memory pressure           :active, 14:26, 4min
-        OOM Kill                  :crit, milestone, 14:30, 0min
+        OOM Kill                  :milestone, 14:30, 0min
     section Seerflow
         CUSUM change point        :done, 14:12, 0min
         HW volume alert           :done, 14:18, 0min
@@ -104,7 +104,7 @@ gantt
 
 The cascade tells a story: a new database query in v2.3.1 was less efficient than the one it replaced. Under load, it held connections longer, draining the pool. As the pool thinned, requests backed up, latency climbed, and the application buffered more data in memory trying to compensate. Eventually, memory pressure triggered an OOM kill.
 
-Seerflow's first alert fired at T+12 --- eighteen minutes before the OOM kill. The blended alert, combining CUSUM change-point detection with Holt-Winters volume divergence, fired at T+20. A team monitoring these alerts had a 10-minute window to roll back before the outage became user-facing.
+Seerflow's first signal fired at T+12 --- eighteen minutes before the OOM kill. The blended alert, combining CUSUM change-point detection with Holt-Winters volume divergence, fired at T+20 at moderate severity. As more sources correlated (proxy latency at T+24, OOM at T+30), the score continued climbing to critical. A team monitoring alerts had a 10-minute window to roll back before the outage became user-facing.
 
 ---
 
