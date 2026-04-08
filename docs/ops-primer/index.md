@@ -48,3 +48,5 @@ These sections build on each other. Start at the top and work down:
     A single operational scenario threads through every section: **a team deploys v2.3.1 of their API service, and within 30 minutes, four log sources show escalating problems.** Application error rates climb from 1% to 8%. The database reports connection pool exhaustion. The reverse proxy shows latency spiking from 200ms to 2 seconds. And finally, the OS kernel logs an OOM kill.
 
     Each event is individually ambiguous — error rates fluctuate, connection pools hiccup, latency has bad days. But Seerflow correlates all four into a single **"deployment degradation"** alert, pinpointing v2.3.1 as the cause. By the end of this chapter, you'll understand exactly how.
+
+**Start reading:** [Failure Patterns in Logs &rarr;](failure-patterns.md)
