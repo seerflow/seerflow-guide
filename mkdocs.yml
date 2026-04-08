@@ -95,8 +95,6 @@ markdown_extensions:
 extra_css:
   - assets/stylesheets/extra.css
 
-extra_javascript: []
-
 extra:
   social:
     - icon: fontawesome/brands/github

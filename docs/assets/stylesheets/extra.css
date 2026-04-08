@@ -19,7 +19,15 @@
   --md-default-fg-color: #E8ECEF;
 }
 
-/* Dark mode logo swap */
+/* Dark mode logo swap — uses a background-image overlay instead of
+   content:url() which is non-standard on <img> and fails in Firefox */
 [data-md-color-scheme="slate"] .md-header__button.md-logo img {
-  content: url('../logo-dark.png');
+  visibility: hidden;
+  width: 0;
+  height: 0;
+}
+[data-md-color-scheme="slate"] .md-header__button.md-logo {
+  background: url('../logo-dark.png') no-repeat center / contain;
+  min-width: 1.6rem;
+  min-height: 1.6rem;
 }
