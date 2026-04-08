@@ -47,7 +47,7 @@ description: Comprehensive guide to Seerflow — streaming log intelligence
 ## How Seerflow Works
 
 ```mermaid
-graph LR
+graph TD
     A[Log Sources] --> B[Receivers]
     B --> C[Parsing & Drain3]
     C --> D[Entity Extraction]

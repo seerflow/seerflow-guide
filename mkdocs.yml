@@ -6,7 +6,7 @@ repo_name: seerflow/seerflow
 
 theme:
   name: material
-  logo: assets/logo-light.png
+  logo: assets/logo-dark.png
   favicon: assets/favicon.png
   font:
     text: Inter
