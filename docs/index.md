@@ -42,6 +42,15 @@ description: Comprehensive guide to Seerflow — streaming log intelligence
         3. [Detection Internals](detection/index.md) — add detectors
         4. [Testing Guide](operations/testing.md) — quality gates
 
+    === "SRE / DevOps"
+
+        Running infrastructure and want log intelligence?
+
+        1. [Ops Primer](ops-primer/index.md) — operational intelligence concepts
+        2. [Architecture](architecture/index.md) — how Seerflow processes logs
+        3. [Detection](detection/index.md) — anomaly detection for ops patterns
+        4. [Tuning Guide](operations/tuning.md) — reduce noise, focus on real issues
+
 ---
 
 ## How Seerflow Works
