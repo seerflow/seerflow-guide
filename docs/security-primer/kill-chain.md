@@ -4,18 +4,18 @@ Our SSH attacker didn't just guess a password and call it a day. After getting i
 
 ## The Lockheed Martin Cyber Kill Chain
 
-In 2011, researchers at Lockheed Martin published a paper describing cyberattacks as a sequence of stages, borrowing the military concept of a "kill chain" -- a systematic process an adversary must complete to achieve their objective. The insight: **an attack is not a single event. It is a chain of dependent steps, and breaking any one link stops the entire attack.**
+In 2011, researchers at Lockheed Martin published [a paper](https://www.lockheedmartin.com/content/dam/lockheed-martin/rms/documents/cyber/LM-White-Paper-Intel-Driven-Defense.pdf) describing cyberattacks as a sequence of stages, borrowing the military concept of a "kill chain" -- a systematic process an adversary must complete to achieve their objective. The insight: **an attack is not a single event. It is a chain of dependent steps, and breaking any one link stops the entire attack.**
 
 They identified seven stages that virtually all intrusions follow:
 
 ```mermaid
-graph LR
-    R["1. Reconnaissance<br/><em>Research the target</em>"]:::stage1 --> W["2. Weaponization<br/><em>Build the payload</em>"]:::stage2
-    W --> D["3. Delivery<br/><em>Transmit to victim</em>"]:::stage3
-    D --> E["4. Exploitation<br/><em>Trigger the vulnerability</em>"]:::stage4
-    E --> I["5. Installation<br/><em>Establish foothold</em>"]:::stage5
-    I --> C2["6. Command &amp; Control<br/><em>Open remote channel</em>"]:::stage6
-    C2 --> A["7. Actions on Objectives<br/><em>Achieve the goal</em>"]:::stage7
+graph TD
+    R["<b>1. Reconnaissance</b><br/>Research the target"]:::stage1 --> W["<b>2. Weaponization</b><br/>Build the payload"]:::stage2
+    W --> D["<b>3. Delivery</b><br/>Transmit to victim"]:::stage3
+    D --> E["<b>4. Exploitation</b><br/>Trigger the vulnerability"]:::stage4
+    E --> I["<b>5. Installation</b><br/>Establish foothold"]:::stage5
+    I --> C2["<b>6. Command & Control</b><br/>Open remote channel"]:::stage6
+    C2 --> A["<b>7. Actions on Objectives</b><br/>Achieve the goal"]:::stage7
 
     classDef stage1 fill:#e8f5e9,stroke:#388e3c,color:#1b5e20
     classDef stage2 fill:#fff9c4,stroke:#f9a825,color:#f57f17
@@ -85,13 +85,13 @@ The Cyber Kill Chain provides a high-level view of attack progression. MITRE ATT
 
 | Kill Chain Stage | MITRE ATT&CK Tactic(s) | Description |
 |---|---|---|
-| **1. Reconnaissance** | Reconnaissance (TA0043) | Gathering target information |
-| **2. Weaponization** | Resource Development (TA0042) | Building tools, acquiring infrastructure |
-| **3. Delivery** | Initial Access (TA0001) | Getting a foothold on the target |
-| **4. Exploitation** | Execution (TA0002) | Running malicious code |
-| **5. Installation** | Persistence (TA0003), Privilege Escalation (TA0004), Defense Evasion (TA0005) | Maintaining and deepening access |
-| **6. Command & Control** | Command and Control (TA0011) | Communicating with compromised systems |
-| **7. Actions on Objectives** | Collection (TA0009), Exfiltration (TA0010), Impact (TA0040) | Achieving the mission goal |
+| **1. Reconnaissance** | [Reconnaissance (TA0043)](https://attack.mitre.org/tactics/TA0043/) | Gathering target information |
+| **2. Weaponization** | [Resource Development (TA0042)](https://attack.mitre.org/tactics/TA0042/) | Building tools, acquiring infrastructure |
+| **3. Delivery** | [Initial Access (TA0001)](https://attack.mitre.org/tactics/TA0001/) | Getting a foothold on the target |
+| **4. Exploitation** | [Execution (TA0002)](https://attack.mitre.org/tactics/TA0002/) | Running malicious code |
+| **5. Installation** | [Persistence (TA0003)](https://attack.mitre.org/tactics/TA0003/), [Privilege Escalation (TA0004)](https://attack.mitre.org/tactics/TA0004/), [Defense Evasion (TA0005)](https://attack.mitre.org/tactics/TA0005/) | Maintaining and deepening access |
+| **6. Command & Control** | [Command and Control (TA0011)](https://attack.mitre.org/tactics/TA0011/) | Communicating with compromised systems |
+| **7. Actions on Objectives** | [Collection (TA0009)](https://attack.mitre.org/tactics/TA0009/), [Exfiltration (TA0010)](https://attack.mitre.org/tactics/TA0010/), [Impact (TA0040)](https://attack.mitre.org/tactics/TA0040/) | Achieving the mission goal |
 
 Notice that Installation maps to three ATT&CK tactics -- once inside, attackers simultaneously work to persist (stay on the system), escalate privileges (gain higher-level permissions), and evade defenses (hide their tracks). Similarly, the final stage can involve collecting data, moving it out, or causing damage -- often all three.
 

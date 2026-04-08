@@ -53,22 +53,23 @@ Three design choices shape how well an anomaly detection system works in practic
 Here is how a raw log event becomes an anomaly score. Every event passes through each stage, and four models evaluate it simultaneously.
 
 ```mermaid
-graph LR
-    A[Raw Log Event] --> B[Drain3<br/>Template Extraction]
-    B --> C[Feature<br/>Engineering]
-    C --> D1[Half-Space Trees<br/>Content Anomaly]
-    C --> D2[Holt-Winters<br/>Volume Anomaly]
-    C --> D3[CUSUM<br/>Change Detection]
-    C --> D4[Markov Chains<br/>Sequence Anomaly]
-    D1 --> E[DSPOT<br/>Auto-Threshold]
+graph TD
+    A["<b>Raw Log Event</b><br/>syslog, CloudWatch, OTel, file tail"]:::input
+    A --> B["<b>Drain3</b><br/>Template Extraction"]
+    B --> C["<b>Feature Engineering</b><br/>frequency, timing, entity count"]
+    C --> D1["<b>Half-Space Trees</b><br/>Content Anomaly"]
+    C --> D2["<b>Holt-Winters</b><br/>Volume Anomaly"]
+    C --> D3["<b>CUSUM</b><br/>Change Detection"]
+    C --> D4["<b>Markov Chains</b><br/>Sequence Anomaly"]
+    D1 --> E["<b>DSPOT</b><br/>Auto-Threshold (EVT)"]
     D2 --> E
     D3 --> E
     D4 --> E
-    E --> F[Blended Score<br/>0.0 – 1.0]
-    F --> G[Alert]
+    E --> F["<b>Blended Score</b><br/>0.0 – 1.0"]
+    F --> G["<b>Alert</b><br/>Webhook · PagerDuty"]:::alert
 
-    style A fill:#2e7d32,stroke:#1b5e20,color:#fff
-    style G fill:#c62828,stroke:#b71c1c,color:#fff
+    classDef input fill:#2e7d32,stroke:#1b5e20,color:#fff
+    classDef alert fill:#c62828,stroke:#b71c1c,color:#fff
 ```
 
 ### What each stage does
@@ -91,7 +92,7 @@ graph LR
 
 **Blended Score** — All four outputs combine into a single score from 0.0 (normal) to 1.0 (highly anomalous). When multiple models agree, signal amplification pushes the blended score higher.
 
-**Alert** — Events exceeding the DSPOT threshold trigger an alert via PagerDuty, Slack, or a webhook.
+**Alert** — Events exceeding the DSPOT threshold trigger an alert through configurable **webhooks** (Slack, Microsoft Teams, or any HTTP endpoint). Teams using incident management can also route alerts to **PagerDuty**, which automatically creates and resolves incidents based on severity.
 
 ---
 

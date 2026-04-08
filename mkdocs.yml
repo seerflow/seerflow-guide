@@ -74,6 +74,8 @@ nav:
   - Reference:
     - Configuration: reference/config.md
     - CLI: reference/cli.md
+    - Bundled Sigma Rules: reference/sigma-rules.md
+    - ATT&CK Coverage: reference/attack-coverage.md
     - Glossary: reference/glossary.md
 
 plugins:
