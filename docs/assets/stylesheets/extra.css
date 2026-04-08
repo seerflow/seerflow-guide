@@ -19,4 +19,9 @@
   --md-default-fg-color: #E8ECEF;
 }
 
-/* Logo is logo-dark.png (white) — works on indigo header in both modes */
+/* Header logo — larger than default for better visibility */
+.md-header__button.md-logo img,
+.md-header__button.md-logo svg {
+  height: 2rem;
+  width: auto;
+}
