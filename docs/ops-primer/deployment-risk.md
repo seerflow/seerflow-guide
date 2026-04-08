@@ -139,8 +139,6 @@ The `drift` parameter controls CUSUM's sensitivity to small shifts (lower values
 
     The `mode: operational` config activates infrastructure and application detectors without loading security rules, reducing overhead for teams focused purely on deployment safety and SLO compliance.
 
----
+    Each of these signals --- error cascade, pool exhaustion, latency spike, OOM --- appeared in a different log source. No single source told the whole story. The application logs showed errors but not *why*. The database logs showed pool exhaustion but not *what caused it*. The proxy logs showed latency but not *where* in the stack the bottleneck lived. Only by correlating events across all four sources could you trace the failure from root cause (inefficient query) to final symptom (OOM kill).
 
-Each of these signals --- error cascade, pool exhaustion, latency spike, OOM --- appeared in a different log source. No single source told the whole story. The application logs showed errors but not *why*. The database logs showed pool exhaustion but not *what caused it*. The proxy logs showed latency but not *where* in the stack the bottleneck lived. Only by correlating events across all four sources could you trace the failure from root cause (inefficient query) to final symptom (OOM kill).
-
-In the next section, we'll see how Seerflow correlates events across sources to turn scattered symptoms into a single root-cause alert. [Cross-Source Correlation &rarr;](ops-correlation.md)
+    **Next:** [Cross-Source Correlation &rarr;](ops-correlation.md)
