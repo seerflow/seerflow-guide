@@ -98,7 +98,7 @@ Sigma rules were originally designed around Windows event fields like `CommandLi
 | `Hashes`, `FileHash`, `md5`, `sha256` | `related_hashes` | Tuple field — any element matches |
 | `EventID`, `EventId` | `template_id` | Scalar field — exact match |
 
-26 field mappings are defined in total. The `body` and `raw_event` fields are excluded from matching to avoid broad false-positive hits on unstructured text.
+27 field mappings are defined in total. The `body` and `raw_event` fields are excluded from matching to avoid broad false-positive hits on unstructured text.
 
 ### Bundled Rules
 

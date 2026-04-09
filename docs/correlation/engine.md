@@ -209,6 +209,18 @@ Load them with `get_bundled_rule_dir()` — returns the path to the bundled rule
 
 ---
 
+## Configuration
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `correlation.rule_dirs` | `list[str]` | `[]` | Directories to scan for correlation rule YAML files |
+| `correlation.window_ns` | int | — | Default temporal window in nanoseconds |
+| `correlation.max_events` | int | `1,000` | Per-entity event buffer size |
+| `correlation.max_entities` | int | `10,000` | Maximum tracked entities (LRU eviction) |
+| `correlation.watermark_tolerance_ns` | int | `0` | Late-arrival tolerance for watermark filtering |
+
+---
+
 ## See Also
 
 - [Sigma Rules](sigma.md) — pattern matching that feeds events into correlation

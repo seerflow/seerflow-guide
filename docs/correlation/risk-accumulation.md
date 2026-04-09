@@ -13,8 +13,8 @@ A single anomaly scores 0.3. A Sigma rule fires at severity "medium." A correlat
     2. **T+45m:** Correlation rule "brute-force-lateral-movement" fires → +0.8 risk points
     3. **T+90m:** Kill chain alert (3 tactics) → +0.7 risk points
 
-    With a 6-hour half-life, by T+90m the first event has decayed to ~0.52. The cumulative risk
-    is 0.52 + 0.72 + 0.70 = **1.94** — well above a typical threshold of 1.5. Without
+    With a 6-hour half-life, by T+90m the first event has decayed to ~0.50. The cumulative risk
+    is 0.50 + 0.73 + 0.70 = **1.94** — well above a typical threshold of 1.5. Without
     accumulation, no single event would have triggered an alert.
 
 !!! example "Operations: Service Risk from Cascading Failures"
@@ -22,10 +22,10 @@ A single anomaly scores 0.3. A Sigma rule fires at severity "medium." A correlat
 
     | Time | Detection | Risk Points | Cumulative |
     |------|-----------|-------------|------------|
-    | T+0 | CUSUM change point (error rate) | 0.4 | 0.4 |
-    | T+12m | Sigma rule (connection pool warning) | 0.5 | 0.87 |
-    | T+18m | Correlation (errors + pool saturation) | 0.8 | 1.55 → **ALERT** |
-    | T+30m | HST anomaly (OOM pattern) | 0.9 | 2.24 |
+    | T+0 | CUSUM change point (error rate) | 0.4 | 0.40 |
+    | T+12m | Sigma rule (connection pool warning) | 0.5 | 0.89 |
+    | T+18m | Correlation (errors + pool saturation) | 0.8 | 1.68 → **ALERT** |
+    | T+30m | HST anomaly (OOM pattern) | 0.9 | 2.54 |
 
     The risk threshold alert at T+18m fires 12 minutes before the OOM crash. See the
     [Ops Primer](../ops-primer/ops-correlation.md) for the full scenario.
@@ -95,10 +95,10 @@ for entry in entries:
 
 | Entry | Points | Age | Decay Factor | Contribution |
 |-------|--------|-----|-------------|--------------|
-| Sigma alert | 0.6 | 90 min | \(e^{-\lambda \times 5.4 \times 10^{12}}\) ≈ 0.87 | 0.52 |
-| Correlation | 0.8 | 45 min | \(e^{-\lambda \times 2.7 \times 10^{12}}\) ≈ 0.92 | 0.74 |
+| Sigma alert | 0.6 | 90 min | \(e^{-\lambda \times 5.4 \times 10^{12}}\) ≈ 0.84 | 0.50 |
+| Correlation | 0.8 | 45 min | \(e^{-\lambda \times 2.7 \times 10^{12}}\) ≈ 0.92 | 0.73 |
 | Kill chain | 0.7 | 0 min | 1.00 | 0.70 |
-| | | | **Total:** | **1.96** |
+| | | | **Total:** | **1.94** |
 
 ### Threshold Alerting
 
