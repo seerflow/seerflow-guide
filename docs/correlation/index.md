@@ -20,20 +20,40 @@ Graph-structural correlation (community crossing, betweenness spikes, fan-out bu
 ## How They Work Together
 
 ```mermaid
-graph LR
-    E[Event arrives] --> S[Sigma Engine]
-    S -->|match| A1[Sigma Alert]
-    S -->|no match| C
-    E --> C[Correlation Engine]
-    C -->|rule fires| A2[Correlation Alert]
-    A1 --> KC[Kill Chain Tracker]
+graph TD
+    E[/"Event arrives<br>(SeerflowEvent)"/]
+
+    subgraph pattern ["Pattern Matching"]
+        direction LR
+        S["Sigma Engine<br><i>logsource-indexed dispatch</i>"]
+        S -->|match| A1([Sigma Alert])
+    end
+
+    subgraph temporal ["Temporal Correlation"]
+        direction LR
+        W["Entity Window Buffer<br><i>per-entity deques · LRU eviction</i>"]
+        W --> CE["Correlation Engine<br><i>YAML rules · cross-source</i>"]
+        CE -->|rule fires| A2([Correlation Alert])
+    end
+
+    subgraph tracking ["Threat Tracking"]
+        direction LR
+        KC["Kill Chain Tracker<br><i>per-entity tactic sets</i>"]
+        KC -->|"≥ 3 tactics"| A3([Kill Chain Alert])
+        R["Risk Register<br><i>exponential decay scoring</i>"]
+        R -->|"≥ threshold"| A4([Risk Alert])
+    end
+
+    D[\"Alert Dispatch<br>(webhook · Slack · PagerDuty)"\]
+
+    E --> S
+    E --> W
+    A1 --> KC
+    A1 --> R
     A2 --> KC
-    KC -->|threshold crossed| A3[Kill Chain Alert]
-    A1 --> R[Risk Register]
     A2 --> R
     A3 --> R
-    R -->|threshold crossed| A4[Risk Alert]
-    A1 --> D[Alert Dispatch]
+    A1 --> D
     A2 --> D
     A3 --> D
     A4 --> D
