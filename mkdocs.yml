@@ -108,6 +108,8 @@ markdown_extensions:
   - tables
   - toc:
       permalink: true
+  - pymdownx.arithmatex:
+      generic: true
 
 extra_css:
   - assets/stylesheets/extra.css
@@ -116,3 +118,7 @@ extra:
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/seerflow/seerflow
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
