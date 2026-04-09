@@ -54,8 +54,10 @@ nav:
     - Ops Correlation: ops-primer/ops-correlation.md
   - Architecture:
     - architecture/index.md
+    - Pipeline: architecture/pipeline.md
     - Receivers: architecture/receivers.md
     - Parsing: architecture/parsing.md
+    - Event Model: architecture/event-model.md
   - Entity Graph:
     - entity-graph/index.md
   - Detection:
