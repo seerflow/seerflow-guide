@@ -32,13 +32,21 @@ Every log event flows through five stages:
 
 ```mermaid
 graph LR
-    A["📡 Receivers"] --> B["📬 Queue<br/><small>10K max · backpressure at 80%</small>"]
-    B --> C["🔍 Parser<br/><small>Drain3 + Entity Extraction</small>"]
-    C --> D["🧠 Detection<br/><small>5 ML models + Sigma rules</small>"]
-    D --> E["🔗 Correlation<br/><small>Entity graph · Risk · Kill chain</small>"]
-    E --> F["🔔 Alerting<br/><small>Webhook · PagerDuty</small>"]
+    A["📡 <b>Receivers</b><br/>Syslog · File Tail<br/>OTLP gRPC/HTTP · Webhook"]
+    B["📬 <b>Queue</b><br/>asyncio.Queue · 10K max<br/>Backpressure at 80%"]
+    C["🔍 <b>Parser</b><br/>Drain3 auto-templates<br/>Entity extraction (6 types)"]
+    D["🧠 <b>Detection</b><br/>HST · Holt-Winters · CUSUM<br/>Markov · DSPOT · Sigma"]
+    E["🔗 <b>Correlation</b><br/>Entity graph · Risk scoring<br/>Kill-chain tracking"]
+    F["🔔 <b>Alerting</b><br/>Webhook · PagerDuty<br/>Dedup (15 min window)"]
 
-    style B fill:#f9f,stroke:#333,stroke-width:1px
+    A --> B --> C --> D --> E --> F
+
+    style A fill:#e3f2fd,stroke:#1565c0,color:#0d47a1
+    style B fill:#fff3e0,stroke:#e65100,color:#bf360c
+    style C fill:#f3e5f5,stroke:#6a1b9a,color:#4a148c
+    style D fill:#e8f5e9,stroke:#2e7d32,color:#1b5e20
+    style E fill:#fce4ec,stroke:#c62828,color:#b71c1c
+    style F fill:#fff8e1,stroke:#f57f17,color:#e65100
 ```
 
 - **Receivers** ingest logs from syslog servers (`auth.log`, `kern.log`), application log files (`/var/log/*.log`), OpenTelemetry Collectors (forwarding CloudWatch, GCP Logging, Azure Monitor), and webhook endpoints (GitHub, Kubernetes, custom apps). A bounded asyncio queue (10,000 events max) absorbs bursts and applies backpressure at 80% utilization.

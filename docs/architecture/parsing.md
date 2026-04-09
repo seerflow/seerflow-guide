@@ -34,16 +34,19 @@ Without masking, every unique IP would create a separate template. With masking,
 
 ```mermaid
 graph TD
-    Root["Root Node"] --> L5["Length: 5 tokens"]
+    Root["<b>Root Node</b>"] --> L5["Length: 5 tokens"]
     Root --> L7["Length: 7 tokens"]
     Root --> L8["Length: 8 tokens"]
-    L7 --> Failed["'Failed'"]
-    L7 --> Connection["'Connection'"]
-    Failed --> C42["Cluster 42<br/><small>Failed password for &lt;*&gt; from &lt;*&gt; port &lt;*&gt;</small>"]
-    Failed --> C51["Cluster 51<br/><small>Failed publickey for &lt;*&gt; from &lt;*&gt; port &lt;*&gt;</small>"]
-    Connection --> C63["Cluster 63<br/><small>Connection closed by &lt;*&gt; port &lt;*&gt;</small>"]
+    L7 --> Failed["First token: 'Failed'"]
+    L7 --> Connection["First token: 'Connection'"]
+    Failed --> C42["<b>Cluster 42</b><br/>Failed password for &lt;*&gt;<br/>from &lt;*&gt; port &lt;*&gt;"]
+    Failed --> C51["Cluster 51<br/>Failed publickey for &lt;*&gt;<br/>from &lt;*&gt; port &lt;*&gt;"]
+    Connection --> C63["Cluster 63<br/>Connection closed by<br/>&lt;*&gt; port &lt;*&gt;"]
 
-    style C42 fill:#c8e6c9,stroke:#2e7d32,color:#1b5e20
+    style Root fill:#5154B4,stroke:#333,color:#fff
+    style C42 fill:#1b5e20,stroke:#1b5e20,color:#fff
+    style C51 fill:#f5f5f5,stroke:#999,color:#333
+    style C63 fill:#f5f5f5,stroke:#999,color:#333
 ```
 
 Messages enter at the root, route by token count, then by first token at each depth level. Leaf nodes are template clusters. New messages either join an existing cluster (similarity ≥ `sim_th`) or create a new one.

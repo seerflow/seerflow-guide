@@ -28,40 +28,46 @@ Backpressure is handled by a bounded `asyncio.Queue` (default 10,000 events). Wh
 
 ```mermaid
 sequenceDiagram
-    participant LS as Log Source
-    participant R as Receiver
-    participant RM as ReceiverManager
-    participant N as EventNormalizer
-    participant DE as DetectionEnsemble
-    participant SE as SigmaEngine
-    participant CE as CorrelationEngine
-    participant AD as AlertDispatcher
-    participant S as Sinks
+    box rgb(227,242,253) Ingestion
+        participant Source
+        participant Recv as Receiver
+        participant Queue as Queue (10K)
+    end
+    box rgb(243,229,245) Parsing
+        participant Norm as Normalizer
+    end
+    box rgb(232,245,233) Detection
+        participant Det as Ensemble
+        participant Sigma
+    end
+    box rgb(252,228,236) Correlation
+        participant Corr as Correlator
+    end
+    box rgb(255,248,225) Alerting
+        participant Alert as Dispatcher
+        participant Sink as Sinks
+    end
 
-    LS->>R: raw log bytes (syslog, HTTP, gRPC, file)
-    Note right of R: Decode protocol, extract metadata
-    R->>RM: RawEvent (put_event)
-    Note right of RM: Bounded queue (10K max)<br/>Backpressure at 80%
-    RM->>N: RawEvent (from queue)
-    N->>N: Drain3 parse → template + params
-    N->>N: Entity extract → IPs, users, hosts
-    Note right of N: RawEvent becomes SeerflowEvent
-    N->>DE: SeerflowEvent (30+ fields populated)
-    DE->>DE: HST (content) + Holt-Winters (volume)
-    DE->>DE: CUSUM (change) + Markov (sequence)
-    DE->>DE: DSPOT auto-threshold + blended score
-    Note right of DE: anomaly_score, risk_score set
-    DE->>SE: enriched event
-    SE->>SE: Match against 3,000+ Sigma rules
-    Note right of SE: mitre_tactics, mitre_techniques set
-    SE->>CE: event + rule matches
-    CE->>CE: Update entity graph (igraph)
-    CE->>CE: Risk accumulation (half-life decay)
-    CE->>CE: Kill-chain progression check
-    Note right of CE: Alert if risk > threshold<br/>or kill-chain ≥ 3 tactics
-    CE->>AD: correlated alerts
-    AD->>AD: Dedup check (15 min window)
-    AD->>S: webhook / PagerDuty
+    Source->>Recv: raw log bytes
+    Note over Recv: Syslog UDP/TCP, File Tail,<br/>OTLP gRPC/HTTP, Webhook
+    Recv->>Queue: RawEvent
+    Note over Queue: asyncio.Queue(maxsize=10K)<br/>Warning at 80%, drop at 100%
+
+    Queue->>Norm: RawEvent (dequeued)
+    Note over Norm: 1. Decode bytes → UTF-8<br/>2. Drain3 → template + params<br/>3. Entity extract → IPs, users,<br/>   hosts, files, domains, processes<br/>4. Build SeerflowEvent (30+ fields)
+
+    Norm->>Det: SeerflowEvent
+    Note over Det: Half-Space Trees (content)<br/>Holt-Winters (volume)<br/>CUSUM (change points)<br/>Markov chains (sequence)<br/>DSPOT (auto-thresholds)<br/>→ blended anomaly_score
+
+    Det->>Sigma: scored event
+    Note over Sigma: Match 3,000+ SigmaHQ rules<br/>→ mitre_tactics, mitre_techniques
+
+    Sigma->>Corr: event + rule matches
+    Note over Corr: 1. Update entity graph (igraph)<br/>2. Risk accumulation (half-life)<br/>3. Kill-chain progression<br/>→ Alert if risk > threshold<br/>   or kill-chain ≥ 3 tactics
+
+    Corr->>Alert: correlated alerts
+    Note over Alert: Dedup check (15 min window,<br/>per-rule overrides)
+    Alert->>Sink: webhook / PagerDuty
 ```
 
 **Step by step:**
