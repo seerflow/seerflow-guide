@@ -31,15 +31,15 @@ The architecture doesn't care which lens matters — it processes every event th
 Every log event flows through five stages:
 
 ```mermaid
-graph LR
-    A["📡 <b>Receivers</b><br/>Syslog · File Tail<br/>OTLP gRPC/HTTP · Webhook"]
-    B["📬 <b>Queue</b><br/>asyncio.Queue · 10K max<br/>Backpressure at 80%"]
-    C["🔍 <b>Parser</b><br/>Drain3 auto-templates<br/>Entity extraction (6 types)"]
-    D["🧠 <b>Detection</b><br/>HST · Holt-Winters · CUSUM<br/>Markov · DSPOT · Sigma"]
-    E["🔗 <b>Correlation</b><br/>Entity graph · Risk scoring<br/>Kill-chain tracking"]
-    F["🔔 <b>Alerting</b><br/>Webhook · PagerDuty<br/>Dedup (15 min window)"]
+graph TD
+    A["📡 <b>Receivers</b><br/>Syslog UDP/TCP · File Tail · OTLP gRPC · OTLP HTTP · Webhook"]
+    B["📬 <b>Queue</b><br/>asyncio.Queue · 10,000 events max · backpressure warning at 80% · drop at 100%"]
+    C["🔍 <b>Parser</b><br/>Drain3 streaming templates (no manual parsers) · Entity extraction: IP, user, host, file, domain, process"]
+    D["🧠 <b>Detection</b><br/>Half-Space Trees · Holt-Winters · CUSUM · Markov chains · DSPOT auto-thresholds · 3,000+ Sigma rules"]
+    E["🔗 <b>Correlation</b><br/>igraph entity graph · per-entity risk accumulation (half-life decay) · MITRE ATT&CK kill-chain tracking"]
+    F["🔔 <b>Alerting</b><br/>Webhook endpoints (Slack, Teams) · PagerDuty · dedup window (15 min default, per-rule overrides)"]
 
-    A --> B --> C --> D --> E --> F
+    A ==> B ==> C ==> D ==> E ==> F
 
     style A fill:#1565c0,stroke:#0d47a1,color:#fff
     style B fill:#e65100,stroke:#bf360c,color:#fff

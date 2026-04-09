@@ -26,8 +26,6 @@ Backpressure is handled by a bounded `asyncio.Queue` (default 10,000 events). Wh
 
 ### Event Lifecycle
 
-!!! tip "Click any diagram to zoom in. Click again to zoom out."
-
 ```mermaid
 sequenceDiagram
     participant Recv as 📡 Receiver

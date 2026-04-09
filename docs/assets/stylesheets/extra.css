@@ -19,30 +19,26 @@
   --md-default-fg-color: #E8ECEF;
 }
 
-/* Mermaid diagrams — larger, scrollable, click to zoom */
+/* Mermaid diagrams — scrollable, click to open fullscreen modal */
 .mermaid {
   overflow-x: auto;
   text-align: center;
+  position: relative;
 }
 
 .mermaid svg {
   min-width: 100%;
   max-width: none;
   cursor: zoom-in;
-  transition: transform 0.3s ease;
 }
 
-.mermaid svg.zoomed {
-  transform: scale(1.5);
-  transform-origin: top left;
-  cursor: zoom-out;
-}
-
-/* Sequence diagrams need extra width */
-.mermaid svg[id*="sequenceDiagram"],
-.mermaid svg[aria-roledescription="sequence"] {
-  min-width: 900px;
-  font-size: 14px;
+/* Hint label */
+.mermaid::after {
+  content: "Click to expand";
+  display: block;
+  font-size: 0.75rem;
+  color: var(--md-default-fg-color--light);
+  margin-top: 0.25rem;
 }
 
 /* Header logo — larger than default for better visibility */
