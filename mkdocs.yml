@@ -89,7 +89,9 @@ nav:
 
 plugins:
   - search
-  - privacy
+  - privacy:
+      assets_exclude:
+        - cdn.jsdelivr.net/npm/mathjax@3/*
   - tags
 
 markdown_extensions:
