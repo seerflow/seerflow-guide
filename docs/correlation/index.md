@@ -65,8 +65,10 @@ Every event passes through the Sigma engine first (pattern matching is cheap). E
 
 ## Reading Order
 
-**Security focus:** Start with [Sigma Rules](sigma.md) to understand rule-based detection, then [Kill Chain](kill-chain.md) for multi-stage attack tracking, then [Risk Accumulation](risk-accumulation.md) for entity scoring.
+Pick the path that matches your goal:
 
-**Operations focus:** Start with the [Correlation Engine](engine.md) to understand how cross-source events are joined, then [Risk Accumulation](risk-accumulation.md) for understanding why some entities trigger alerts over time.
-
-**Building custom rules:** [Sigma Rules](sigma.md) → Writing Custom Rules section, then [Correlation Engine](engine.md) → YAML Rule Format section.
+| Goal | Start Here | Then | Then |
+|------|-----------|------|------|
+| **Understand security detection** | [Sigma Rules](sigma.md) | [Kill Chain](kill-chain.md) | [Risk Accumulation](risk-accumulation.md) |
+| **Understand ops correlation** | [Correlation Engine](engine.md) | [Risk Accumulation](risk-accumulation.md) | — |
+| **Write custom rules** | [Sigma Rules](sigma.md) § Writing Custom Rules | [Correlation Engine](engine.md) § YAML Rule Format | — |
