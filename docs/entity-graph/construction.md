@@ -33,7 +33,15 @@ For example, user `alice` always produces:
 uuid5(NS_USER, "alice") → always the same UUID
 ```
 
-This means when `alice` appears in an SSH log, a sudo log, and a web access log, all three events link to the same graph node.
+This means when `alice` appears in an SSH log, a sudo log, and a web access log, all three events link to the same graph node:
+
+```mermaid
+graph LR
+    SSH["SSH log:<br/><i>Failed password for alice</i>"] --> N((alice<br/><small>uuid5: a1b2...c3d4</small>))
+    SUDO["sudo log:<br/><i>alice ran apt install</i>"] --> N
+    WEB["web log:<br/><i>alice accessed /admin</i>"] --> N
+    style N fill:#4285f4,color:#fff
+```
 
 ### Username Normalization
 
@@ -103,7 +111,12 @@ The same edge can be inferred from many events. Rather than creating duplicate e
 - `last_seen` = latest timestamp across all events
 - `event_count` = total number of events that produced this edge
 
-This means a single edge between `alice` and `web-server-01` might represent hundreds of SSH sessions, with metadata showing when the first and last sessions occurred.
+This means a single edge between `alice` and `web-server-01` might represent hundreds of SSH sessions, with metadata showing when the first and last sessions occurred:
+
+```mermaid
+graph LR
+    U((alice)) -->|"logged_into<br/><small>first: Jan 3 09:12<br/>last: Apr 9 14:30<br/>count: 347</small>"| H((web-server-01))
+```
 
 ---
 

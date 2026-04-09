@@ -17,13 +17,13 @@ That's it. If you can draw circles and lines between them, you have a graph.
 
 ```mermaid
 graph LR
-    A[Alice] --- B[Bob]
-    A --- C[Carol]
-    B --- C
-    B --- D[Dave]
+    A((Alice)) --->|"edge"| B((Bob))
+    A --->|"edge"| C((Carol))
+    B --->|"edge"| C
+    B --->|"edge"| D((Dave))
 ```
 
-Three nodes, four edges. Alice knows Bob and Carol; Bob knows Carol and Dave. That's a graph.
+The circles are **nodes** — Alice, Bob, Carol, Dave. The lines connecting them are **edges** — each one represents a relationship ("knows", "follows", "connects to"). Four nodes, four edges.
 
 ### Real-World Analogies
 
