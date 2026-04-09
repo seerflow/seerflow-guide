@@ -150,7 +150,7 @@ For the full configuration reference, see [Configuration Reference →](../refer
 
 Explore a simulated Seerflow entity graph. Click nodes to see entity details, use the dropdown to switch between scenarios, and toggle entity types with the checkboxes.
 
-<iframe src="assets/entity-graph-explorer.html" width="100%" height="700" style="border: 1px solid var(--md-default-fg-color--lightest); border-radius: 8px;" loading="lazy"></iframe>
+<iframe src="../entity-graph/assets/entity-graph-explorer.html" width="100%" height="700" style="border: 1px solid var(--md-default-fg-color--lightest); border-radius: 8px;" loading="lazy"></iframe>
 
 **Scenarios:**
 
