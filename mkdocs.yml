@@ -60,6 +60,8 @@ nav:
     - Event Model: architecture/event-model.md
   - Entity Graph:
     - entity-graph/index.md
+    - Building the Graph: entity-graph/construction.md
+    - Algorithms & Detection: entity-graph/algorithms.md
   - Detection:
     - detection/index.md
     - Half-Space Trees: detection/hst.md
