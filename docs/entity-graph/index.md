@@ -59,7 +59,7 @@ Seerflow's entity graph is a **directed multigraph**: edges have direction, and 
 ```mermaid
 graph LR
     U[alice] -->|logged_into| H[web-server-01]
-    U -->|accessed| F[/etc/passwd]
+    U -->|accessed| F["/etc/passwd"]
     U -->|logged_into| H2[dev-host-1]
 ```
 
