@@ -42,6 +42,18 @@ A node with **suddenly high betweenness** that was previously a leaf is suspicio
 
 **Range:** Scores sum to approximately 1.0 across all nodes. Higher = more important.
 
+```mermaid
+graph LR
+    A[web-app-1] --> D[prod-db<br/><b>PageRank: 0.31</b>]
+    B[web-app-2] --> D
+    C[api-gateway] --> D
+    E[batch-job] --> D
+    F[monitoring] --> D
+    style D fill:#4285f4,color:#fff
+```
+
+`prod-db` has high PageRank because five different services point to it. The more incoming connections from important nodes, the higher the score.
+
 ### Security Meaning
 
 High-PageRank entities are **high-value targets** — they're the nodes that many other entities depend on. A database server that every application connects to will have high PageRank. Anomalous activity on high-PageRank nodes deserves higher scrutiny.
@@ -80,6 +92,35 @@ Community crossing is Seerflow's most intuitive graph-structural alert: *this en
 **Fan-out:** The number of unique entities a node connects **to** (outgoing edges). High fan-out means an entity is reaching many targets.
 
 **Fan-in:** The number of unique entities connecting **to** a node (incoming edges). High fan-in means many entities are accessing the same target.
+
+=== "Fan-out (outgoing)"
+
+    ```mermaid
+    graph LR
+        H[compromised-host<br/><b>fan-out: 6</b>] --> T1[target-1]
+        H --> T2[target-2]
+        H --> T3[target-3]
+        H --> T4[target-4]
+        H --> T5[target-5]
+        H --> T6[target-6]
+        style H fill:#e53935,color:#fff
+    ```
+
+    One node reaching many targets — could be port scanning or credential spraying.
+
+=== "Fan-in (incoming)"
+
+    ```mermaid
+    graph LR
+        S1[192.168.1.10] --> T[login-server<br/><b>fan-in: 5</b>]
+        S2[192.168.1.20] --> T
+        S3[10.0.0.5] --> T
+        S4[172.16.0.8] --> T
+        S5[185.220.1.9] --> T
+        style T fill:#fa7b17,color:#fff
+    ```
+
+    Many nodes reaching one target — could be distributed brute force.
 
 ### Security Meaning
 
