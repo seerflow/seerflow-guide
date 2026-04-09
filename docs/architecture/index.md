@@ -2,7 +2,7 @@
 
 ## The Problem: Too Many Logs, Not Enough Signal
 
-Modern infrastructure generates millions of log events per day. Security teams drown in alerts they can't triage. Operations teams miss failures buried in noise. Traditional tools force a choice: rule-based SIEMs that catch known threats but miss novel ones, or ML-only platforms that flag anomalies but can't explain them.
+Modern infrastructure generates millions of log events per day. Security teams drown in alerts they can't triage. SRE, DevOps, and infrastructure teams miss failures buried in noise. Traditional tools force a choice: rule-based SIEMs that catch known threats but miss novel ones, or ML-only platforms that flag anomalies but can't explain them.
 
 Seerflow takes a different approach: **one streaming pipeline that serves both security and operations**, combining rules (fast, explainable) with machine learning (adaptive, catches unknowns).
 
