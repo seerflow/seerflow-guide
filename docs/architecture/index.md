@@ -41,9 +41,13 @@ graph LR
     style B fill:#f9f,stroke:#333,stroke-width:1px
 ```
 
-**Receivers** ingest logs from syslog, files, OpenTelemetry, and webhooks. A bounded asyncio queue (10,000 events max) absorbs bursts and applies backpressure at 80% utilization. The **parser** uses Drain3 for streaming template extraction and regex-based entity extraction. **Detection** runs five online ML models (Half-Space Trees, Holt-Winters, CUSUM, Markov chains, DSPOT thresholds) plus Sigma rule matching. **Correlation** connects related events through an entity graph, risk accumulation, and kill-chain tracking. **Alerting** dispatches to webhooks and PagerDuty with deduplication.
+- **Receivers** ingest logs from syslog servers (`auth.log`, `kern.log`), application log files (`/var/log/*.log`), OpenTelemetry Collectors (forwarding CloudWatch, GCP Logging, Azure Monitor), and webhook endpoints (GitHub, Kubernetes, custom apps). A bounded asyncio queue (10,000 events max) absorbs bursts and applies backpressure at 80% utilization.
+- **Parser** uses Drain3 for streaming template extraction — no grok patterns or manual parsers needed. New log formats are learned automatically. Regex-based entity extraction pulls IPs, usernames, hostnames, domains, processes, and file paths from every message.
+- **Detection** runs five online ML models in parallel: Half-Space Trees (content anomalies), Holt-Winters (volume spikes), CUSUM (change points), Markov chains (sequence anomalies), and DSPOT (auto-thresholds). Plus 3,000+ Sigma rules for known threat signatures.
+- **Correlation** connects related events through an igraph-based entity graph (40-250x faster than NetworkX), per-entity risk accumulation with configurable half-life decay, and MITRE ATT&CK kill-chain tracking that fires when an entity crosses 3+ tactics.
+- **Alerting** dispatches to webhook endpoints (Slack, Teams, custom) and PagerDuty with dedup windows (default 15 min, per-rule overrides) to prevent alert storms.
 
-The entire pipeline runs in a single asyncio event loop — no threads, no GIL contention, predictable memory.
+The entire pipeline runs in a single Python asyncio event loop — no threads, no multiprocessing, no GIL contention. Predictable memory, simple debugging, 10K+ events/sec on a single core.
 
 ## A Preview: Two Events, One Pipeline
 
