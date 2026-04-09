@@ -77,8 +77,20 @@ The entire pipeline runs in a single Python asyncio event loop — no threads, n
 
 ## Who Is This Guide For?
 
-| You are a... | Start here | Then read |
-|--------------|-----------|-----------|
-| **Operator** setting up Seerflow | This page → [Receivers](receivers.md) | [Operations](../operations/index.md) for alerting and tuning |
-| **Contributor** working on the codebase | [Pipeline](pipeline.md) → [Parsing](parsing.md) | [Event Model](event-model.md) for the core data structure |
-| **Security analyst** evaluating Seerflow | Skim this page → [Security Primer](../security-primer/index.md) | [Detection](../detection/index.md) → [Correlation](../correlation/index.md) |
+**:material-wrench: Operator** deploying or configuring Seerflow
+
+:   1. **You're here** — understand the pipeline and what each stage does
+    2. [Receivers](receivers.md) — configure which log sources to ingest
+    3. [Operations](../operations/index.md) — set up alerting, storage, and tuning
+
+**:material-code-braces: Contributor** working on the Seerflow codebase
+
+:   1. [Pipeline](pipeline.md) — understand the handler factory and async architecture
+    2. [Parsing](parsing.md) — learn how Drain3 and entity extraction work
+    3. [Event Model](event-model.md) — the `SeerflowEvent` struct every component touches
+
+**:material-shield-search: Security analyst** evaluating Seerflow's detection capabilities
+
+:   1. [Security Primer](../security-primer/index.md) — ATT&CK, Sigma, Kill Chain foundations
+    2. [Detection](../detection/index.md) — how the 5 ML models and Sigma engine work
+    3. [Correlation](../correlation/index.md) — entity graph, risk scoring, kill-chain tracking
