@@ -145,8 +145,6 @@ Score
 
 Each detection adds a step up. Between detections, the curve decays exponentially. The threshold line shows where an alert would fire. After the last detection, risk decays back toward zero.
 
-*This chart will be upgraded to an interactive Plotly.js visualization in S-139H.*
-
 ---
 
 ## See Also
