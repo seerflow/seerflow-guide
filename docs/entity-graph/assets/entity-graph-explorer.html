@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Entity Graph Explorer</title>
+  <script src="https://d3js.org/d3.v7.min.js" integrity="sha384-CjloA8y00+1SDAUkjs099PVfnY2KmDC2BZnws9kh8D/lX1s46w6EPhpXdqMfjK6i" crossorigin="anonymous"></script>
+  <style>
+    /* ── CSS custom properties (light defaults, overridden by theme detection) ── */
+    :root {
+      --bg-color: #ffffff;
+      --text-color: #212121;
+      --edge-color: #999999;
+      --sidebar-bg: #f5f5f5;
+      --header-bg: #fafafa;
+      --border-color: #e0e0e0;
+      --label-color: #555555;
+      --hull-opacity: 0.08;
+    }
+
+    /* ── Type color palette ── */
+    :root {
+      --color-user:    #4285f4;
+      --color-ip:      #34a853;
+      --color-host:    #fa7b17;
+      --color-process: #9334e6;
+      --color-file:    #f9ab00;
+      --color-domain:  #00bcd4;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg-color);
+      color: var(--text-color);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ── Header ── */
+    #header {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding: 8px 14px;
+      background: var(--header-bg);
+      border-bottom: 1px solid var(--border-color);
+      flex-shrink: 0;
+    }
+
+    #header label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--label-color);
+      white-space: nowrap;
+    }
+
+    #scenario-select {
+      font-size: 13px;
+      padding: 4px 8px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      background: var(--bg-color);
+      color: var(--text-color);
+      cursor: pointer;
+    }
+
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .filter-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .filter-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .filter-item input[type="checkbox"] {
+      cursor: pointer;
+    }
+
+    /* ── Main area ── */
+    #main {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* ── SVG container ── */
+    #graph-container {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #graph-svg {
+      width: 100%;
+      height: 100%;
+      min-height: 500px;
+      display: block;
+      cursor: grab;
+    }
+
+    #graph-svg:active {
+      cursor: grabbing;
+    }
+
+    /* ── Node styles ── */
+    .node circle {
+      r: 12;
+      stroke-width: 2px;
+      transition: opacity 0.2s;
+    }
+
+    .node text {
+      font-size: 10px;
+      fill: var(--text-color);
+      text-anchor: middle;
+      pointer-events: none;
+      dominant-baseline: hanging;
+    }
+
+    .node.hidden {
+      display: none;
+    }
+
+    /* ── Edge styles ── */
+    .edge-line {
+      stroke: var(--edge-color);
+      stroke-width: 1.5px;
+      fill: none;
+    }
+
+    .edge-line.anomalous {
+      stroke: #e53935;
+      stroke-width: 3px;
+    }
+
+    .edge-label {
+      font-size: 9px;
+      fill: var(--label-color);
+      text-anchor: middle;
+      pointer-events: none;
+    }
+
+    /* ── Community hull styles ── */
+    .hull {
+      fill-opacity: var(--hull-opacity);
+      stroke-width: 1px;
+      stroke-dasharray: 4 3;
+    }
+
+    /* ── Pulsing animation for anomalous nodes/edges ── */
+    @keyframes pulse {
+      0%   { opacity: 1; }
+      50%  { opacity: 0.5; }
+      100% { opacity: 1; }
+    }
+
+    .anomalous {
+      animation: pulse 1.4s ease-in-out infinite;
+    }
+
+    /* ── Sidebar ── */
+    #sidebar {
+      width: 280px;
+      background: var(--sidebar-bg);
+      border-left: 1px solid var(--border-color);
+      padding: 14px;
+      overflow-y: auto;
+      transform: translateX(100%);
+      transition: transform 0.25s ease;
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      z-index: 10;
+    }
+
+    #sidebar.open {
+      transform: translateX(0);
+    }
+
+    #sidebar-close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: none;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+      color: var(--text-color);
+      line-height: 1;
+    }
+
+    #sidebar h3 {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      padding-right: 24px;
+    }
+
+    .entity-type-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .type-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .detail-row {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 8px;
+    }
+
+    .detail-label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--label-color);
+      margin-bottom: 2px;
+    }
+
+    .detail-value {
+      font-size: 12px;
+      word-break: break-all;
+    }
+
+    #edge-list {
+      margin-top: 10px;
+    }
+
+    #edge-list h4 {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--label-color);
+      margin-bottom: 6px;
+    }
+
+    .edge-item {
+      font-size: 11px;
+      padding: 4px 6px;
+      border-radius: 3px;
+      margin-bottom: 3px;
+      background: var(--bg-color);
+      border: 1px solid var(--border-color);
+    }
+
+    .edge-item.anomalous-edge {
+      border-color: #e53935;
+      color: #e53935;
+    }
+
+    /* ── Footer ── */
+    #footer {
+      padding: 5px 14px;
+      font-size: 11px;
+      color: var(--label-color);
+      background: var(--header-bg);
+      border-top: 1px solid var(--border-color);
+      flex-shrink: 0;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div id="header">
+    <label for="scenario-select">Scenario:</label>
+    <select id="scenario-select">
+      <option value="normal">Normal Operations</option>
+      <option value="lateral">Lateral Movement</option>
+      <option value="fanout">Fan-out Burst</option>
+    </select>
+
+    <label>Filter:</label>
+    <div class="filter-group" id="filter-group">
+      <label class="filter-item">
+        <input type="checkbox" data-type="User" checked />
+        <span class="filter-dot" style="background:var(--color-user)"></span>
+        User
+      </label>
+      <label class="filter-item">
+        <input type="checkbox" data-type="IP" checked />
+        <span class="filter-dot" style="background:var(--color-ip)"></span>
+        IP
+      </label>
+      <label class="filter-item">
+        <input type="checkbox" data-type="Host" checked />
+        <span class="filter-dot" style="background:var(--color-host)"></span>
+        Host
+      </label>
+      <label class="filter-item">
+        <input type="checkbox" data-type="Process" checked />
+        <span class="filter-dot" style="background:var(--color-process)"></span>
+        Process
+      </label>
+      <label class="filter-item">
+        <input type="checkbox" data-type="File" checked />
+        <span class="filter-dot" style="background:var(--color-file)"></span>
+        File
+      </label>
+      <label class="filter-item">
+        <input type="checkbox" data-type="Domain" checked />
+        <span class="filter-dot" style="background:var(--color-domain)"></span>
+        Domain
+      </label>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div id="main">
+    <div id="graph-container">
+      <svg id="graph-svg"></svg>
+    </div>
+
+    <!-- Sidebar -->
+    <div id="sidebar">
+      <button id="sidebar-close" title="Close">&times;</button>
+      <h3 id="sidebar-title">Entity Details</h3>
+      <div class="entity-type-badge">
+        <span class="type-dot" id="sidebar-type-dot"></span>
+        <span id="sidebar-type-label"></span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Label</span>
+        <span class="detail-value" id="sd-label"></span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">UUID</span>
+        <span class="detail-value" id="sd-uuid"></span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Community ID</span>
+        <span class="detail-value" id="sd-community"></span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Betweenness</span>
+        <span class="detail-value" id="sd-betweenness"></span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">PageRank</span>
+        <span class="detail-value" id="sd-pagerank"></span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Fan-out</span>
+        <span class="detail-value" id="sd-fanout"></span>
+      </div>
+      <div id="edge-list">
+        <h4>Connected Edges</h4>
+        <div id="sd-edges"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div id="footer">
+    Scroll to zoom &middot; Drag to pan &middot; Click node for details &middot; Drag nodes to rearrange
+  </div>
+
+<script>
+// ============================================================
+// THEME DETECTION
+// ============================================================
+function applyTheme() {
+  const root = document.documentElement;
+  let isDark = false;
+
+  // Check prefers-color-scheme
+  if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    isDark = true;
+  }
+
+  // Check parent iframe data-md-color-scheme (MkDocs Material)
+  try {
+    const parentBody = window.parent.document.body;
+    const scheme = parentBody && parentBody.getAttribute('data-md-color-scheme');
+    if (scheme === 'slate') isDark = true;
+    if (scheme === 'default') isDark = false;
+  } catch (_) {
+    // Cross-origin — ignore
+  }
+
+  if (isDark) {
+    root.style.setProperty('--bg-color',     '#1e1e1e');
+    root.style.setProperty('--text-color',   '#e0e0e0');
+    root.style.setProperty('--edge-color',   '#777777');
+    root.style.setProperty('--sidebar-bg',   '#2a2a2a');
+    root.style.setProperty('--header-bg',    '#252525');
+    root.style.setProperty('--border-color', '#3a3a3a');
+    root.style.setProperty('--label-color',  '#aaaaaa');
+  } else {
+    root.style.setProperty('--bg-color',     '#ffffff');
+    root.style.setProperty('--text-color',   '#212121');
+    root.style.setProperty('--edge-color',   '#999999');
+    root.style.setProperty('--sidebar-bg',   '#f5f5f5');
+    root.style.setProperty('--header-bg',    '#fafafa');
+    root.style.setProperty('--border-color', '#e0e0e0');
+    root.style.setProperty('--label-color',  '#555555');
+  }
+}
+
+applyTheme();
+
+// Listen for OS-level theme change
+if (window.matchMedia) {
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyTheme);
+}
+
+// Poll parent for MkDocs Material theme changes (every 2s)
+setInterval(() => {
+  try {
+    const parentBody = window.parent.document.body;
+    if (parentBody) applyTheme();
+  } catch (_) {}
+}, 2000);
+
+
+// ============================================================
+// TYPE COLOR MAP
+// ============================================================
+const TYPE_COLORS = {
+  User:    '#4285f4',
+  IP:      '#34a853',
+  Host:    '#fa7b17',
+  Process: '#9334e6',
+  File:    '#f9ab00',
+  Domain:  '#00bcd4',
+};
+
+function colorFor(type) {
+  return TYPE_COLORS[type] || '#888888';
+}
+
+
+// ============================================================
+// SCENARIO DATA
+// ============================================================
+const SCENARIOS = {
+
+  // ── NORMAL OPERATIONS ──────────────────────────────────────
+  normal: {
+    nodes: [
+      // Users (community 0 = dev-team, community 1 = production)
+      { id: 'u-alice',   type: 'User',    label: 'alice',       community: 0, betweenness: 0.18, pagerank: 0.0421, fanout: 3, uuid: 'a1b2c3d4-0001-0001-0001-000000000001' },
+      { id: 'u-bob',     type: 'User',    label: 'bob',         community: 0, betweenness: 0.12, pagerank: 0.0380, fanout: 2, uuid: 'a1b2c3d4-0001-0001-0001-000000000002' },
+      { id: 'u-carol',   type: 'User',    label: 'carol',       community: 0, betweenness: 0.09, pagerank: 0.0310, fanout: 2, uuid: 'a1b2c3d4-0001-0001-0001-000000000003' },
+      { id: 'u-dave',    type: 'User',    label: 'dave',        community: 1, betweenness: 0.21, pagerank: 0.0510, fanout: 4, uuid: 'a1b2c3d4-0001-0001-0001-000000000004' },
+      { id: 'u-eve',     type: 'User',    label: 'eve',         community: 1, betweenness: 0.14, pagerank: 0.0390, fanout: 3, uuid: 'a1b2c3d4-0001-0001-0001-000000000005' },
+
+      // IPs
+      { id: 'ip-10-1',   type: 'IP',      label: '10.0.1.10',   community: 0, betweenness: 0.07, pagerank: 0.0210, fanout: 2, uuid: 'b2c3d4e5-0002-0002-0002-000000000011' },
+      { id: 'ip-10-2',   type: 'IP',      label: '10.0.1.20',   community: 0, betweenness: 0.06, pagerank: 0.0190, fanout: 2, uuid: 'b2c3d4e5-0002-0002-0002-000000000012' },
+      { id: 'ip-10-3',   type: 'IP',      label: '10.0.2.10',   community: 1, betweenness: 0.11, pagerank: 0.0280, fanout: 3, uuid: 'b2c3d4e5-0002-0002-0002-000000000013' },
+      { id: 'ip-10-4',   type: 'IP',      label: '10.0.2.20',   community: 1, betweenness: 0.09, pagerank: 0.0250, fanout: 2, uuid: 'b2c3d4e5-0002-0002-0002-000000000014' },
+      { id: 'ip-ext-1',  type: 'IP',      label: '8.8.8.8',     community: 2, betweenness: 0.04, pagerank: 0.0120, fanout: 1, uuid: 'b2c3d4e5-0002-0002-0002-000000000015' },
+      { id: 'ip-ext-2',  type: 'IP',      label: '1.1.1.1',     community: 2, betweenness: 0.03, pagerank: 0.0110, fanout: 1, uuid: 'b2c3d4e5-0002-0002-0002-000000000016' },
+
+      // Hosts
+      { id: 'h-devhost1',type: 'Host',    label: 'dev-host-1',  community: 0, betweenness: 0.22, pagerank: 0.0480, fanout: 5, uuid: 'c3d4e5f6-0003-0003-0003-000000000021' },
+      { id: 'h-devhost2',type: 'Host',    label: 'dev-host-2',  community: 0, betweenness: 0.17, pagerank: 0.0420, fanout: 4, uuid: 'c3d4e5f6-0003-0003-0003-000000000022' },
+      { id: 'h-proddb',  type: 'Host',    label: 'prod-db',     community: 1, betweenness: 0.29, pagerank: 0.0610, fanout: 6, uuid: 'c3d4e5f6-0003-0003-0003-000000000023' },
+      { id: 'h-prodapp', type: 'Host',    label: 'prod-app',    community: 1, betweenness: 0.25, pagerank: 0.0570, fanout: 5, uuid: 'c3d4e5f6-0003-0003-0003-000000000024' },
+      { id: 'h-dns1',    type: 'Host',    label: 'dns-1',       community: 2, betweenness: 0.15, pagerank: 0.0350, fanout: 3, uuid: 'c3d4e5f6-0003-0003-0003-000000000025' },
+      { id: 'h-dns2',    type: 'Host',    label: 'dns-2',       community: 2, betweenness: 0.12, pagerank: 0.0310, fanout: 2, uuid: 'c3d4e5f6-0003-0003-0003-000000000026' },
+
+      // Processes
+      { id: 'p-sshd',    type: 'Process', label: 'sshd',        community: 0, betweenness: 0.13, pagerank: 0.0330, fanout: 3, uuid: 'd4e5f6a7-0004-0004-0004-000000000031' },
+      { id: 'p-nginx',   type: 'Process', label: 'nginx',       community: 1, betweenness: 0.18, pagerank: 0.0440, fanout: 4, uuid: 'd4e5f6a7-0004-0004-0004-000000000032' },
+      { id: 'p-postgres',type: 'Process', label: 'postgres',    community: 1, betweenness: 0.16, pagerank: 0.0400, fanout: 3, uuid: 'd4e5f6a7-0004-0004-0004-000000000033' },
+      { id: 'p-named',   type: 'Process', label: 'named',       community: 2, betweenness: 0.10, pagerank: 0.0270, fanout: 2, uuid: 'd4e5f6a7-0004-0004-0004-000000000034' },
+
+      // Files
+      { id: 'f-authlog', type: 'File',    label: 'auth.log',    community: 0, betweenness: 0.08, pagerank: 0.0220, fanout: 1, uuid: 'e5f6a7b8-0005-0005-0005-000000000041' },
+      { id: 'f-nginx-log',type:'File',    label: 'access.log',  community: 1, betweenness: 0.07, pagerank: 0.0200, fanout: 1, uuid: 'e5f6a7b8-0005-0005-0005-000000000042' },
+      { id: 'f-dbdata',  type: 'File',    label: 'pg_data',     community: 1, betweenness: 0.09, pagerank: 0.0240, fanout: 2, uuid: 'e5f6a7b8-0005-0005-0005-000000000043' },
+      { id: 'f-named-conf',type:'File',   label: 'named.conf',  community: 2, betweenness: 0.05, pagerank: 0.0150, fanout: 1, uuid: 'e5f6a7b8-0005-0005-0005-000000000044' },
+      { id: 'f-sshconf', type: 'File',    label: 'sshd.conf',   community: 0, betweenness: 0.04, pagerank: 0.0130, fanout: 1, uuid: 'e5f6a7b8-0005-0005-0005-000000000045' },
+
+      // Domains
+      { id: 'd-internal',type: 'Domain',  label: 'internal.svc',community: 1, betweenness: 0.11, pagerank: 0.0290, fanout: 2, uuid: 'f6a7b8c9-0006-0006-0006-000000000051' },
+      { id: 'd-google',  type: 'Domain',  label: 'google.com',  community: 2, betweenness: 0.03, pagerank: 0.0100, fanout: 1, uuid: 'f6a7b8c9-0006-0006-0006-000000000052' },
+      { id: 'd-github',  type: 'Domain',  label: 'github.com',  community: 2, betweenness: 0.04, pagerank: 0.0120, fanout: 1, uuid: 'f6a7b8c9-0006-0006-0006-000000000053' },
+      { id: 'd-npm',     type: 'Domain',  label: 'npmjs.com',   community: 2, betweenness: 0.03, pagerank: 0.0110, fanout: 1, uuid: 'f6a7b8c9-0006-0006-0006-000000000054' },
+    ],
+    edges: [
+      // Users → Hosts (SSH login)
+      { source: 'u-alice',    target: 'h-devhost1', rel_type: 'logged_into' },
+      { source: 'u-alice',    target: 'h-devhost2', rel_type: 'logged_into' },
+      { source: 'u-bob',      target: 'h-devhost1', rel_type: 'logged_into' },
+      { source: 'u-carol',    target: 'h-devhost2', rel_type: 'logged_into' },
+      { source: 'u-dave',     target: 'h-prodapp',  rel_type: 'logged_into' },
+      { source: 'u-dave',     target: 'h-proddb',   rel_type: 'logged_into' },
+      { source: 'u-eve',      target: 'h-prodapp',  rel_type: 'logged_into' },
+
+      // Users → IPs
+      { source: 'u-alice',    target: 'ip-10-1',    rel_type: 'authenticated_from' },
+      { source: 'u-bob',      target: 'ip-10-2',    rel_type: 'authenticated_from' },
+      { source: 'u-dave',     target: 'ip-10-3',    rel_type: 'authenticated_from' },
+      { source: 'u-eve',      target: 'ip-10-4',    rel_type: 'authenticated_from' },
+
+      // Hosts → Processes
+      { source: 'h-devhost1', target: 'p-sshd',     rel_type: 'runs' },
+      { source: 'h-prodapp',  target: 'p-nginx',    rel_type: 'runs' },
+      { source: 'h-proddb',   target: 'p-postgres', rel_type: 'runs' },
+      { source: 'h-dns1',     target: 'p-named',    rel_type: 'runs' },
+      { source: 'h-dns2',     target: 'p-named',    rel_type: 'runs' },
+
+      // Processes → Files
+      { source: 'p-sshd',     target: 'f-authlog',  rel_type: 'writes' },
+      { source: 'p-sshd',     target: 'f-sshconf',  rel_type: 'reads' },
+      { source: 'p-nginx',    target: 'f-nginx-log',rel_type: 'writes' },
+      { source: 'p-postgres', target: 'f-dbdata',   rel_type: 'reads' },
+      { source: 'p-named',    target: 'f-named-conf',rel_type: 'reads' },
+
+      // Hosts → Domains / IPs (DNS / outbound)
+      { source: 'h-devhost1', target: 'd-github',   rel_type: 'dns_query' },
+      { source: 'h-devhost2', target: 'd-npm',      rel_type: 'dns_query' },
+      { source: 'h-prodapp',  target: 'd-internal', rel_type: 'dns_query' },
+      { source: 'h-dns1',     target: 'ip-ext-1',   rel_type: 'resolved_to' },
+      { source: 'h-dns2',     target: 'ip-ext-2',   rel_type: 'resolved_to' },
+      { source: 'h-devhost1', target: 'd-google',   rel_type: 'dns_query' },
+
+      // prod-app ↔ prod-db
+      { source: 'h-prodapp',  target: 'h-proddb',   rel_type: 'db_connect' },
+    ],
+  },
+
+  // ── LATERAL MOVEMENT ───────────────────────────────────────
+  lateral: {
+    nodes: [
+      // (same base nodes as normal)
+      { id: 'u-alice',   type: 'User',    label: 'alice',         community: 0, betweenness: 0.18, pagerank: 0.0421, fanout: 3, uuid: 'a1b2c3d4-0001-0001-0001-000000000001' },
+      { id: 'u-bob',     type: 'User',    label: 'bob',           community: 0, betweenness: 0.12, pagerank: 0.0380, fanout: 2, uuid: 'a1b2c3d4-0001-0001-0001-000000000002' },
+      { id: 'u-carol',   type: 'User',    label: 'carol',         community: 0, betweenness: 0.09, pagerank: 0.0310, fanout: 2, uuid: 'a1b2c3d4-0001-0001-0001-000000000003' },
+      { id: 'u-dave',    type: 'User',    label: 'dave',          community: 1, betweenness: 0.21, pagerank: 0.0510, fanout: 4, uuid: 'a1b2c3d4-0001-0001-0001-000000000004' },
+      { id: 'u-eve',     type: 'User',    label: 'eve',           community: 1, betweenness: 0.14, pagerank: 0.0390, fanout: 3, uuid: 'a1b2c3d4-0001-0001-0001-000000000005' },
+      // Attacker
+      { id: 'u-attacker',type: 'User',    label: 'attacker',      community: 0, betweenness: 0.44, pagerank: 0.0890, fanout: 7, uuid: 'a1b2c3d4-dead-beef-cafe-000000000099', anomalous: true },
+
+      // IPs
+      { id: 'ip-10-1',   type: 'IP',      label: '10.0.1.10',     community: 0, betweenness: 0.07, pagerank: 0.0210, fanout: 2, uuid: 'b2c3d4e5-0002-0002-0002-000000000011' },
+      { id: 'ip-10-2',   type: 'IP',      label: '10.0.1.20',     community: 0, betweenness: 0.06, pagerank: 0.0190, fanout: 2, uuid: 'b2c3d4e5-0002-0002-0002-000000000012' },
+      { id: 'ip-10-3',   type: 'IP',      label: '10.0.2.10',     community: 1, betweenness: 0.11, pagerank: 0.0280, fanout: 3, uuid: 'b2c3d4e5-0002-0002-0002-000000000013' },
+      { id: 'ip-10-4',   type: 'IP',      label: '10.0.2.20',     community: 1, betweenness: 0.09, pagerank: 0.0250, fanout: 2, uuid: 'b2c3d4e5-0002-0002-0002-000000000014' },
+      { id: 'ip-ext-1',  type: 'IP',      label: '8.8.8.8',       community: 2, betweenness: 0.04, pagerank: 0.0120, fanout: 1, uuid: 'b2c3d4e5-0002-0002-0002-000000000015' },
+      { id: 'ip-ext-2',  type: 'IP',      label: '1.1.1.1',       community: 2, betweenness: 0.03, pagerank: 0.0110, fanout: 1, uuid: 'b2c3d4e5-0002-0002-0002-000000000016' },
+      { id: 'ip-atk',    type: 'IP',      label: '185.220.1.9',   community: 0, betweenness: 0.08, pagerank: 0.0230, fanout: 2, uuid: 'b2c3d4e5-0002-0002-0002-000000000099', anomalous: true },
+
+      // Hosts
+      { id: 'h-devhost1',type: 'Host',    label: 'dev-host-1',    community: 0, betweenness: 0.22, pagerank: 0.0480, fanout: 5, uuid: 'c3d4e5f6-0003-0003-0003-000000000021' },
+      { id: 'h-devhost2',type: 'Host',    label: 'dev-host-2',    community: 0, betweenness: 0.17, pagerank: 0.0420, fanout: 4, uuid: 'c3d4e5f6-0003-0003-0003-000000000022' },
+      { id: 'h-proddb',  type: 'Host',    label: 'prod-db',       community: 1, betweenness: 0.29, pagerank: 0.0610, fanout: 6, uuid: 'c3d4e5f6-0003-0003-0003-000000000023' },
+      { id: 'h-prodapp', type: 'Host',    label: 'prod-app',      community: 1, betweenness: 0.25, pagerank: 0.0570, fanout: 5, uuid: 'c3d4e5f6-0003-0003-0003-000000000024' },
+      { id: 'h-dns1',    type: 'Host',    label: 'dns-1',         community: 2, betweenness: 0.15, pagerank: 0.0350, fanout: 3, uuid: 'c3d4e5f6-0003-0003-0003-000000000025' },
+      { id: 'h-dns2',    type: 'Host',    label: 'dns-2',         community: 2, betweenness: 0.12, pagerank: 0.0310, fanout: 2, uuid: 'c3d4e5f6-0003-0003-0003-000000000026' },
+
+      // Processes
+      { id: 'p-sshd',    type: 'Process', label: 'sshd',          community: 0, betweenness: 0.13, pagerank: 0.0330, fanout: 3, uuid: 'd4e5f6a7-0004-0004-0004-000000000031' },
+      { id: 'p-nginx',   type: 'Process', label: 'nginx',         community: 1, betweenness: 0.18, pagerank: 0.0440, fanout: 4, uuid: 'd4e5f6a7-0004-0004-0004-000000000032' },
+      { id: 'p-postgres',type: 'Process', label: 'postgres',      community: 1, betweenness: 0.16, pagerank: 0.0400, fanout: 3, uuid: 'd4e5f6a7-0004-0004-0004-000000000033' },
+      { id: 'p-named',   type: 'Process', label: 'named',         community: 2, betweenness: 0.10, pagerank: 0.0270, fanout: 2, uuid: 'd4e5f6a7-0004-0004-0004-000000000034' },
+
+      // Files
+      { id: 'f-authlog', type: 'File',    label: 'auth.log',      community: 0, betweenness: 0.08, pagerank: 0.0220, fanout: 1, uuid: 'e5f6a7b8-0005-0005-0005-000000000041' },
+      { id: 'f-nginx-log',type:'File',    label: 'access.log',    community: 1, betweenness: 0.07, pagerank: 0.0200, fanout: 1, uuid: 'e5f6a7b8-0005-0005-0005-000000000042' },
+      { id: 'f-dbdata',  type: 'File',    label: 'pg_data',       community: 1, betweenness: 0.09, pagerank: 0.0240, fanout: 2, uuid: 'e5f6a7b8-0005-0005-0005-000000000043' },
+      { id: 'f-named-conf',type:'File',   label: 'named.conf',    community: 2, betweenness: 0.05, pagerank: 0.0150, fanout: 1, uuid: 'e5f6a7b8-0005-0005-0005-000000000044' },
+      { id: 'f-sshconf', type: 'File',    label: 'sshd.conf',     community: 0, betweenness: 0.04, pagerank: 0.0130, fanout: 1, uuid: 'e5f6a7b8-0005-0005-0005-000000000045' },
+      { id: 'f-shadow',  type: 'File',    label: '/etc/shadow',   community: 1, betweenness: 0.06, pagerank: 0.0180, fanout: 1, uuid: 'e5f6a7b8-0005-0005-0005-000000000098', anomalous: true },
+
+      // Domains
+      { id: 'd-internal',type: 'Domain',  label: 'internal.svc',  community: 1, betweenness: 0.11, pagerank: 0.0290, fanout: 2, uuid: 'f6a7b8c9-0006-0006-0006-000000000051' },
+      { id: 'd-google',  type: 'Domain',  label: 'google.com',    community: 2, betweenness: 0.03, pagerank: 0.0100, fanout: 1, uuid: 'f6a7b8c9-0006-0006-0006-000000000052' },
+      { id: 'd-github',  type: 'Domain',  label: 'github.com',    community: 2, betweenness: 0.04, pagerank: 0.0120, fanout: 1, uuid: 'f6a7b8c9-0006-0006-0006-000000000053' },
+      { id: 'd-npm',     type: 'Domain',  label: 'npmjs.com',     community: 2, betweenness: 0.03, pagerank: 0.0110, fanout: 1, uuid: 'f6a7b8c9-0006-0006-0006-000000000054' },
+      { id: 'd-c2',      type: 'Domain',  label: 'evil-c2.net',   community: 0, betweenness: 0.07, pagerank: 0.0200, fanout: 1, uuid: 'f6a7b8c9-0006-0006-0006-000000000099', anomalous: true },
+    ],
+    edges: [
+      // Normal edges
+      { source: 'u-alice',    target: 'h-devhost1', rel_type: 'logged_into' },
+      { source: 'u-alice',    target: 'h-devhost2', rel_type: 'logged_into' },
+      { source: 'u-bob',      target: 'h-devhost1', rel_type: 'logged_into' },
+      { source: 'u-carol',    target: 'h-devhost2', rel_type: 'logged_into' },
+      { source: 'u-dave',     target: 'h-prodapp',  rel_type: 'logged_into' },
+      { source: 'u-dave',     target: 'h-proddb',   rel_type: 'logged_into' },
+      { source: 'u-eve',      target: 'h-prodapp',  rel_type: 'logged_into' },
+      { source: 'u-alice',    target: 'ip-10-1',    rel_type: 'authenticated_from' },
+      { source: 'u-bob',      target: 'ip-10-2',    rel_type: 'authenticated_from' },
+      { source: 'u-dave',     target: 'ip-10-3',    rel_type: 'authenticated_from' },
+      { source: 'u-eve',      target: 'ip-10-4',    rel_type: 'authenticated_from' },
+      { source: 'h-devhost1', target: 'p-sshd',     rel_type: 'runs' },
+      { source: 'h-prodapp',  target: 'p-nginx',    rel_type: 'runs' },
+      { source: 'h-proddb',   target: 'p-postgres', rel_type: 'runs' },
+      { source: 'h-dns1',     target: 'p-named',    rel_type: 'runs' },
+      { source: 'h-dns2',     target: 'p-named',    rel_type: 'runs' },
+      { source: 'p-sshd',     target: 'f-authlog',  rel_type: 'writes' },
+      { source: 'p-sshd',     target: 'f-sshconf',  rel_type: 'reads' },
+      { source: 'p-nginx',    target: 'f-nginx-log',rel_type: 'writes' },
+      { source: 'p-postgres', target: 'f-dbdata',   rel_type: 'reads' },
+      { source: 'p-named',    target: 'f-named-conf',rel_type: 'reads' },
+      { source: 'h-devhost1', target: 'd-github',   rel_type: 'dns_query' },
+      { source: 'h-devhost2', target: 'd-npm',      rel_type: 'dns_query' },
+      { source: 'h-prodapp',  target: 'd-internal', rel_type: 'dns_query' },
+      { source: 'h-dns1',     target: 'ip-ext-1',   rel_type: 'resolved_to' },
+      { source: 'h-dns2',     target: 'ip-ext-2',   rel_type: 'resolved_to' },
+      { source: 'h-devhost1', target: 'd-google',   rel_type: 'dns_query' },
+      { source: 'h-prodapp',  target: 'h-proddb',   rel_type: 'db_connect' },
+
+      // Anomalous edges — attacker lateral movement (crossing dev → prod communities)
+      { source: 'u-attacker', target: 'ip-atk',     rel_type: 'authenticated_from',    anomalous: true },
+      { source: 'u-attacker', target: 'h-devhost1',  rel_type: 'ssh_brute',  anomalous: true },
+      { source: 'h-devhost1', target: 'h-proddb',    rel_type: 'lateral_mvt',anomalous: true },
+      { source: 'h-devhost1', target: 'f-shadow',    rel_type: 'exfil_read', anomalous: true },
+      { source: 'h-devhost2', target: 'd-c2',        rel_type: 'c2_beacon',  anomalous: true },
+    ],
+  },
+
+  // ── FAN-OUT BURST ──────────────────────────────────────────
+  fanout: {
+    nodes: [
+      // Base nodes
+      { id: 'u-alice',   type: 'User',    label: 'alice',       community: 0, betweenness: 0.18, pagerank: 0.0421, fanout: 3, uuid: 'a1b2c3d4-0001-0001-0001-000000000001' },
+      { id: 'u-bob',     type: 'User',    label: 'bob',         community: 0, betweenness: 0.12, pagerank: 0.0380, fanout: 2, uuid: 'a1b2c3d4-0001-0001-0001-000000000002' },
+      { id: 'u-carol',   type: 'User',    label: 'carol',       community: 0, betweenness: 0.09, pagerank: 0.0310, fanout: 2, uuid: 'a1b2c3d4-0001-0001-0001-000000000003' },
+      { id: 'u-dave',    type: 'User',    label: 'dave',        community: 1, betweenness: 0.21, pagerank: 0.0510, fanout: 4, uuid: 'a1b2c3d4-0001-0001-0001-000000000004' },
+      { id: 'u-eve',     type: 'User',    label: 'eve',         community: 1, betweenness: 0.14, pagerank: 0.0390, fanout: 3, uuid: 'a1b2c3d4-0001-0001-0001-000000000005' },
+      { id: 'ip-10-1',   type: 'IP',      label: '10.0.1.10',   community: 0, betweenness: 0.07, pagerank: 0.0210, fanout: 2, uuid: 'b2c3d4e5-0002-0002-0002-000000000011' },
+      { id: 'ip-10-2',   type: 'IP',      label: '10.0.1.20',   community: 0, betweenness: 0.06, pagerank: 0.0190, fanout: 2, uuid: 'b2c3d4e5-0002-0002-0002-000000000012' },
+      { id: 'ip-10-3',   type: 'IP',      label: '10.0.2.10',   community: 1, betweenness: 0.11, pagerank: 0.0280, fanout: 3, uuid: 'b2c3d4e5-0002-0002-0002-000000000013' },
+      { id: 'ip-10-4',   type: 'IP',      label: '10.0.2.20',   community: 1, betweenness: 0.09, pagerank: 0.0250, fanout: 2, uuid: 'b2c3d4e5-0002-0002-0002-000000000014' },
+      { id: 'ip-ext-1',  type: 'IP',      label: '8.8.8.8',     community: 2, betweenness: 0.04, pagerank: 0.0120, fanout: 1, uuid: 'b2c3d4e5-0002-0002-0002-000000000015' },
+      { id: 'ip-ext-2',  type: 'IP',      label: '1.1.1.1',     community: 2, betweenness: 0.03, pagerank: 0.0110, fanout: 1, uuid: 'b2c3d4e5-0002-0002-0002-000000000016' },
+      { id: 'h-devhost1',type: 'Host',    label: 'dev-host-1',  community: 0, betweenness: 0.22, pagerank: 0.0480, fanout: 5, uuid: 'c3d4e5f6-0003-0003-0003-000000000021' },
+      { id: 'h-devhost2',type: 'Host',    label: 'dev-host-2',  community: 0, betweenness: 0.17, pagerank: 0.0420, fanout: 4, uuid: 'c3d4e5f6-0003-0003-0003-000000000022' },
+      { id: 'h-proddb',  type: 'Host',    label: 'prod-db',     community: 1, betweenness: 0.29, pagerank: 0.0610, fanout: 6, uuid: 'c3d4e5f6-0003-0003-0003-000000000023' },
+      { id: 'h-prodapp', type: 'Host',    label: 'prod-app',    community: 1, betweenness: 0.25, pagerank: 0.0570, fanout: 5, uuid: 'c3d4e5f6-0003-0003-0003-000000000024' },
+      { id: 'h-dns1',    type: 'Host',    label: 'dns-1',       community: 2, betweenness: 0.15, pagerank: 0.0350, fanout: 3, uuid: 'c3d4e5f6-0003-0003-0003-000000000025' },
+      { id: 'h-dns2',    type: 'Host',    label: 'dns-2',       community: 2, betweenness: 0.12, pagerank: 0.0310, fanout: 2, uuid: 'c3d4e5f6-0003-0003-0003-000000000026' },
+      { id: 'p-sshd',    type: 'Process', label: 'sshd',        community: 0, betweenness: 0.13, pagerank: 0.0330, fanout: 3, uuid: 'd4e5f6a7-0004-0004-0004-000000000031' },
+      { id: 'p-nginx',   type: 'Process', label: 'nginx',       community: 1, betweenness: 0.18, pagerank: 0.0440, fanout: 4, uuid: 'd4e5f6a7-0004-0004-0004-000000000032' },
+      { id: 'p-postgres',type: 'Process', label: 'postgres',    community: 1, betweenness: 0.16, pagerank: 0.0400, fanout: 3, uuid: 'd4e5f6a7-0004-0004-0004-000000000033' },
+      { id: 'p-named',   type: 'Process', label: 'named',       community: 2, betweenness: 0.10, pagerank: 0.0270, fanout: 2, uuid: 'd4e5f6a7-0004-0004-0004-000000000034' },
+      { id: 'f-authlog', type: 'File',    label: 'auth.log',    community: 0, betweenness: 0.08, pagerank: 0.0220, fanout: 1, uuid: 'e5f6a7b8-0005-0005-0005-000000000041' },
+      { id: 'f-nginx-log',type:'File',    label: 'access.log',  community: 1, betweenness: 0.07, pagerank: 0.0200, fanout: 1, uuid: 'e5f6a7b8-0005-0005-0005-000000000042' },
+      { id: 'f-dbdata',  type: 'File',    label: 'pg_data',     community: 1, betweenness: 0.09, pagerank: 0.0240, fanout: 2, uuid: 'e5f6a7b8-0005-0005-0005-000000000043' },
+      { id: 'f-named-conf',type:'File',   label: 'named.conf',  community: 2, betweenness: 0.05, pagerank: 0.0150, fanout: 1, uuid: 'e5f6a7b8-0005-0005-0005-000000000044' },
+      { id: 'f-sshconf', type: 'File',    label: 'sshd.conf',   community: 0, betweenness: 0.04, pagerank: 0.0130, fanout: 1, uuid: 'e5f6a7b8-0005-0005-0005-000000000045' },
+      { id: 'd-internal',type: 'Domain',  label: 'internal.svc',community: 1, betweenness: 0.11, pagerank: 0.0290, fanout: 2, uuid: 'f6a7b8c9-0006-0006-0006-000000000051' },
+      { id: 'd-google',  type: 'Domain',  label: 'google.com',  community: 2, betweenness: 0.03, pagerank: 0.0100, fanout: 1, uuid: 'f6a7b8c9-0006-0006-0006-000000000052' },
+      { id: 'd-github',  type: 'Domain',  label: 'github.com',  community: 2, betweenness: 0.04, pagerank: 0.0120, fanout: 1, uuid: 'f6a7b8c9-0006-0006-0006-000000000053' },
+      { id: 'd-npm',     type: 'Domain',  label: 'npmjs.com',   community: 2, betweenness: 0.03, pagerank: 0.0110, fanout: 1, uuid: 'f6a7b8c9-0006-0006-0006-000000000054' },
+
+      // Compromised host with massive fan-out
+      { id: 'h-compromised', type: 'Host', label: 'compromised-host', community: 0, betweenness: 0.71, pagerank: 0.1250, fanout: 16, uuid: 'c3d4e5f6-dead-beef-cafe-000000000099', anomalous: true },
+
+      // 12 additional scan targets
+      { id: 'h-scan-01', type: 'Host',    label: '10.0.3.1',    community: 1, betweenness: 0.01, pagerank: 0.0050, fanout: 0, uuid: 'c3d4e5f6-0003-0003-0003-000000000101' },
+      { id: 'h-scan-02', type: 'Host',    label: '10.0.3.2',    community: 1, betweenness: 0.01, pagerank: 0.0050, fanout: 0, uuid: 'c3d4e5f6-0003-0003-0003-000000000102' },
+      { id: 'h-scan-03', type: 'Host',    label: '10.0.3.3',    community: 1, betweenness: 0.01, pagerank: 0.0050, fanout: 0, uuid: 'c3d4e5f6-0003-0003-0003-000000000103' },
+      { id: 'h-scan-04', type: 'Host',    label: '10.0.3.4',    community: 1, betweenness: 0.01, pagerank: 0.0050, fanout: 0, uuid: 'c3d4e5f6-0003-0003-0003-000000000104' },
+      { id: 'h-scan-05', type: 'Host',    label: '10.0.3.5',    community: 1, betweenness: 0.01, pagerank: 0.0050, fanout: 0, uuid: 'c3d4e5f6-0003-0003-0003-000000000105' },
+      { id: 'h-scan-06', type: 'Host',    label: '10.0.3.6',    community: 1, betweenness: 0.01, pagerank: 0.0050, fanout: 0, uuid: 'c3d4e5f6-0003-0003-0003-000000000106' },
+      { id: 'h-scan-07', type: 'Host',    label: '10.0.3.7',    community: 1, betweenness: 0.01, pagerank: 0.0050, fanout: 0, uuid: 'c3d4e5f6-0003-0003-0003-000000000107' },
+      { id: 'h-scan-08', type: 'Host',    label: '10.0.3.8',    community: 1, betweenness: 0.01, pagerank: 0.0050, fanout: 0, uuid: 'c3d4e5f6-0003-0003-0003-000000000108' },
+      { id: 'h-scan-09', type: 'Host',    label: '10.0.3.9',    community: 1, betweenness: 0.01, pagerank: 0.0050, fanout: 0, uuid: 'c3d4e5f6-0003-0003-0003-000000000109' },
+      { id: 'h-scan-10', type: 'Host',    label: '10.0.3.10',   community: 1, betweenness: 0.01, pagerank: 0.0050, fanout: 0, uuid: 'c3d4e5f6-0003-0003-0003-000000000110' },
+      { id: 'h-scan-11', type: 'Host',    label: '10.0.3.11',   community: 1, betweenness: 0.01, pagerank: 0.0050, fanout: 0, uuid: 'c3d4e5f6-0003-0003-0003-000000000111' },
+      { id: 'h-scan-12', type: 'Host',    label: '10.0.3.12',   community: 1, betweenness: 0.01, pagerank: 0.0050, fanout: 0, uuid: 'c3d4e5f6-0003-0003-0003-000000000112' },
+    ],
+    edges: [
+      // Normal edges
+      { source: 'u-alice',    target: 'h-devhost1', rel_type: 'logged_into' },
+      { source: 'u-alice',    target: 'h-devhost2', rel_type: 'logged_into' },
+      { source: 'u-bob',      target: 'h-devhost1', rel_type: 'logged_into' },
+      { source: 'u-carol',    target: 'h-devhost2', rel_type: 'logged_into' },
+      { source: 'u-dave',     target: 'h-prodapp',  rel_type: 'logged_into' },
+      { source: 'u-dave',     target: 'h-proddb',   rel_type: 'logged_into' },
+      { source: 'u-eve',      target: 'h-prodapp',  rel_type: 'logged_into' },
+      { source: 'u-alice',    target: 'ip-10-1',    rel_type: 'authenticated_from' },
+      { source: 'u-bob',      target: 'ip-10-2',    rel_type: 'authenticated_from' },
+      { source: 'u-dave',     target: 'ip-10-3',    rel_type: 'authenticated_from' },
+      { source: 'u-eve',      target: 'ip-10-4',    rel_type: 'authenticated_from' },
+      { source: 'h-devhost1', target: 'p-sshd',     rel_type: 'runs' },
+      { source: 'h-prodapp',  target: 'p-nginx',    rel_type: 'runs' },
+      { source: 'h-proddb',   target: 'p-postgres', rel_type: 'runs' },
+      { source: 'h-dns1',     target: 'p-named',    rel_type: 'runs' },
+      { source: 'h-dns2',     target: 'p-named',    rel_type: 'runs' },
+      { source: 'p-sshd',     target: 'f-authlog',  rel_type: 'writes' },
+      { source: 'p-sshd',     target: 'f-sshconf',  rel_type: 'reads' },
+      { source: 'p-nginx',    target: 'f-nginx-log',rel_type: 'writes' },
+      { source: 'p-postgres', target: 'f-dbdata',   rel_type: 'reads' },
+      { source: 'p-named',    target: 'f-named-conf',rel_type: 'reads' },
+      { source: 'h-devhost1', target: 'd-github',   rel_type: 'dns_query' },
+      { source: 'h-devhost2', target: 'd-npm',      rel_type: 'dns_query' },
+      { source: 'h-prodapp',  target: 'd-internal', rel_type: 'dns_query' },
+      { source: 'h-dns1',     target: 'ip-ext-1',   rel_type: 'resolved_to' },
+      { source: 'h-dns2',     target: 'ip-ext-2',   rel_type: 'resolved_to' },
+      { source: 'h-devhost1', target: 'd-google',   rel_type: 'dns_query' },
+      { source: 'h-prodapp',  target: 'h-proddb',   rel_type: 'db_connect' },
+
+      // Compromised host → all scan targets (anomalous fan-out)
+      { source: 'h-compromised', target: 'h-devhost1', rel_type: 'port_scan', anomalous: true },
+      { source: 'h-compromised', target: 'h-prodapp',  rel_type: 'port_scan', anomalous: true },
+      { source: 'h-compromised', target: 'h-proddb',   rel_type: 'port_scan', anomalous: true },
+      { source: 'h-compromised', target: 'h-scan-01',  rel_type: 'port_scan', anomalous: true },
+      { source: 'h-compromised', target: 'h-scan-02',  rel_type: 'port_scan', anomalous: true },
+      { source: 'h-compromised', target: 'h-scan-03',  rel_type: 'port_scan', anomalous: true },
+      { source: 'h-compromised', target: 'h-scan-04',  rel_type: 'port_scan', anomalous: true },
+      { source: 'h-compromised', target: 'h-scan-05',  rel_type: 'port_scan', anomalous: true },
+      { source: 'h-compromised', target: 'h-scan-06',  rel_type: 'port_scan', anomalous: true },
+      { source: 'h-compromised', target: 'h-scan-07',  rel_type: 'port_scan', anomalous: true },
+      { source: 'h-compromised', target: 'h-scan-08',  rel_type: 'port_scan', anomalous: true },
+      { source: 'h-compromised', target: 'h-scan-09',  rel_type: 'port_scan', anomalous: true },
+      { source: 'h-compromised', target: 'h-scan-10',  rel_type: 'port_scan', anomalous: true },
+      { source: 'h-compromised', target: 'h-scan-11',  rel_type: 'port_scan', anomalous: true },
+      { source: 'h-compromised', target: 'h-scan-12',  rel_type: 'port_scan', anomalous: true },
+      { source: 'h-compromised', target: 'h-dns1',     rel_type: 'port_scan', anomalous: true },
+    ],
+  },
+};
+
+
+// ============================================================
+// GRAPH STATE
+// ============================================================
+let simulation = null;
+let activeFilters = new Set(['User', 'IP', 'Host', 'Process', 'File', 'Domain']);
+let currentScenario = 'normal';
+
+const svg = d3.select('#graph-svg');
+const container = document.getElementById('graph-container');
+
+// Main group for zoom/pan transform
+const g = svg.append('g').attr('class', 'graph-root');
+const hullLayer  = g.append('g').attr('class', 'hulls');
+const edgeLayer  = g.append('g').attr('class', 'edges');
+const nodeLabelLayer = g.append('g').attr('class', 'node-labels');
+const nodeLayer  = g.append('g').attr('class', 'nodes');
+
+
+// ============================================================
+// ZOOM / PAN
+// ============================================================
+const zoomBehavior = d3.zoom()
+  .scaleExtent([0.3, 5])
+  .on('zoom', (event) => {
+    g.attr('transform', event.transform);
+  });
+
+svg.call(zoomBehavior);
+
+// Click on SVG background → close sidebar
+svg.on('click', (event) => {
+  if (event.target === svg.node() || event.target.classList.contains('graph-root')) {
+    closeSidebar();
+  }
+});
+
+
+// ============================================================
+// COMMUNITY HULL COLORS
+// ============================================================
+const COMMUNITY_COLORS = ['#4285f4', '#fa7b17', '#34a853', '#9334e6', '#f9ab00', '#00bcd4'];
+
+function communityColor(id) {
+  return COMMUNITY_COLORS[id % COMMUNITY_COLORS.length];
+}
+
+
+// ============================================================
+// DRAW GRAPH
+// ============================================================
+function getSize() {
+  const rect = container.getBoundingClientRect();
+  return { width: rect.width || 800, height: rect.height || 600 };
+}
+
+function loadScenario(key) {
+  currentScenario = key;
+  const raw = SCENARIOS[key];
+
+  // Deep-copy to avoid D3 mutating the originals
+  const allNodes = raw.nodes.map(n => ({ ...n }));
+  const allEdges = raw.edges.map(e => ({ ...e }));
+
+  // Filter nodes and edges by active type filters
+  const visibleNodes = allNodes.filter(n => activeFilters.has(n.type));
+  const visibleIdSet = new Set(visibleNodes.map(n => n.id));
+  const visibleEdges = allEdges.filter(
+    e => visibleIdSet.has(e.source) && visibleIdSet.has(e.target)
+  );
+
+  // Build adjacency for sidebar
+  const edgeIndex = buildEdgeIndex(allEdges);
+
+  drawGraph(visibleNodes, visibleEdges, allNodes, edgeIndex);
+}
+
+function buildEdgeIndex(edges) {
+  const idx = {};
+  edges.forEach(e => {
+    const src = typeof e.source === 'object' ? e.source.id : e.source;
+    const tgt = typeof e.target === 'object' ? e.target.id : e.target;
+    if (!idx[src]) idx[src] = [];
+    if (!idx[tgt]) idx[tgt] = [];
+    idx[src].push({ rel_type: e.rel_type, other: tgt, anomalous: !!e.anomalous });
+    idx[tgt].push({ rel_type: e.rel_type, other: src, anomalous: !!e.anomalous });
+  });
+  return idx;
+}
+
+function drawGraph(nodes, edges, allNodes, edgeIndex) {
+  // Stop any running simulation
+  if (simulation) simulation.stop();
+
+  // Clear layers
+  hullLayer.selectAll('*').remove();
+  edgeLayer.selectAll('*').remove();
+  nodeLabelLayer.selectAll('*').remove();
+  nodeLayer.selectAll('*').remove();
+
+  const { width, height } = getSize();
+
+  // ── Edges ──
+  const edgeSel = edgeLayer.selectAll('.edge-group')
+    .data(edges)
+    .join('g')
+    .attr('class', 'edge-group');
+
+  const edgeLine = edgeSel.append('line')
+    .attr('class', d => 'edge-line' + (d.anomalous ? ' anomalous' : ''));
+
+  const edgeLabel = edgeSel.append('text')
+    .attr('class', 'edge-label')
+    .text(d => d.rel_type);
+
+  // ── Nodes ──
+  const nodeSel = nodeLayer.selectAll('.node')
+    .data(nodes, d => d.id)
+    .join('g')
+    .attr('class', d => 'node' + (d.anomalous ? ' anomalous' : ''))
+    .call(dragBehavior());
+
+  nodeSel.append('circle')
+    .attr('r', 12)
+    .attr('fill', d => colorFor(d.type))
+    .attr('stroke', d => d3.color(colorFor(d.type)).darker(0.8))
+    .attr('stroke-width', 2);
+
+  nodeSel.on('click', (event, d) => {
+    event.stopPropagation();
+    openSidebar(d, allNodes, edgeIndex);
+  });
+
+  // ── Node labels ──
+  const labelSel = nodeLabelLayer.selectAll('.node-label')
+    .data(nodes, d => d.id)
+    .join('text')
+    .attr('class', 'node-label')
+    .attr('font-size', 10)
+    .attr('fill', 'var(--text-color)')
+    .attr('text-anchor', 'middle')
+    .attr('dominant-baseline', 'hanging')
+    .attr('pointer-events', 'none')
+    .text(d => d.label.length > 15 ? d.label.slice(0, 14) + '…' : d.label);
+
+  // ── Community hulls ──
+  function updateHulls() {
+    const byComm = d3.group(nodes, d => d.community);
+    const hullData = [];
+    byComm.forEach((members, commId) => {
+      if (members.length < 3) return;
+      const pts = members.map(d => [d.x || 0, d.y || 0]);
+      const hull = d3.polygonHull(pts);
+      if (hull) hullData.push({ commId, hull });
+    });
+
+    hullLayer.selectAll('.hull')
+      .data(hullData, d => d.commId)
+      .join('path')
+      .attr('class', 'hull')
+      .attr('d', d => 'M' + d.hull.map(p => p.join(',')).join('L') + 'Z')
+      .attr('fill', d => communityColor(d.commId))
+      .attr('stroke', d => communityColor(d.commId));
+  }
+
+  // ── Simulation ──
+  simulation = d3.forceSimulation(nodes)
+    .force('link',    d3.forceLink(edges).id(d => d.id).distance(80))
+    .force('charge',  d3.forceManyBody().strength(-200))
+    .force('center',  d3.forceCenter(width / 2, height / 2))
+    .force('collide', d3.forceCollide(20))
+    .on('tick', () => {
+      // Update edge positions
+      edgeLine
+        .attr('x1', d => d.source.x)
+        .attr('y1', d => d.source.y)
+        .attr('x2', d => d.target.x)
+        .attr('y2', d => d.target.y);
+
+      // Update edge label positions and rotation
+      edgeLabel
+        .attr('x', d => (d.source.x + d.target.x) / 2)
+        .attr('y', d => (d.source.y + d.target.y) / 2)
+        .attr('transform', d => {
+          const dx = d.target.x - d.source.x;
+          const dy = d.target.y - d.source.y;
+          const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+          const mx = (d.source.x + d.target.x) / 2;
+          const my = (d.source.y + d.target.y) / 2;
+          return `rotate(${angle},${mx},${my})`;
+        });
+
+      // Update node and label positions
+      nodeSel.attr('transform', d => `translate(${d.x},${d.y})`);
+      labelSel.attr('x', d => d.x).attr('y', d => d.y + 14);
+
+      // Recompute hulls
+      updateHulls();
+    });
+
+  // Reset zoom to fit
+  svg.transition().duration(300).call(
+    zoomBehavior.transform,
+    d3.zoomIdentity.translate(0, 0).scale(1)
+  );
+}
+
+
+// ============================================================
+// DRAG BEHAVIOR
+// ============================================================
+function dragBehavior() {
+  return d3.drag()
+    .on('start', (event, d) => {
+      if (!event.active) simulation.alphaTarget(0.3).restart();
+      d.fx = d.x;
+      d.fy = d.y;
+    })
+    .on('drag', (event, d) => {
+      d.fx = event.x;
+      d.fy = event.y;
+    })
+    .on('end', (event, d) => {
+      if (!event.active) simulation.alphaTarget(0);
+      d.fx = null;
+      d.fy = null;
+    });
+}
+
+
+// ============================================================
+// SIDEBAR
+// ============================================================
+const sidebar = document.getElementById('sidebar');
+
+function openSidebar(node, allNodes, edgeIndex) {
+  const nodeMap = new Map(allNodes.map(n => [n.id, n]));
+
+  document.getElementById('sidebar-title').textContent = 'Entity Details';
+
+  const dot = document.getElementById('sidebar-type-dot');
+  dot.style.background = colorFor(node.type);
+  document.getElementById('sidebar-type-label').textContent = node.type;
+
+  document.getElementById('sd-label').textContent = node.label;
+  document.getElementById('sd-uuid').textContent = node.uuid ? node.uuid.slice(0, 18) + '…' : '—';
+  document.getElementById('sd-community').textContent = node.community !== undefined ? `Community ${node.community}` : '—';
+  document.getElementById('sd-betweenness').textContent = typeof node.betweenness === 'number' ? node.betweenness.toFixed(2) : '—';
+  document.getElementById('sd-pagerank').textContent = typeof node.pagerank === 'number' ? node.pagerank.toFixed(4) : '—';
+  document.getElementById('sd-fanout').textContent = typeof node.fanout === 'number' ? node.fanout : '—';
+
+  const edgesContainer = document.getElementById('sd-edges');
+  edgesContainer.innerHTML = '';
+  const connected = edgeIndex[node.id] || [];
+  if (connected.length === 0) {
+    edgesContainer.innerHTML = '<div style="font-size:11px;color:var(--label-color)">No edges</div>';
+  } else {
+    connected.forEach(e => {
+      const other = nodeMap.get(e.other);
+      const otherLabel = other ? other.label : e.other;
+      const div = document.createElement('div');
+      div.className = 'edge-item' + (e.anomalous ? ' anomalous-edge' : '');
+      div.textContent = `${e.rel_type} → ${otherLabel}`;
+      edgesContainer.appendChild(div);
+    });
+  }
+
+  sidebar.classList.add('open');
+}
+
+function closeSidebar() {
+  sidebar.classList.remove('open');
+}
+
+document.getElementById('sidebar-close').addEventListener('click', closeSidebar);
+
+
+// ============================================================
+// FILTERS
+// ============================================================
+document.querySelectorAll('#filter-group input[type="checkbox"]').forEach(cb => {
+  cb.addEventListener('change', () => {
+    if (cb.checked) {
+      activeFilters.add(cb.dataset.type);
+    } else {
+      activeFilters.delete(cb.dataset.type);
+    }
+    loadScenario(currentScenario);
+  });
+});
+
+
+// ============================================================
+// SCENARIO DROPDOWN
+// ============================================================
+document.getElementById('scenario-select').addEventListener('change', (e) => {
+  loadScenario(e.target.value);
+  closeSidebar();
+});
+
+
+// ============================================================
+// RESIZE HANDLER
+// ============================================================
+const resizeObserver = new ResizeObserver(() => {
+  if (simulation) {
+    const { width, height } = getSize();
+    simulation.force('center', d3.forceCenter(width / 2, height / 2));
+    simulation.alpha(0.1).restart();
+  }
+});
+resizeObserver.observe(container);
+
+
+// ============================================================
+// INITIAL LOAD
+// ============================================================
+loadScenario('normal');
+</script>
+</body>
+</html>
