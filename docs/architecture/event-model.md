@@ -145,48 +145,48 @@ The security and observability industry has no single standard for log events. F
 Traditional tools pick one schema and translate everything into it — losing information in the process. Seerflow takes a different approach: **carry all four schemas simultaneously** in a single struct. No translation, no lossy mapping, no schema conversion at query time.
 
 ```mermaid
-graph TB
-    SE["🔷 SeerflowEvent<br/><small>One struct, four schemas</small>"]
+graph LR
+    SE["🔷 <b>SeerflowEvent</b><br/>One struct, four schemas"]
 
-    subgraph OTel["OpenTelemetry"]
-        direction LR
-        OT1["trace_id"]
-        OT2["span_id"]
-        OT3["otel_severity"]
-        OT4["body"]
-        OT5["resource_attrs"]
+    subgraph OTel["📡 OpenTelemetry"]
+        OT1["trace_id<br/><small>Distributed trace correlation</small>"]
+        OT2["span_id<br/><small>Span within a trace</small>"]
+        OT3["otel_severity<br/><small>Severity 1-24</small>"]
+        OT4["body<br/><small>Raw payload (deferred decode)</small>"]
+        OT5["resource_attrs<br/><small>service.name, host.name, ...</small>"]
     end
 
-    subgraph ECS["Elastic Common Schema"]
-        direction LR
-        ECS1["event_kind"]
-        ECS2["event_category"]
-        ECS3["event_type"]
-        ECS4["event_outcome"]
-        ECS5["event_action"]
+    subgraph ECS["📋 Elastic Common Schema"]
+        ECS1["event_kind<br/><small>alert · event · metric · state</small>"]
+        ECS2["event_category<br/><small>authentication · process · network</small>"]
+        ECS3["event_type<br/><small>start · end · info · error</small>"]
+        ECS4["event_outcome<br/><small>success · failure · unknown</small>"]
+        ECS5["event_action<br/><small>ssh_login · file_create · ...</small>"]
     end
 
-    subgraph OCSF_g["OCSF"]
-        direction LR
-        OC1["category_uid"]
-        OC2["class_uid"]
-        OC3["type_uid"]
-        OC4["activity_id"]
+    subgraph OCSF_g["🔢 OCSF"]
+        OC1["category_uid<br/><small>1=System · 3=Identity · 4=Network</small>"]
+        OC2["class_uid<br/><small>3002=Authentication</small>"]
+        OC3["type_uid<br/><small>300201=Logon Failed</small>"]
+        OC4["activity_id<br/><small>1=Logon · 3=Terminate</small>"]
     end
 
-    subgraph Sigma_g["Sigma"]
-        direction LR
-        SG1["log_source_category"]
-        SG2["log_source_product"]
-        SG3["log_source_service"]
+    subgraph Sigma_g["🛡️ Sigma"]
+        SG1["log_source_category<br/><small>process_creation · firewall</small>"]
+        SG2["log_source_product<br/><small>linux · windows · aws</small>"]
+        SG3["log_source_service<br/><small>sshd · nginx · cloudtrail</small>"]
     end
 
-    SE --> OTel
-    SE --> ECS
-    SE --> OCSF_g
-    SE --> Sigma_g
+    SE --> OT1 & OT2 & OT3 & OT4 & OT5
+    SE --> ECS1 & ECS2 & ECS3 & ECS4 & ECS5
+    SE --> OC1 & OC2 & OC3 & OC4
+    SE --> SG1 & SG2 & SG3
 
     style SE fill:#5154B4,stroke:#333,color:#fff
+    style OTel fill:#e3f2fd,stroke:#1565c0,color:#0d47a1
+    style ECS fill:#fff3e0,stroke:#e65100,color:#bf360c
+    style OCSF_g fill:#f3e5f5,stroke:#6a1b9a,color:#4a148c
+    style Sigma_g fill:#e8f5e9,stroke:#2e7d32,color:#1b5e20
 ```
 
 ### Who Reads What
