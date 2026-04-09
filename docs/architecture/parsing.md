@@ -32,6 +32,22 @@ Without masking, every unique IP would create a separate template. With masking,
 
 **Step 2 — Tree traversal:** The masked message traverses a fixed-depth parse tree (default depth=4). At each level, the tree matches tokens against existing cluster nodes. If a cluster matches with similarity ≥ `sim_th` (default 0.4), the message joins that cluster. Otherwise, a new cluster is created.
 
+```mermaid
+graph TD
+    Root["Root Node"] --> L5["Length: 5 tokens"]
+    Root --> L7["Length: 7 tokens"]
+    Root --> L8["Length: 8 tokens"]
+    L7 --> Failed["'Failed'"]
+    L7 --> Connection["'Connection'"]
+    Failed --> C42["Cluster 42<br/><small>Failed password for &lt;*&gt; from &lt;*&gt; port &lt;*&gt;</small>"]
+    Failed --> C51["Cluster 51<br/><small>Failed publickey for &lt;*&gt; from &lt;*&gt; port &lt;*&gt;</small>"]
+    Connection --> C63["Cluster 63<br/><small>Connection closed by &lt;*&gt; port &lt;*&gt;</small>"]
+
+    style C42 fill:#e8f5e9,stroke:#2e7d32
+```
+
+Messages enter at the root, route by token count, then by first token at each depth level. Leaf nodes are template clusters. New messages either join an existing cluster (similarity ≥ `sim_th`) or create a new one.
+
 **Step 3 — Template + parameters:** The result is a template ID, template string, and extracted parameters:
 
 ```
