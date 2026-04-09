@@ -133,11 +133,23 @@ The `SeverityLevel` enum maps to a 7-level scale: TRACE (0), INFORMATIONAL (1), 
 
 ### Schema Unification
 
+The security and observability industry has no single standard for log events. Four competing schemas dominate, each designed for a different purpose:
+
+| Schema | Origin | Strength | Used by |
+|--------|--------|----------|---------|
+| **OpenTelemetry** | CNCF (2019) | Distributed tracing, nanosecond timestamps, resource attributes | Cloud-native apps, Kubernetes, OTel Collector |
+| **Elastic Common Schema** | Elastic (2019) | Human-readable event classification (`event.kind/category/type/outcome`) | Elasticsearch, Kibana, Elastic SIEM |
+| **OCSF** | AWS + Splunk (2022) | Numeric taxonomy for machine processing (`category_uid/class_uid/type_uid`) | AWS Security Lake, Splunk, CrowdStrike |
+| **Sigma** | Open-source (2017) | Portable detection rules via `logsource.category/product/service` matching | 3,000+ SigmaHQ rules, every major SIEM |
+
+Traditional tools pick one schema and translate everything into it — losing information in the process. Seerflow takes a different approach: **carry all four schemas simultaneously** in a single struct. No translation, no lossy mapping, no schema conversion at query time.
+
 ```mermaid
 graph TB
-    SE["SeerflowEvent"]
+    SE["🔷 SeerflowEvent<br/><small>One struct, four schemas</small>"]
 
-    subgraph "OpenTelemetry"
+    subgraph OTel["OpenTelemetry"]
+        direction LR
         OT1["trace_id"]
         OT2["span_id"]
         OT3["otel_severity"]
@@ -145,7 +157,8 @@ graph TB
         OT5["resource_attrs"]
     end
 
-    subgraph "Elastic Common Schema"
+    subgraph ECS["Elastic Common Schema"]
+        direction LR
         ECS1["event_kind"]
         ECS2["event_category"]
         ECS3["event_type"]
@@ -153,26 +166,72 @@ graph TB
         ECS5["event_action"]
     end
 
-    subgraph "OCSF"
+    subgraph OCSF_g["OCSF"]
+        direction LR
         OC1["category_uid"]
         OC2["class_uid"]
         OC3["type_uid"]
         OC4["activity_id"]
     end
 
-    subgraph "Sigma"
+    subgraph Sigma_g["Sigma"]
+        direction LR
         SG1["log_source_category"]
         SG2["log_source_product"]
         SG3["log_source_service"]
     end
 
-    SE --> OT1 & OT2 & OT3 & OT4 & OT5
-    SE --> ECS1 & ECS2 & ECS3 & ECS4 & ECS5
-    SE --> OC1 & OC2 & OC3 & OC4
-    SE --> SG1 & SG2 & SG3
+    SE --> OTel
+    SE --> ECS
+    SE --> OCSF_g
+    SE --> Sigma_g
+
+    style SE fill:#5154B4,stroke:#333,color:#fff
 ```
 
-Each downstream consumer queries only its native fields — the Sigma engine reads `log_source_*`, the correlation engine reads `entity_refs` and `related_*`, the dashboard reads `event_kind` and `risk_score`. No translation needed.
+### Who Reads What
+
+Each pipeline component queries only the fields it understands — no component needs to know about the other schemas:
+
+| Component | Schema it reads | Fields it uses | Why |
+|-----------|----------------|----------------|-----|
+| **OTLP receivers** | OpenTelemetry | `trace_id`, `span_id`, `otel_severity`, `body`, `resource_attrs` | Native format — zero conversion on ingest |
+| **Sigma engine** | Sigma | `log_source_category`, `log_source_product`, `log_source_service` | Rule matching requires logsource fields to route rules to the right events |
+| **Detection ensemble** | Seerflow-native | `anomaly_score`, `risk_score`, `template_id`, `related_*` | ML models and scoring don't care about classification schemas |
+| **Correlation engine** | ECS + Seerflow | `event_category`, `event_outcome`, `entity_refs`, `related_*` | Entity graph needs both classification context and entity references |
+| **Dashboard / alerting** | ECS + OCSF | `event_kind`, `event_category`, `category_uid`, `class_uid` | Human-readable labels (ECS) + machine-readable taxonomy (OCSF) for filtering |
+| **Export / SIEM forwarding** | All four | Everything | Forward events to downstream systems in their native schema without translation |
+
+### Concrete Example: One Event, Four Lenses
+
+A single SSH brute-force event carries all four schemas at once:
+
+```
+OpenTelemetry lens:
+  trace_id: "4bf92f3577b34da6a3ce929d0e0e4736"
+  otel_severity: 13 (WARN)
+  resource_attrs: {"service.name": "sshd", "host.name": "web-prod-01"}
+
+ECS lens:
+  event_kind: "alert"
+  event_category: "authentication"
+  event_type: "start"
+  event_outcome: "failure"
+  event_action: "ssh_login"
+
+OCSF lens:
+  category_uid: 3        → Identity & Access Management
+  class_uid: 3002        → Authentication
+  type_uid: 300201       → Authentication: Logon — Failed
+  activity_id: 1         → Logon
+
+Sigma lens:
+  log_source_product: "linux"
+  log_source_service: "sshd"
+  → matches rule: "Sigma SSH Brute Force Detection"
+```
+
+No translation happened. The OTLP receiver populated the OTel fields at ingest. The normalizer set the ECS and OCSF fields based on message classification. The Sigma engine matched rules using the logsource fields. Every downstream consumer got exactly the fields it needed, in its native format.
 
 ## Configuration
 
