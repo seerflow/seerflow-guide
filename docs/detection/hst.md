@@ -226,3 +226,5 @@ The `dominant_signal: "hst"` field indicates that content novelty (not volume or
 - [Ensemble overview](index.md)
 - [Scoring & Attack Mapping](scoring.md)
 - [Configuration Reference](../reference/config.md)
+
+**Next:** [Holt-Winters →](holt-winters.md) — seasonal volume anomaly detection via triple exponential smoothing.

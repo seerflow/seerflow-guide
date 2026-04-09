@@ -185,3 +185,5 @@ This is useful for detecting service outages, log pipeline breaks, or an attacke
 - [Anomaly Detection concepts](../security-primer/anomaly-detection.md) — background on EVT and streaming thresholds
 - [Configuration Reference](../reference/config.md) — `dspot_calibration_window`, `dspot_risk_level`, `dspot_initial_percentile`
 - [Deployment Risk](../ops-primer/deployment-risk.md) — ops context for threshold adaptation during deploys
+
+**Next:** [Scoring & Attack Mapping →](scoring.md) — how detector scores are blended and mapped to MITRE ATT&CK.

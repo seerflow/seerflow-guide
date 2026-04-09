@@ -85,3 +85,5 @@ A brief overview — full detail including weights and amplification math is in 
 - [Security Primer: Anomaly Detection](../security-primer/anomaly-detection.md) — background concepts behind streaming ML detection
 - [Architecture: Pipeline](../architecture/pipeline.md) — where the detection ensemble fits in the broader processing pipeline
 - [Configuration Reference](../reference/config.md) — all parameters controlling the ensemble
+
+**Next:** [Half-Space Trees →](hst.md) — streaming content anomaly detection via random half-space partitions.

@@ -156,3 +156,5 @@ Change point declared in **under 1 minute** — `g_upper` exceeds threshold on t
 ---
 
 **See also:** [Anomaly Detection](../security-primer/anomaly-detection.md) · [Ensemble](index.md) · [Scoring](scoring.md) · [Config Reference](../reference/config.md)
+
+**Next:** [Markov Chains →](markov.md) — sequence anomaly detection via per-entity transition matrices.

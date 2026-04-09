@@ -174,3 +174,5 @@ Sample detector output:
 - [CUSUM](cusum.md)
 - [Scoring & Attack Mapping](scoring.md)
 - [Configuration Reference](../reference/config.md)
+
+**Next:** [DSPOT →](dspot.md) — adaptive thresholds via Extreme Value Theory and GPD tail fitting.

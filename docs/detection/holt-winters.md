@@ -187,3 +187,5 @@ The ensemble packages the Holt-Winters score alongside the other detector scores
 - [Ensemble & Blending](index.md) — how Holt-Winters scores combine with HST, CUSUM, and Markov
 - [Scoring & Attack Mapping](scoring.md) — blended score normalization and MITRE ATT&CK mapping
 - [Configuration Reference](../reference/config.md) — full parameter list with environment variable names
+
+**Next:** [CUSUM →](cusum.md) — change-point detection via bidirectional cumulative sums.

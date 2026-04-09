@@ -278,3 +278,5 @@ During warmup, some channels remain NaN. The weighted average divides by the act
 - [Ensemble Overview](index.md) — how all detectors and scoring connect end-to-end
 - [Anomaly Detection concepts](../security-primer/anomaly-detection.md) — background on z-score normalization and signal amplification
 - [Configuration Reference](../reference/config.md) — `weights_content`, `weights_volume`, `weights_sequence`, `weights_pattern`
+
+**Next:** [Correlation →](../correlation/index.md) — how Seerflow correlates alerts across sources and time.
