@@ -149,32 +149,32 @@ graph LR
     SE["🔷 <b>SeerflowEvent</b><br/>One struct, four schemas"]
 
     subgraph OTel["📡 OpenTelemetry"]
-        OT1["trace_id<br/><small>Distributed trace correlation</small>"]
-        OT2["span_id<br/><small>Span within a trace</small>"]
-        OT3["otel_severity<br/><small>Severity 1-24</small>"]
-        OT4["body<br/><small>Raw payload (deferred decode)</small>"]
-        OT5["resource_attrs<br/><small>service.name, host.name, ...</small>"]
+        OT1["<b>trace_id</b><br/>Distributed trace correlation"]
+        OT2["<b>span_id</b><br/>Span within a trace"]
+        OT3["<b>otel_severity</b><br/>Severity 1-24"]
+        OT4["<b>body</b><br/>Raw payload (deferred decode)"]
+        OT5["<b>resource_attrs</b><br/>service.name, host.name, ..."]
     end
 
     subgraph ECS["📋 Elastic Common Schema"]
-        ECS1["event_kind<br/><small>alert · event · metric · state</small>"]
-        ECS2["event_category<br/><small>authentication · process · network</small>"]
-        ECS3["event_type<br/><small>start · end · info · error</small>"]
-        ECS4["event_outcome<br/><small>success · failure · unknown</small>"]
-        ECS5["event_action<br/><small>ssh_login · file_create · ...</small>"]
+        ECS1["<b>event_kind</b><br/>alert · event · metric · state"]
+        ECS2["<b>event_category</b><br/>authentication · process · network"]
+        ECS3["<b>event_type</b><br/>start · end · info · error"]
+        ECS4["<b>event_outcome</b><br/>success · failure · unknown"]
+        ECS5["<b>event_action</b><br/>ssh_login · file_create · ..."]
     end
 
     subgraph OCSF_g["🔢 OCSF"]
-        OC1["category_uid<br/><small>1=System · 3=Identity · 4=Network</small>"]
-        OC2["class_uid<br/><small>3002=Authentication</small>"]
-        OC3["type_uid<br/><small>300201=Logon Failed</small>"]
-        OC4["activity_id<br/><small>1=Logon · 3=Terminate</small>"]
+        OC1["<b>category_uid</b><br/>1=System · 3=Identity · 4=Network"]
+        OC2["<b>class_uid</b><br/>3002=Authentication"]
+        OC3["<b>type_uid</b><br/>300201=Logon Failed"]
+        OC4["<b>activity_id</b><br/>1=Logon · 3=Terminate"]
     end
 
     subgraph Sigma_g["🛡️ Sigma"]
-        SG1["log_source_category<br/><small>process_creation · firewall</small>"]
-        SG2["log_source_product<br/><small>linux · windows · aws</small>"]
-        SG3["log_source_service<br/><small>sshd · nginx · cloudtrail</small>"]
+        SG1["<b>log_source_category</b><br/>process_creation · firewall"]
+        SG2["<b>log_source_product</b><br/>linux · windows · aws"]
+        SG3["<b>log_source_service</b><br/>sshd · nginx · cloudtrail"]
     end
 
     SE --> OT1 & OT2 & OT3 & OT4 & OT5
@@ -183,10 +183,23 @@ graph LR
     SE --> SG1 & SG2 & SG3
 
     style SE fill:#5154B4,stroke:#333,color:#fff
-    style OTel fill:#e3f2fd,stroke:#1565c0,color:#0d47a1
-    style ECS fill:#fff3e0,stroke:#e65100,color:#bf360c
-    style OCSF_g fill:#f3e5f5,stroke:#6a1b9a,color:#4a148c
-    style Sigma_g fill:#e8f5e9,stroke:#2e7d32,color:#1b5e20
+    style OT1 fill:#1565c0,stroke:#0d47a1,color:#fff
+    style OT2 fill:#1565c0,stroke:#0d47a1,color:#fff
+    style OT3 fill:#1565c0,stroke:#0d47a1,color:#fff
+    style OT4 fill:#1565c0,stroke:#0d47a1,color:#fff
+    style OT5 fill:#1565c0,stroke:#0d47a1,color:#fff
+    style ECS1 fill:#e65100,stroke:#bf360c,color:#fff
+    style ECS2 fill:#e65100,stroke:#bf360c,color:#fff
+    style ECS3 fill:#e65100,stroke:#bf360c,color:#fff
+    style ECS4 fill:#e65100,stroke:#bf360c,color:#fff
+    style ECS5 fill:#e65100,stroke:#bf360c,color:#fff
+    style OC1 fill:#6a1b9a,stroke:#4a148c,color:#fff
+    style OC2 fill:#6a1b9a,stroke:#4a148c,color:#fff
+    style OC3 fill:#6a1b9a,stroke:#4a148c,color:#fff
+    style OC4 fill:#6a1b9a,stroke:#4a148c,color:#fff
+    style SG1 fill:#2e7d32,stroke:#1b5e20,color:#fff
+    style SG2 fill:#2e7d32,stroke:#1b5e20,color:#fff
+    style SG3 fill:#2e7d32,stroke:#1b5e20,color:#fff
 ```
 
 ### Who Reads What
