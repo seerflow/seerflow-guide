@@ -60,7 +60,7 @@ At startup, `make_handler()` wires all components together and returns a single 
 handler = make_handler(
     ensemble=detection_ensemble,
     storage=sqlite_backend,
-    sigma_holder=sigma_engine,
+    sigma_holder=sigma_holder,  # EngineHolder[SigmaEngine | None]
     entity_graph=entity_graph,
     window_buffer=window_buffer,
     risk_register=risk_register,

@@ -211,6 +211,7 @@ This functional update pattern ensures immutability throughout the pipeline. No 
         category_uid=3,                            # OCSF: Identity & Access
         class_uid=3002,                            # OCSF: Authentication
         type_uid=300201,                           # OCSF: Logon Failed
+        activity_id=1,                             # OCSF: Logon
         message="Failed password for root from 198.51.100.23 port 44123",
         source_type="syslog",
         log_source_category="",                    # Sigma
@@ -244,6 +245,7 @@ This functional update pattern ensures immutability throughout the pipeline. No 
         category_uid=1,                            # OCSF: System Activity
         class_uid=1001,                            # OCSF: Process Activity
         type_uid=100103,                           # OCSF: Terminate
+        activity_id=3,                             # OCSF: Terminate
         message="Container nginx-canary-7f8b9 exceeded memory limit 512Mi, OOMKilled",
         source_type="webhook",
         source_id="k8s-events",
