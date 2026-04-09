@@ -161,5 +161,6 @@ You now understand three key concepts:
 ### Ready to Go Deeper?
 
 - [Architecture overview &rarr;](../architecture/index.md) --- how Seerflow processes logs from ingestion to alerting
+- [Entity graph &rarr;](../entity-graph/index.md) --- graph theory, entity types, and how Seerflow builds its relationship graph
 - [Detection deep dives &rarr;](../detection/index.md) --- the math behind HST, CUSUM, Holt-Winters, and Markov detectors
 - [Tuning guide &rarr;](../operations/tuning.md) --- reducing false positives in your environment

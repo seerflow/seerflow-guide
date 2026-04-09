@@ -179,4 +179,6 @@ log_level: INFO
     - **Handler factory:** [`pipeline/handler.py`](https://github.com/seerflow/seerflow/blob/main/src/seerflow/pipeline/handler.py) — `make_handler()` wires all components into a single async closure
     - **Pipeline builder:** [`pipeline/__init__.py`](https://github.com/seerflow/seerflow/blob/main/src/seerflow/pipeline/__init__.py) — `build_pipeline()` constructs the handler from config
 
+    - **Entity graph details:** [Building the Graph →](../entity-graph/construction.md) — entity types, edge inference, and igraph implementation
+
     **Next:** [Receivers →](receivers.md) — How logs get into the pipeline.

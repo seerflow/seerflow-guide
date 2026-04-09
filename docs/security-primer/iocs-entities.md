@@ -93,7 +93,7 @@ No single log source contains all four facts. Entities are the connective tissue
 
     - Seerflow extracts **six entity types** from every log event: **IP address**, **user**, **hostname**, **domain**, **process**, and **file**. These are the building blocks of all downstream detection and correlation.
     - **Entity resolution** bridges identity gaps automatically — linking hostname to IP, IP to FQDN, cloud instance ID back to the same host. When `web-prod-01`, `10.0.1.15`, and `i-0a1b2c3d4e5f67890` appear in different logs, Seerflow knows they are the same machine.
-    - Entities power the **entity graph** — a network data structure connecting users, IPs, hosts, and domains through observed relationships. When user `deploy` authenticates from `198.51.100.23` to `web-prod-01`, which then queries `evil-c2.example.com`, those relationships become edges in the graph.
+    - Entities power the **[entity graph](../entity-graph/index.md)** — a network data structure connecting users, IPs, hosts, and domains through observed relationships. When user `deploy` authenticates from `198.51.100.23` to `web-prod-01`, which then queries `evil-c2.example.com`, those relationships become edges in the graph.
     - The **KillChainTracker** tracks entity progression across all log sources, mapping each step to the corresponding kill chain stage. It recognizes that a brute-force attempt, a successful login, a C2 connection, and data exfiltration are part of the same attack — even when each step appears in a different log.
 
     **Next:** [Sigma Rules →](sigma-rules.md)
