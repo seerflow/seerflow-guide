@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Entity Graph Explorer</title>
-  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://d3js.org/d3.v7.min.js" integrity="sha384-CjloA8y00+1SDAUkjs099PVfnY2KmDC2BZnws9kh8D/lX1s46w6EPhpXdqMfjK6i" crossorigin="anonymous"></script>
   <style>
     /* ── CSS custom properties (light defaults, overridden by theme detection) ── */
     :root {
@@ -520,19 +520,19 @@ const SCENARIOS = {
     ],
     edges: [
       // Users → Hosts (SSH login)
-      { source: 'u-alice',    target: 'h-devhost1', rel_type: 'ssh_login' },
-      { source: 'u-alice',    target: 'h-devhost2', rel_type: 'ssh_login' },
-      { source: 'u-bob',      target: 'h-devhost1', rel_type: 'ssh_login' },
-      { source: 'u-carol',    target: 'h-devhost2', rel_type: 'ssh_login' },
-      { source: 'u-dave',     target: 'h-prodapp',  rel_type: 'ssh_login' },
-      { source: 'u-dave',     target: 'h-proddb',   rel_type: 'ssh_login' },
-      { source: 'u-eve',      target: 'h-prodapp',  rel_type: 'ssh_login' },
+      { source: 'u-alice',    target: 'h-devhost1', rel_type: 'logged_into' },
+      { source: 'u-alice',    target: 'h-devhost2', rel_type: 'logged_into' },
+      { source: 'u-bob',      target: 'h-devhost1', rel_type: 'logged_into' },
+      { source: 'u-carol',    target: 'h-devhost2', rel_type: 'logged_into' },
+      { source: 'u-dave',     target: 'h-prodapp',  rel_type: 'logged_into' },
+      { source: 'u-dave',     target: 'h-proddb',   rel_type: 'logged_into' },
+      { source: 'u-eve',      target: 'h-prodapp',  rel_type: 'logged_into' },
 
       // Users → IPs
-      { source: 'u-alice',    target: 'ip-10-1',    rel_type: 'from_ip' },
-      { source: 'u-bob',      target: 'ip-10-2',    rel_type: 'from_ip' },
-      { source: 'u-dave',     target: 'ip-10-3',    rel_type: 'from_ip' },
-      { source: 'u-eve',      target: 'ip-10-4',    rel_type: 'from_ip' },
+      { source: 'u-alice',    target: 'ip-10-1',    rel_type: 'authenticated_from' },
+      { source: 'u-bob',      target: 'ip-10-2',    rel_type: 'authenticated_from' },
+      { source: 'u-dave',     target: 'ip-10-3',    rel_type: 'authenticated_from' },
+      { source: 'u-eve',      target: 'ip-10-4',    rel_type: 'authenticated_from' },
 
       // Hosts → Processes
       { source: 'h-devhost1', target: 'p-sshd',     rel_type: 'runs' },
@@ -552,8 +552,8 @@ const SCENARIOS = {
       { source: 'h-devhost1', target: 'd-github',   rel_type: 'dns_query' },
       { source: 'h-devhost2', target: 'd-npm',      rel_type: 'dns_query' },
       { source: 'h-prodapp',  target: 'd-internal', rel_type: 'dns_query' },
-      { source: 'h-dns1',     target: 'ip-ext-1',   rel_type: 'resolves' },
-      { source: 'h-dns2',     target: 'ip-ext-2',   rel_type: 'resolves' },
+      { source: 'h-dns1',     target: 'ip-ext-1',   rel_type: 'resolved_to' },
+      { source: 'h-dns2',     target: 'ip-ext-2',   rel_type: 'resolved_to' },
       { source: 'h-devhost1', target: 'd-google',   rel_type: 'dns_query' },
 
       // prod-app ↔ prod-db
@@ -613,17 +613,17 @@ const SCENARIOS = {
     ],
     edges: [
       // Normal edges
-      { source: 'u-alice',    target: 'h-devhost1', rel_type: 'ssh_login' },
-      { source: 'u-alice',    target: 'h-devhost2', rel_type: 'ssh_login' },
-      { source: 'u-bob',      target: 'h-devhost1', rel_type: 'ssh_login' },
-      { source: 'u-carol',    target: 'h-devhost2', rel_type: 'ssh_login' },
-      { source: 'u-dave',     target: 'h-prodapp',  rel_type: 'ssh_login' },
-      { source: 'u-dave',     target: 'h-proddb',   rel_type: 'ssh_login' },
-      { source: 'u-eve',      target: 'h-prodapp',  rel_type: 'ssh_login' },
-      { source: 'u-alice',    target: 'ip-10-1',    rel_type: 'from_ip' },
-      { source: 'u-bob',      target: 'ip-10-2',    rel_type: 'from_ip' },
-      { source: 'u-dave',     target: 'ip-10-3',    rel_type: 'from_ip' },
-      { source: 'u-eve',      target: 'ip-10-4',    rel_type: 'from_ip' },
+      { source: 'u-alice',    target: 'h-devhost1', rel_type: 'logged_into' },
+      { source: 'u-alice',    target: 'h-devhost2', rel_type: 'logged_into' },
+      { source: 'u-bob',      target: 'h-devhost1', rel_type: 'logged_into' },
+      { source: 'u-carol',    target: 'h-devhost2', rel_type: 'logged_into' },
+      { source: 'u-dave',     target: 'h-prodapp',  rel_type: 'logged_into' },
+      { source: 'u-dave',     target: 'h-proddb',   rel_type: 'logged_into' },
+      { source: 'u-eve',      target: 'h-prodapp',  rel_type: 'logged_into' },
+      { source: 'u-alice',    target: 'ip-10-1',    rel_type: 'authenticated_from' },
+      { source: 'u-bob',      target: 'ip-10-2',    rel_type: 'authenticated_from' },
+      { source: 'u-dave',     target: 'ip-10-3',    rel_type: 'authenticated_from' },
+      { source: 'u-eve',      target: 'ip-10-4',    rel_type: 'authenticated_from' },
       { source: 'h-devhost1', target: 'p-sshd',     rel_type: 'runs' },
       { source: 'h-prodapp',  target: 'p-nginx',    rel_type: 'runs' },
       { source: 'h-proddb',   target: 'p-postgres', rel_type: 'runs' },
@@ -637,13 +637,13 @@ const SCENARIOS = {
       { source: 'h-devhost1', target: 'd-github',   rel_type: 'dns_query' },
       { source: 'h-devhost2', target: 'd-npm',      rel_type: 'dns_query' },
       { source: 'h-prodapp',  target: 'd-internal', rel_type: 'dns_query' },
-      { source: 'h-dns1',     target: 'ip-ext-1',   rel_type: 'resolves' },
-      { source: 'h-dns2',     target: 'ip-ext-2',   rel_type: 'resolves' },
+      { source: 'h-dns1',     target: 'ip-ext-1',   rel_type: 'resolved_to' },
+      { source: 'h-dns2',     target: 'ip-ext-2',   rel_type: 'resolved_to' },
       { source: 'h-devhost1', target: 'd-google',   rel_type: 'dns_query' },
       { source: 'h-prodapp',  target: 'h-proddb',   rel_type: 'db_connect' },
 
       // Anomalous edges — attacker lateral movement (crossing dev → prod communities)
-      { source: 'u-attacker', target: 'ip-atk',     rel_type: 'from_ip',    anomalous: true },
+      { source: 'u-attacker', target: 'ip-atk',     rel_type: 'authenticated_from',    anomalous: true },
       { source: 'u-attacker', target: 'h-devhost1',  rel_type: 'ssh_brute',  anomalous: true },
       { source: 'h-devhost1', target: 'h-proddb',    rel_type: 'lateral_mvt',anomalous: true },
       { source: 'h-devhost1', target: 'f-shadow',    rel_type: 'exfil_read', anomalous: true },
@@ -705,17 +705,17 @@ const SCENARIOS = {
     ],
     edges: [
       // Normal edges
-      { source: 'u-alice',    target: 'h-devhost1', rel_type: 'ssh_login' },
-      { source: 'u-alice',    target: 'h-devhost2', rel_type: 'ssh_login' },
-      { source: 'u-bob',      target: 'h-devhost1', rel_type: 'ssh_login' },
-      { source: 'u-carol',    target: 'h-devhost2', rel_type: 'ssh_login' },
-      { source: 'u-dave',     target: 'h-prodapp',  rel_type: 'ssh_login' },
-      { source: 'u-dave',     target: 'h-proddb',   rel_type: 'ssh_login' },
-      { source: 'u-eve',      target: 'h-prodapp',  rel_type: 'ssh_login' },
-      { source: 'u-alice',    target: 'ip-10-1',    rel_type: 'from_ip' },
-      { source: 'u-bob',      target: 'ip-10-2',    rel_type: 'from_ip' },
-      { source: 'u-dave',     target: 'ip-10-3',    rel_type: 'from_ip' },
-      { source: 'u-eve',      target: 'ip-10-4',    rel_type: 'from_ip' },
+      { source: 'u-alice',    target: 'h-devhost1', rel_type: 'logged_into' },
+      { source: 'u-alice',    target: 'h-devhost2', rel_type: 'logged_into' },
+      { source: 'u-bob',      target: 'h-devhost1', rel_type: 'logged_into' },
+      { source: 'u-carol',    target: 'h-devhost2', rel_type: 'logged_into' },
+      { source: 'u-dave',     target: 'h-prodapp',  rel_type: 'logged_into' },
+      { source: 'u-dave',     target: 'h-proddb',   rel_type: 'logged_into' },
+      { source: 'u-eve',      target: 'h-prodapp',  rel_type: 'logged_into' },
+      { source: 'u-alice',    target: 'ip-10-1',    rel_type: 'authenticated_from' },
+      { source: 'u-bob',      target: 'ip-10-2',    rel_type: 'authenticated_from' },
+      { source: 'u-dave',     target: 'ip-10-3',    rel_type: 'authenticated_from' },
+      { source: 'u-eve',      target: 'ip-10-4',    rel_type: 'authenticated_from' },
       { source: 'h-devhost1', target: 'p-sshd',     rel_type: 'runs' },
       { source: 'h-prodapp',  target: 'p-nginx',    rel_type: 'runs' },
       { source: 'h-proddb',   target: 'p-postgres', rel_type: 'runs' },
@@ -729,8 +729,8 @@ const SCENARIOS = {
       { source: 'h-devhost1', target: 'd-github',   rel_type: 'dns_query' },
       { source: 'h-devhost2', target: 'd-npm',      rel_type: 'dns_query' },
       { source: 'h-prodapp',  target: 'd-internal', rel_type: 'dns_query' },
-      { source: 'h-dns1',     target: 'ip-ext-1',   rel_type: 'resolves' },
-      { source: 'h-dns2',     target: 'ip-ext-2',   rel_type: 'resolves' },
+      { source: 'h-dns1',     target: 'ip-ext-1',   rel_type: 'resolved_to' },
+      { source: 'h-dns2',     target: 'ip-ext-2',   rel_type: 'resolved_to' },
       { source: 'h-devhost1', target: 'd-google',   rel_type: 'dns_query' },
       { source: 'h-prodapp',  target: 'h-proddb',   rel_type: 'db_connect' },
 

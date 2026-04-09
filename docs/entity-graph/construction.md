@@ -92,6 +92,9 @@ The full set of edge types, defined in the `EDGE_TYPE_MAP`:
 
 Edges are bidirectional in lookup — if an event has (IP, User), Seerflow checks both (ip, user) and (user, ip) in the map.
 
+!!! note "Core Set"
+    The `EDGE_TYPE_MAP` above shows the relationship types currently implemented in `edges.py`. Additional relationship types (e.g., host-to-process, process-to-file) may be inferred by custom rules or future extensions. The [interactive explorer](algorithms.md#interactive-entity-graph-explorer) includes illustrative relationship types beyond this core set.
+
 ### Edge Deduplication
 
 The same edge can be inferred from many events. Rather than creating duplicate edges, Seerflow **merges** them:

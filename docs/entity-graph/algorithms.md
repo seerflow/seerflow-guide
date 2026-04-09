@@ -106,7 +106,12 @@ Seerflow combines the algorithms above into three detection modes, all tagged wi
 
 **Trigger:** A new edge connects entities in **different Louvain communities**.
 
-**Risk score:** Fixed at `0.6` — community crossing is always moderately suspicious but not inherently critical (legitimate cross-team access does happen).
+**Risk score:** Fixed at `0.6` (configurable via `graph.community_crossing_risk`) — community crossing is always moderately suspicious but not inherently critical (legitimate cross-team access does happen).
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `graph.community_crossing_enabled` | `true` | Enable or disable community crossing detection |
+| `graph.community_crossing_risk` | `0.6` | Fixed risk score for community crossing alerts |
 
 **Example:** User `alice` (community 0, dev team) creates an `authenticated_from` edge to `prod-db` (community 1, production). Seerflow generates a `graph-community-crossing` alert.
 
