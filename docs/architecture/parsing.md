@@ -45,8 +45,8 @@ graph TD
 
     style Root fill:#5154B4,stroke:#333,color:#fff
     style C42 fill:#1b5e20,stroke:#1b5e20,color:#fff
-    style C51 fill:#f5f5f5,stroke:#999,color:#333
-    style C63 fill:#f5f5f5,stroke:#999,color:#333
+    style C51 fill:#37474f,stroke:#263238,color:#fff
+    style C63 fill:#37474f,stroke:#263238,color:#fff
 ```
 
 Messages enter at the root, route by token count, then by first token at each depth level. Leaf nodes are template clusters. New messages either join an existing cluster (similarity ≥ `sim_th`) or create a new one.
