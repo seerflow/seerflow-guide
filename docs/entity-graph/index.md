@@ -15,6 +15,16 @@ A **graph** is a data structure made of two things:
 
 That's it. If you can draw circles and lines between them, you have a graph.
 
+```mermaid
+graph LR
+    A[Alice] --- B[Bob]
+    A --- C[Carol]
+    B --- C
+    B --- D[Dave]
+```
+
+Three nodes, four edges. Alice knows Bob and Carol; Bob knows Carol and Dave. That's a graph.
+
 ### Real-World Analogies
 
 | Analogy | Nodes | Edges |
@@ -46,6 +56,15 @@ A **multigraph** allows multiple edges between the same pair of nodes. This matt
 
 Seerflow's entity graph is a **directed multigraph**: edges have direction, and multiple edge types can exist between any two nodes.
 
+```mermaid
+graph LR
+    U[alice] -->|logged_into| H[web-server-01]
+    U -->|accessed| F[/etc/passwd]
+    U -->|logged_into| H2[dev-host-1]
+```
+
+Here `alice` has three edges: two *logged_into* edges to different hosts, and one *accessed* edge to a file. A simple graph would only allow one edge between alice and each target.
+
 ---
 
 ## Why Graphs Matter for Security
@@ -58,7 +77,18 @@ A graph tells you:
 
 > *User alice logged into web-server-01, which shares an IP with db-primary, where a privileged process just spawned a reverse shell. Alice's account has never connected to db-primary before, and the IP 10.0.0.5 is in a different network community than her usual workstation.*
 
-The graph connects the dots. Individual events are data points; the graph reveals **patterns** — lateral movement, privilege escalation, data exfiltration — that only emerge when you see relationships across events.
+The graph connects the dots:
+
+```mermaid
+graph LR
+    U[alice] -->|logged_into| H1[web-server-01]
+    H1 -->|has_ip| IP[10.0.0.5]
+    IP -->|has_ip| H2[db-primary]
+    P[reverse-shell] -->|spawned_on| H2
+    style P fill:#e53935,color:#fff
+```
+
+Individual events are data points; the graph reveals **patterns** — lateral movement, privilege escalation, data exfiltration — that only emerge when you see relationships across events.
 
 ### What Seerflow Builds
 
@@ -73,7 +103,16 @@ Seerflow constructs its entity graph in real time as events arrive. Six entity t
 | **File** | `/etc/shadow` |
 | **Domain** | `evil-c2.example.com` |
 
-Edges are inferred from events — when a log line mentions a user and a host, Seerflow creates a *logged_into* edge between them. Over time, the graph grows to represent every observed relationship across all log sources.
+Edges are inferred from events — a single log line like `Failed password for alice from 10.0.0.5 on web-server-01` creates three edges at once:
+
+```mermaid
+graph LR
+    U[alice<br/><small>User</small>] -->|authenticated_from| IP[10.0.0.5<br/><small>IP</small>]
+    U -->|logged_into| H[web-server-01<br/><small>Host</small>]
+    IP -->|has_ip| H
+```
+
+Over time, the graph grows to represent every observed relationship across all log sources.
 
 Graph algorithms then analyze this structure: **community detection** finds clusters of entities that normally interact together, **betweenness centrality** identifies bridge nodes that connect communities, and **fan-out analysis** flags entities suddenly connecting to many targets. When these patterns break — a user crosses into a community they've never touched, a host's betweenness spikes — Seerflow generates alerts.
 
