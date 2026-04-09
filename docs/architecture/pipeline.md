@@ -38,19 +38,47 @@ sequenceDiagram
     participant AD as AlertDispatcher
     participant S as Sinks
 
-    LS->>R: raw log bytes
+    LS->>R: raw log bytes (syslog, HTTP, gRPC, file)
+    Note right of R: Decode protocol, extract metadata
     R->>RM: RawEvent (put_event)
+    Note right of RM: Bounded queue (10K max)<br/>Backpressure at 80%
     RM->>N: RawEvent (from queue)
-    N->>N: Drain3 parse + entity extract
-    N->>DE: SeerflowEvent
-    DE->>DE: HST + Holt-Winters + CUSUM + Markov + DSPOT
-    DE->>SE: enriched event (scores populated)
-    SE->>SE: match Sigma rules
+    N->>N: Drain3 parse → template + params
+    N->>N: Entity extract → IPs, users, hosts
+    Note right of N: RawEvent becomes SeerflowEvent
+    N->>DE: SeerflowEvent (30+ fields populated)
+    DE->>DE: HST (content) + Holt-Winters (volume)
+    DE->>DE: CUSUM (change) + Markov (sequence)
+    DE->>DE: DSPOT auto-threshold + blended score
+    Note right of DE: anomaly_score, risk_score set
+    DE->>SE: enriched event
+    SE->>SE: Match against 3,000+ Sigma rules
+    Note right of SE: mitre_tactics, mitre_techniques set
     SE->>CE: event + rule matches
-    CE->>CE: entity graph + risk + kill chain
+    CE->>CE: Update entity graph (igraph)
+    CE->>CE: Risk accumulation (half-life decay)
+    CE->>CE: Kill-chain progression check
+    Note right of CE: Alert if risk > threshold<br/>or kill-chain ≥ 3 tactics
     CE->>AD: correlated alerts
+    AD->>AD: Dedup check (15 min window)
     AD->>S: webhook / PagerDuty
 ```
+
+**Step by step:**
+
+1. **Log Source → Receiver:** Raw bytes arrive over the wire — a syslog UDP packet, an HTTP POST, a gRPC protobuf, or a new line in a tailed file. The receiver decodes the protocol framing and extracts metadata (e.g., syslog severity).
+
+2. **Receiver → ReceiverManager:** The receiver wraps the bytes into a `RawEvent` and calls `put_event()`. If the queue is full (10K events), the call returns `False` and the receiver drops the event (backpressure).
+
+3. **ReceiverManager → EventNormalizer:** The main event loop pulls the next `RawEvent` from the queue. The normalizer decodes bytes to UTF-8, runs Drain3 to extract a template and parameters, then runs entity extraction to identify IPs, users, hosts, files, domains, and processes. The result is a fully populated `SeerflowEvent`.
+
+4. **EventNormalizer → DetectionEnsemble:** Five online ML models score the event in sequence: Half-Space Trees for content anomalies, Holt-Winters for volume spikes, CUSUM for change points, Markov chains for sequence anomalies, and DSPOT for auto-thresholds. Scores are blended into a single `anomaly_score`.
+
+5. **DetectionEnsemble → SigmaEngine:** The enriched event is matched against 3,000+ Sigma rules (logsource-indexed for throughput). Matching rules populate `mitre_tactics` and `mitre_techniques` fields.
+
+6. **SigmaEngine → CorrelationEngine:** The correlation engine updates the entity graph (linking IPs, users, and hosts seen in this event), accumulates risk per entity (with configurable half-life decay), and checks kill-chain progression. If an entity crosses the risk threshold or reaches 3+ ATT&CK tactics, an alert is generated.
+
+7. **CorrelationEngine → AlertDispatcher → Sinks:** The dispatcher checks the dedup window (default 15 minutes, per-rule overrides). If this alert hasn't been sent recently, it fires to configured sinks — webhook endpoints (Slack, Teams) and/or PagerDuty.
 
 ### The Handler Factory
 
