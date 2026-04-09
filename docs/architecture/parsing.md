@@ -43,7 +43,7 @@ graph TD
     Failed --> C51["Cluster 51<br/><small>Failed publickey for &lt;*&gt; from &lt;*&gt; port &lt;*&gt;</small>"]
     Connection --> C63["Cluster 63<br/><small>Connection closed by &lt;*&gt; port &lt;*&gt;</small>"]
 
-    style C42 fill:#e8f5e9,stroke:#2e7d32
+    style C42 fill:#c8e6c9,stroke:#2e7d32,color:#1b5e20
 ```
 
 Messages enter at the root, route by token count, then by first token at each depth level. Leaf nodes are template clusters. New messages either join an existing cluster (similarity ≥ `sim_th`) or create a new one.
