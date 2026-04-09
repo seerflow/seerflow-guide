@@ -73,7 +73,9 @@ nav:
   - Correlation:
     - correlation/index.md
     - Sigma Rules: correlation/sigma.md
+    - Correlation Engine: correlation/engine.md
     - Kill Chain: correlation/kill-chain.md
+    - Risk Accumulation: correlation/risk-accumulation.md
     - Graph-Structural: correlation/graph-structural.md
   - Operations:
     - operations/index.md

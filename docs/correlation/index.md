@@ -1,10 +1,74 @@
 # Correlation & Threat Detection
 
-!!! note "Coming Soon"
-    This page will provide an overview of Seerflow's correlation capabilities — Sigma rules, temporal windows, kill chain tracking, and graph-structural analysis.
+Individual detectors (HST, Holt-Winters, CUSUM, Markov) score events one at a time. Correlation connects the dots — joining events across sources, matching known attack patterns, tracking multi-stage campaigns, and maintaining a decaying risk score per entity. This is where isolated anomalies become actionable intelligence.
 
-## Theory
+---
 
-## Seerflow Implementation
+## The Four Strategies
 
-## Practical Examples
+| Strategy | What It Does | When It Fires | Deep Dive |
+|----------|-------------|---------------|-----------|
+| **Sigma Rules** | Pattern-matches events against known threat signatures | An event matches a Sigma rule's logsource + detection logic | [Sigma Rules](sigma.md) |
+| **Temporal Correlation** | Joins events from multiple sources within time windows | Multiple conditions across sources are met within a sliding window | [Correlation Engine](engine.md) |
+| **Kill Chain Tracking** | Tracks per-entity MITRE ATT&CK tactic progression | An entity accumulates 3+ distinct tactics within 24 hours | [Kill Chain](kill-chain.md) |
+| **Risk Accumulation** | Maintains a decaying risk score per entity | An entity's accumulated risk crosses the configured threshold | [Risk Accumulation](risk-accumulation.md) |
+
+Graph-structural correlation (community crossing, betweenness spikes, fan-out bursts) operates at the entity graph layer. See [Graph-Structural Correlation](graph-structural.md).
+
+---
+
+## How They Work Together
+
+```mermaid
+graph TD
+    E[/"Event arrives<br>(SeerflowEvent)"/]
+
+    subgraph pattern ["Pattern Matching"]
+        direction LR
+        S["Sigma Engine<br><i>logsource-indexed dispatch</i>"]
+        S -->|match| A1([Sigma Alert])
+    end
+
+    subgraph temporal ["Temporal Correlation"]
+        direction LR
+        W["Entity Window Buffer<br><i>per-entity deques · LRU eviction</i>"]
+        W --> CE["Correlation Engine<br><i>YAML rules · cross-source</i>"]
+        CE -->|rule fires| A2([Correlation Alert])
+    end
+
+    subgraph tracking ["Threat Tracking"]
+        direction LR
+        KC["Kill Chain Tracker<br><i>per-entity tactic sets</i>"]
+        KC -->|"≥ 3 tactics"| A3([Kill Chain Alert])
+        R["Risk Register<br><i>exponential decay scoring</i>"]
+        R -->|"≥ threshold"| A4([Risk Alert])
+    end
+
+    D[\"Alert Dispatch<br>(webhook · Slack · PagerDuty)"\]
+
+    E --> S
+    E --> W
+    A1 --> KC
+    A1 --> R
+    A2 --> KC
+    A2 --> R
+    A3 --> R
+    A1 --> D
+    A2 --> D
+    A3 --> D
+    A4 --> D
+```
+
+Every event passes through the Sigma engine first (pattern matching is cheap). Events also enter the correlation engine's temporal windows regardless of Sigma results. Alerts from both Sigma and correlation feed into the kill chain tracker (tactic accumulation) and risk register (score decay). Each layer can independently produce alerts — they complement rather than gate each other.
+
+---
+
+## Reading Order
+
+Pick the path that matches your goal:
+
+| Goal | Start Here | Then | Then |
+|------|-----------|------|------|
+| **Understand security detection** | [Sigma Rules](sigma.md) | [Kill Chain](kill-chain.md) | [Risk Accumulation](risk-accumulation.md) |
+| **Understand ops correlation** | [Correlation Engine](engine.md) | [Risk Accumulation](risk-accumulation.md) | — |
+| **Write custom rules** | [Sigma Rules](sigma.md) § Writing Custom Rules | [Correlation Engine](engine.md) § YAML Rule Format | — |
