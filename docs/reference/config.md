@@ -76,9 +76,11 @@ Parameters for the ML anomaly detection ensemble. These control how each detecto
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `detection.weights_content` | `float` | `0.30` | HST weight in blended score. |
-| `detection.weights_volume` | `float` | `0.25` | Holt-Winters weight in blended score. |
+| `detection.weights_volume` | `float` | `0.25` | Holt-Winters (per-source) weight in blended score. |
 | `detection.weights_sequence` | `float` | `0.25` | Markov weight in blended score. |
 | `detection.weights_pattern` | `float` | `0.20` | CUSUM weight in blended score. |
+| `detection.weights_template_volume` | `float` | `0.15` | Per-template Holt-Winters weight in blended score. |
+| `detection.weights_entity_volume` | `float` | `0.15` | Per-entity Holt-Winters weight in blended score. |
 
 Weights don't need to sum to 1.0 — only the ratios between them matter.
 
@@ -87,6 +89,8 @@ Weights don't need to sum to 1.0 — only the ratios between them matter.
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `detection.max_sources` | `int` | `256` | LRU cap on per-source detector instances. |
+| `detection.max_template_hw` | `int` | `500` | LRU cap on per-template Holt-Winters instances. |
+| `detection.max_entity_hw` | `int` | `500` | LRU cap on per-entity Holt-Winters instances. |
 | `detection.model_save_interval_seconds` | `int` | `300` | Checkpoint interval in seconds. |
 | `detection.score_interval` | `int` | `1` | Score every N-th event per source. Set > 1 to reduce CPU. |
 | `detection.min_events_for_scoring` | `int` | `50` | Events before ensemble starts scoring a new source. |

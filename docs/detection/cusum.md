@@ -26,31 +26,31 @@ Bidirectional CUSUM tracks both increases (`g_upper`) and decreases (`g_lower`) 
 
 ### Key Equations
 
-Each bucket, the observed count $y_t$ is standardized against the current baseline:
+Each bucket, the observed count \( y_t \) is standardized against the current baseline:
 
-$$z_t = \frac{y_t - \mu_t}{\sigma_t}$$
+\[ z_t = \frac{y_t - \mu_t}{\sigma_t} \]
 
 The bidirectional cumulative sums update as:
 
-$$g^+_t = \max(0, \; g^+_{t-1} + z_t - k)$$
+\[ g^+_t = \max(0, \; g^+_{t-1} + z_t - k) \]
 
-$$g^-_t = \max(0, \; g^-_{t-1} - z_t - k)$$
+\[ g^-_t = \max(0, \; g^-_{t-1} - z_t - k) \]
 
 The normalized score reported to the ensemble is:
 
-$$\text{score}_t = \frac{\max(g^+_t, \; g^-_t)}{h}$$
+\[ \text{score}_t = \frac{\max(g^+_t, \; g^-_t)}{h} \]
 
 **Where:**
 
 | Symbol | Meaning | Default |
 |--------|---------|---------|
-| $y_t$ | Event count for the completed 1-minute bucket | — |
-| $\mu_t$ | Running mean tracked via EMA | — |
-| $\sigma_t$ | Running standard deviation tracked via EMA | — |
-| $k$ | Drift — allowable slack before accumulation begins | 0.5 |
-| $h$ | Threshold — cumulative sum level for a change point | 5.0 |
-| $g^+$ | Upper cumulative sum (tracks increases) | 0.0 |
-| $g^-$ | Lower cumulative sum (tracks decreases) | 0.0 |
+| \( y_t \) | Event count for the completed 1-minute bucket | — |
+| \( \mu_t \) | Running mean tracked via EMA | — |
+| \( \sigma_t \) | Running standard deviation tracked via EMA | — |
+| \( k \) | Drift — allowable slack before accumulation begins | 0.5 |
+| \( h \) | Threshold — cumulative sum level for a change point | 5.0 |
+| \( g^+ \) | Upper cumulative sum (tracks increases) | 0.0 |
+| \( g^- \) | Lower cumulative sum (tracks decreases) | 0.0 |
 
 ## Seerflow Implementation
 
@@ -101,12 +101,12 @@ If events arrive with time gaps (missing buckets), CUSUM fills the gap with zero
 
 - Baseline: mean ≈ 5 failures/min, std ≈ 1.4
 - Attack: ~40 failures/min
-- Standardized residual: $z_t \approx (40 - 5) / 1.4 \approx 25$ — simplified; in practice the initial std is lower, giving $z_t \approx 3.5$
-- After drift subtraction: $z_t - k \approx 3.5 - 0.5 = 3.0$ added to `g_upper` each minute
+- Standardized residual: \( z_t \approx (40 - 5) / 1.4 \approx 25 \) — simplified; in practice the initial std is lower, giving \( z_t \approx 3.5 \)
+- After drift subtraction: \( z_t - k \approx 3.5 - 0.5 = 3.0 \) added to `g_upper` each minute
 
 **Accumulation:**
 
-| Minute | $z_t - k$ | $g^+$ | Score |
+| Minute | \( z_t - k \) | \( g^+ \) | Score |
 |--------|-----------|-------|-------|
 | 1 | 3.0 | 3.0 | 0.60 |
 | 2 | 3.0 | 6.0 | 1.0 → reset |
@@ -119,8 +119,8 @@ Change point declared after **2 minutes**. Score: 1.2 → clamped to 1.0.
 
 - Baseline: mean ≈ 12 errors/min (1% of 1200 rps), std ≈ 3.5
 - Post-deploy: ~96 errors/min
-- Standardized residual: $z_t \approx (96 - 12) / 3.5 \approx 7.0$
-- After drift: $7.0 - 0.5 = 6.5 > h = 5.0$
+- Standardized residual: \( z_t \approx (96 - 12) / 3.5 \approx 7.0 \)
+- After drift: \( 7.0 - 0.5 = 6.5 > h = 5.0 \)
 
 Change point declared in **under 1 minute** — `g_upper` exceeds threshold on the first post-deploy bucket.
 
