@@ -19,6 +19,32 @@
   --md-default-fg-color: #E8ECEF;
 }
 
+/* Mermaid diagrams — larger, scrollable, click to zoom */
+.mermaid {
+  overflow-x: auto;
+  text-align: center;
+}
+
+.mermaid svg {
+  min-width: 100%;
+  max-width: none;
+  cursor: zoom-in;
+  transition: transform 0.3s ease;
+}
+
+.mermaid svg.zoomed {
+  transform: scale(1.5);
+  transform-origin: top left;
+  cursor: zoom-out;
+}
+
+/* Sequence diagrams need extra width */
+.mermaid svg[id*="sequenceDiagram"],
+.mermaid svg[aria-roledescription="sequence"] {
+  min-width: 900px;
+  font-size: 14px;
+}
+
 /* Header logo — larger than default for better visibility */
 .md-header__button.md-logo img,
 .md-header__button.md-logo svg {

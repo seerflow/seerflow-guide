@@ -26,48 +26,31 @@ Backpressure is handled by a bounded `asyncio.Queue` (default 10,000 events). Wh
 
 ### Event Lifecycle
 
+!!! tip "Click any diagram to zoom in. Click again to zoom out."
+
 ```mermaid
 sequenceDiagram
-    box rgb(227,242,253) Ingestion
-        participant Source
-        participant Recv as Receiver
-        participant Queue as Queue (10K)
-    end
-    box rgb(243,229,245) Parsing
-        participant Norm as Normalizer
-    end
-    box rgb(232,245,233) Detection
-        participant Det as Ensemble
-        participant Sigma
-    end
-    box rgb(252,228,236) Correlation
-        participant Corr as Correlator
-    end
-    box rgb(255,248,225) Alerting
-        participant Alert as Dispatcher
-        participant Sink as Sinks
-    end
+    participant Recv as 📡 Receiver
+    participant Queue as 📬 Queue
+    participant Parse as 🔍 Parser
+    participant Detect as 🧠 Detection
+    participant Corr as 🔗 Correlation
+    participant Alert as 🔔 Alerting
 
-    Source->>Recv: raw log bytes
-    Note over Recv: Syslog UDP/TCP, File Tail,<br/>OTLP gRPC/HTTP, Webhook
     Recv->>Queue: RawEvent
-    Note over Queue: asyncio.Queue(maxsize=10K)<br/>Warning at 80%, drop at 100%
+    Note over Recv,Queue: Syslog, File Tail, OTLP gRPC/HTTP, Webhook<br/>→ asyncio.Queue(10K max, backpressure at 80%)
 
-    Queue->>Norm: RawEvent (dequeued)
-    Note over Norm: 1. Decode bytes → UTF-8<br/>2. Drain3 → template + params<br/>3. Entity extract → IPs, users,<br/>   hosts, files, domains, processes<br/>4. Build SeerflowEvent (30+ fields)
+    Queue->>Parse: RawEvent
+    Note over Parse: Drain3 → template + params<br/>Entity extract → IPs, users, hosts<br/>→ SeerflowEvent (30+ fields)
 
-    Norm->>Det: SeerflowEvent
-    Note over Det: Half-Space Trees (content)<br/>Holt-Winters (volume)<br/>CUSUM (change points)<br/>Markov chains (sequence)<br/>DSPOT (auto-thresholds)<br/>→ blended anomaly_score
+    Parse->>Detect: SeerflowEvent
+    Note over Detect: HST + Holt-Winters + CUSUM + Markov + DSPOT<br/>→ blended anomaly_score<br/>3,000+ Sigma rules → mitre_tactics
 
-    Det->>Sigma: scored event
-    Note over Sigma: Match 3,000+ SigmaHQ rules<br/>→ mitre_tactics, mitre_techniques
+    Detect->>Corr: scored event + rule matches
+    Note over Corr: Entity graph (igraph) update<br/>Risk accumulation (half-life decay)<br/>Kill-chain progression check
 
-    Sigma->>Corr: event + rule matches
-    Note over Corr: 1. Update entity graph (igraph)<br/>2. Risk accumulation (half-life)<br/>3. Kill-chain progression<br/>→ Alert if risk > threshold<br/>   or kill-chain ≥ 3 tactics
-
-    Corr->>Alert: correlated alerts
-    Note over Alert: Dedup check (15 min window,<br/>per-rule overrides)
-    Alert->>Sink: webhook / PagerDuty
+    Corr->>Alert: alerts (if threshold crossed)
+    Note over Alert: Dedup (15 min window)<br/>→ Webhook / PagerDuty
 ```
 
 **Step by step:**
