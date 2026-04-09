@@ -181,4 +181,7 @@ This is useful for detecting service outages, log pipeline breaks, or an attacke
 - [CUSUM](cusum.md) — change-point detection complementing DSPOT's tail approach
 - [Markov Chains](markov.md) — sequence anomaly scores entering the blended signal
 - [Scoring & Attack Mapping](scoring.md) — how DSPOT's `ThresholdResult` combines with other detectors
+- [Ensemble Overview](index.md) — how all detectors and DSPOT connect end-to-end
+- [Anomaly Detection concepts](../security-primer/anomaly-detection.md) — background on EVT and streaming thresholds
+- [Configuration Reference](../reference/config.md) — `dspot_calibration_window`, `dspot_risk_level`, `dspot_initial_percentile`
 - [Deployment Risk](../ops-primer/deployment-risk.md) — ops context for threshold adaptation during deploys

@@ -276,3 +276,5 @@ During warmup, some channels remain NaN. The weighted average divides by the act
 - [Markov Chains](markov.md) — sequence anomaly score (weight 0.25)
 - [DSPOT Adaptive Thresholds](dspot.md) — applies the adaptive threshold to the blended score
 - [Ensemble Overview](index.md) — how all detectors and scoring connect end-to-end
+- [Anomaly Detection concepts](../security-primer/anomaly-detection.md) — background on z-score normalization and signal amplification
+- [Configuration Reference](../reference/config.md) — `weights_content`, `weights_volume`, `weights_sequence`, `weights_pattern`
