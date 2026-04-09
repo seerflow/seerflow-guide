@@ -141,7 +141,41 @@ Fan-out risk score: `min(1.0, current_fan_out / max(computed_threshold, 1.0))`
 
 ## Graph-Structural Anomaly Detection
 
-Seerflow combines the algorithms above into three detection modes, all tagged with [MITRE ATT&CK T1021 (Remote Services)](https://attack.mitre.org/techniques/T1021/) under the Lateral Movement tactic:
+Seerflow combines the algorithms above into three detection modes, all tagged with [MITRE ATT&CK T1021 (Remote Services)](https://attack.mitre.org/techniques/T1021/) under the Lateral Movement tactic.
+
+Here's a single graph showing all three anomalies at once:
+
+```mermaid
+graph LR
+    subgraph Community 0: Dev Team
+        A1[alice] --> A2[dev-host-1]
+        A1 --> A3[dev-host-2]
+        A2 --- A3
+    end
+    subgraph Community 1: Production
+        B1[svc-deploy] --> B2[prod-db]
+        B1 --> B3[prod-app]
+        B2 --- B3
+    end
+
+    A1 -.->|"community crossing<br/>risk: 0.6"| B2
+    A2 -.->|"betweenness spike<br/>risk: 0.68"| B3
+    A3 -->|scan| T1[target-1]
+    A3 -->|scan| T2[target-2]
+    A3 -->|scan| T3[target-3]
+    A3 -->|scan| T4[target-4]
+
+    style A1 fill:#e53935,color:#fff
+    style A2 fill:#e53935,color:#fff
+    style A3 fill:#e53935,color:#fff
+
+    linkStyle 4 stroke:#e53935,stroke-width:3
+    linkStyle 5 stroke:#e53935,stroke-width:3
+```
+
+- **alice** crosses from dev into production → community crossing alert
+- **dev-host-1** becomes a bridge between communities → betweenness spike
+- **dev-host-2** suddenly connects to 4 new targets → fan-out burst
 
 ### Community Crossing
 
