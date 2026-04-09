@@ -19,26 +19,41 @@
   --md-default-fg-color: #E8ECEF;
 }
 
-/* Mermaid diagrams — scrollable, click to open fullscreen modal */
-.mermaid {
+/* Mermaid diagrams — force larger rendering */
+pre.mermaid {
   overflow-x: auto;
   text-align: center;
-  position: relative;
+  background: transparent;
+  border: none;
+  padding: 1rem 0;
 }
 
-.mermaid svg {
-  min-width: 100%;
+/* Force SVGs to use full container width and scale up */
+pre.mermaid svg {
   max-width: none;
-  cursor: zoom-in;
+  width: 100%;
+  min-height: 300px;
+  height: auto;
 }
 
-/* Hint label */
-.mermaid::after {
-  content: "Click to expand";
-  display: block;
-  font-size: 0.75rem;
-  color: var(--md-default-fg-color--light);
-  margin-top: 0.25rem;
+/* Sequence diagrams need even more space */
+pre.mermaid svg[aria-roledescription="sequence"] {
+  min-width: 800px;
+  min-height: 500px;
+}
+
+/* Graph diagrams — scale up font for readability */
+pre.mermaid .node .label,
+pre.mermaid .nodeLabel,
+pre.mermaid .edgeLabel,
+pre.mermaid .label {
+  font-size: 14px !important;
+}
+
+pre.mermaid .messageText,
+pre.mermaid .noteText,
+pre.mermaid text.actor {
+  font-size: 13px !important;
 }
 
 /* Header logo — larger than default for better visibility */
