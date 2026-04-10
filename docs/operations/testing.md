@@ -99,11 +99,11 @@ open htmlcov/index.html
 
 ## LANL Dataset
 
-The [Los Alamos National Laboratory (LANL) Unified Host and Network Dataset](https://csr.lanl.gov/data/unified-host-network-dataset-2017/) is a 90-day capture of anonymized host event, authentication, process, network flow, and DNS records from a real enterprise environment. It is the standard public benchmark for host-based anomaly detection research and contains labelled red-team activity — making it suitable for end-to-end validation of Seerflow's detection pipeline.
+The [Los Alamos National Laboratory (LANL) Unified Host and Network Dataset](https://datasets.lanl.gov/unified-host-network-dataset-2017) is a 90-day capture of anonymized host event, authentication, process, network flow, and DNS records from a real enterprise environment. It is the standard public benchmark for host-based anomaly detection research and contains labelled red-team activity — making it suitable for end-to-end validation of Seerflow's detection pipeline.
 
 ### How to Obtain
 
-The dataset is available free of charge from the LANL Cyber Security Research data portal. Download the unified CSV files directly from [csr.lanl.gov](https://csr.lanl.gov/data/unified-host-network-dataset-2017/). No registration is required. Files are gzip-compressed CSV; the full dataset is approximately 12 GB compressed.
+The dataset is available free of charge from the LANL Cyber Security Research data portal. Download the unified CSV files directly from [csr.lanl.gov](https://datasets.lanl.gov/unified-host-network-dataset-2017). No registration is required. Files are gzip-compressed CSV; the full dataset is approximately 12 GB compressed.
 
 ### Converting to SeerflowEvent
 
