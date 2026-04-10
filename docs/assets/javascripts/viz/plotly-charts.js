@@ -28,6 +28,8 @@
     const fg = getCssVar('--sf-viz-fg') || (scheme === 'slate' ? '#f3f4f6' : '#1a1a1a');
     const muted = getCssVar('--sf-viz-muted') || (scheme === 'slate' ? '#9ca3af' : '#6b7280');
     const border = getCssVar('--sf-viz-border') || (scheme === 'slate' ? '#374151' : '#d1d5db');
+    const panelBg = getCssVar('--sf-viz-panel-bg') || (scheme === 'slate' ? '#1f2937' : '#f9fafb');
+    const panelFg = getCssVar('--sf-viz-panel-fg') || (scheme === 'slate' ? '#f9fafb' : '#111827');
     return {
       paper_bgcolor: 'rgba(0,0,0,0)',
       plot_bgcolor: 'rgba(0,0,0,0)',
@@ -48,6 +50,12 @@
         title: { text: '', font: { color: muted } },
       },
       hovermode: 'x unified',
+      hoverlabel: {
+        bgcolor: panelBg,
+        bordercolor: border,
+        font: { color: panelFg, family: 'Inter, system-ui, sans-serif', size: 12 },
+        align: 'left',
+      },
       showlegend: true,
       legend: { bgcolor: 'rgba(0,0,0,0)', font: { color: fg } },
     };
@@ -304,6 +312,9 @@
       layout.barmode = 'stack';
       layout.bargap = 0.3;
       layout.showlegend = false;
+      // Override unified x-hover: gantt rows at the same timestamp should not
+      // stack into one tooltip — show only the row the cursor is actually on.
+      layout.hovermode = 'closest';
       return layout;
     }
 
