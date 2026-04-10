@@ -8,8 +8,8 @@ This page helps operators systematically reduce false positives, recover missed 
 
 | Symptom | First thing to try | Section |
 |---------|-------------------|---------|
-| **Too many alerts** — mostly false positives | Raise `dspot_risk_level` or use `seerflow feedback <id> fp` | [False Positives](#too-many-alerts--mostly-false-positives) |
-| **Too many alerts** — correct but noisy | Increase `dedup_window_seconds` or lower detector weights | [Dedup & Weights](#too-many-alerts--correct-but-noisy) |
+| **Too many alerts** — mostly false positives | Raise `dspot_risk_level` or use `seerflow feedback <id> fp` | [False Positives](#too-many-alerts-mostly-false-positives) |
+| **Too many alerts** — correct but noisy | Increase `dedup_window_seconds` or lower detector weights | [Dedup & Weights](#too-many-alerts-not-false-positives-just-noisy) |
 | **Too few alerts** | Lower the relevant detector threshold | [Detector Tuning](#detector-tuning) |
 | **Wrong alerts** — correlation misfires | Adjust `window_duration_seconds` or `late_tolerance_seconds` | [Correlation Tuning](#correlation-tuning) |
 | **Wrong alerts** — wrong detector emphasis | Rebalance `weights_*` parameters | [Detector Tuning](#detector-tuning) |
