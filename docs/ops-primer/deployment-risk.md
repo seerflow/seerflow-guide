@@ -77,35 +77,20 @@ Seerflow can alert on these patterns automatically. **DSPOT** --- the adaptive t
 
 Here is the full timeline of the v2.3.1 deployment failure, showing how symptoms cascade across log sources and when Seerflow's detectors fire:
 
-<div class="seerflow-mermaid-wide" markdown="1">
-
-```mermaid
-%%{init: {'gantt': {'fontSize': 16, 'sectionFontSize': 18, 'barHeight': 28, 'barGap': 6, 'topPadding': 60, 'leftPadding': 140, 'useMaxWidth': true}}}%%
-gantt
-    title Deployment v2.3.1 — Failure Cascade
-    dateFormat HH:mm
-    axisFormat %H:%M
-    section Deployment
-        Deploy completes           :milestone, 14:00, 0min
-    section App Logs
-        Error rate 1%→3%          :crit, 14:12, 6min
-        Error rate 3%→8%          :crit, 14:18, 6min
-    section DB Logs
-        Pool warnings             :active, 14:18, 4min
-        Pool exhausted            :crit, 14:22, 8min
-    section Proxy Logs
-        p99 latency 200ms→800ms  :active, 14:20, 4min
-        p99 latency 800ms→2s     :crit, 14:24, 6min
-    section System Logs
-        Memory pressure           :active, 14:26, 4min
-        OOM Kill                  :milestone, 14:30, 0min
-    section Seerflow
-        CUSUM change point        :done, 14:12, 0min
-        HW volume alert           :done, 14:18, 0min
-        Blended alert fires       :done, 14:20, 0min
-```
-
-</div>
+| Time  | T+   | Source       | Event                          | Severity   |
+|-------|------|--------------|--------------------------------|------------|
+| 14:00 | 0    | Deployment   | Deploy v2.3.1 completes        | milestone  |
+| 14:12 | +12  | App Logs     | Error rate 1% → 3%             | warning    |
+| 14:12 | +12  | **Seerflow** | **CUSUM change point detected** | signal     |
+| 14:18 | +18  | App Logs     | Error rate 3% → 8%             | critical   |
+| 14:18 | +18  | DB Logs      | Pool connection warnings        | warning    |
+| 14:18 | +18  | **Seerflow** | **HW volume divergence alert** | signal     |
+| 14:20 | +20  | Proxy Logs   | p99 latency 200ms → 800ms      | warning    |
+| 14:20 | +20  | **Seerflow** | **Blended alert fires (moderate)** | alert  |
+| 14:22 | +22  | DB Logs      | Pool exhausted                  | critical   |
+| 14:24 | +24  | Proxy Logs   | p99 latency 800ms → 2s         | critical   |
+| 14:26 | +26  | System Logs  | Memory pressure                 | warning    |
+| 14:30 | +30  | System Logs  | OOM Kill                        | milestone  |
 
 The cascade tells a story: a new database query in v2.3.1 was less efficient than the one it replaced. Under load, it held connections longer, draining the pool. As the pool thinned, requests backed up, latency climbed, and the application buffered more data in memory trying to compensate. Eventually, memory pressure triggered an OOM kill.
 
