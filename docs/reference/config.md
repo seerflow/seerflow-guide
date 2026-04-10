@@ -1,26 +1,25 @@
 # Configuration Reference
 
-## Graph & Correlation
+## Graph-Structural Detection
 
-Parameters for graph-structural anomaly detection. These control when the entity graph generates alerts based on structural patterns.
+Parameters for graph-structural anomaly detection, nested under `detection.graph_structural` in `seerflow.yaml`. These control when the entity graph generates alerts based on structural patterns.
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `graph.betweenness_threshold` | `float` | `0.3` | Alert when betweenness centrality exceeds this value. Range: 0.0-1.0. |
-| `graph.betweenness_risk_multiplier` | `float` | `1.5` | Multiplied by raw betweenness for risk score, capped at 1.0. |
-| `graph.fan_out_sigma` | `float` | `3.0` | Standard deviations above mean for fan-out burst detection. |
-| `graph.fan_out_history_size` | `int` | `20` | Rolling window sample size for fan-out baseline calculation. |
-| `graph.fan_out_min_floor` | `int` | `5` | Minimum outgoing connections before fan-out alerting triggers. |
-| `graph.community_crossing_risk` | `float` | `0.6` | Fixed risk score assigned to community crossing alerts. |
-| `graph.community_crossing_enabled` | `bool` | `true` | Enable or disable community crossing detection. |
+| `detection.graph_structural.betweenness_threshold` | `float` | `0.3` | Alert when betweenness centrality exceeds this value. Range: 0.0-1.0. |
+| `detection.graph_structural.fan_out_sigma` | `float` | `3.0` | Standard deviations above mean for fan-out burst detection. |
+| `detection.graph_structural.fan_out_history_size` | `int` | `20` | Rolling window sample size for fan-out baseline calculation. |
+| `detection.graph_structural.fan_out_min_floor` | `int` | `5` | Minimum outgoing connections before fan-out alerting triggers. |
+| `detection.graph_structural.community_crossing_enabled` | `bool` | `true` | Enable or disable community crossing detection. |
 
 !!! example "Configuration Example"
     ```yaml
-    graph:
-      betweenness_threshold: 0.4       # raise for environments with many bridge nodes
-      fan_out_sigma: 2.5               # lower for stricter fan-out detection
-      fan_out_min_floor: 10            # raise for larger networks
-      community_crossing_enabled: true
+    detection:
+      graph_structural:
+        betweenness_threshold: 0.4       # raise for environments with many bridge nodes
+        fan_out_sigma: 2.5               # lower for stricter fan-out detection
+        fan_out_min_floor: 10            # raise for larger networks
+        community_crossing_enabled: true
     ```
 
 For detailed explanations of each parameter, see [Algorithms & Detection](../entity-graph/algorithms.md) and [Graph-Structural Correlation](../correlation/graph-structural.md).
@@ -67,9 +66,9 @@ Parameters for the ML anomaly detection ensemble. These control how each detecto
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `detection.dspot_calibration_window` | `int` | `1000` | Scores collected before GPD fitting. No anomalies during calibration. |
-| `detection.dspot_risk_level` | `float` | `0.0001` | Target false positive rate (0.01%). Lower = higher threshold. |
-| `detection.dspot_initial_percentile` | `int` | `98` | Percentile for initial threshold. Upper at P-th, lower at (100-P)-th. |
+| `detection.dspot.calibration_window` | `int` | `1000` | Scores collected before GPD fitting. No anomalies during calibration. |
+| `detection.dspot.risk_level` | `float` | `0.0001` | Target false positive rate (0.01%). Lower = higher threshold. |
+| `detection.dspot.initial_percentile` | `int` | `98` | Percentile for initial threshold. Upper at P-th, lower at (100-P)-th. |
 
 ### Blending Weights
 
@@ -101,7 +100,8 @@ Weights don't need to sum to 1.0 — only the ratios between them matter.
       hst_window_size: 2000       # larger window for noisy environments
       hw_n_std: 4.0               # wider prediction band, fewer false positives
       cusum_drift: 0.3            # more sensitive to small shifts
-      dspot_risk_level: 0.001     # lower threshold, more alerts
+      dspot:
+        risk_level: 0.001         # lower threshold, more alerts
       weights_content: 0.35       # emphasize content novelty
       max_sources: 512            # more sources before eviction
     ```
@@ -375,7 +375,8 @@ detection:
   hst_window_size: 2000
   hw_n_std: 3.5
   cusum_drift: 0.4
-  dspot_risk_level: 0.0001
+  dspot:
+    risk_level: 0.0001
   weights_content: 0.30
   weights_volume: 0.25
   weights_sequence: 0.25
