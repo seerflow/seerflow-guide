@@ -1,0 +1,180 @@
+/* Shared stylesheet for Seerflow Guide interactive visualizations.
+   Dark/light palette handled via CSS custom properties so the entity
+   graph and other D3 components can read current colors without JS. */
+
+:root {
+  /* Light palette (default) */
+  --sf-viz-bg: transparent;
+  --sf-viz-fg: #1a1a1a;
+  --sf-viz-muted: #6b7280;
+  --sf-viz-border: #d1d5db;
+  --sf-viz-panel-bg: #f9fafb;
+  --sf-viz-panel-fg: #111827;
+
+  /* Entity type colors — colorblind-safe */
+  --sf-entity-user: #0ea5e9;
+  --sf-entity-ip: #f59e0b;
+  --sf-entity-host: #10b981;
+  --sf-entity-process: #a855f7;
+  --sf-entity-file: #ef4444;
+  --sf-entity-domain: #ec4899;
+
+  /* Edge + anomaly accents */
+  --sf-edge: #9ca3af;
+  --sf-edge-highlight: #1f2937;
+  --sf-anomaly: #dc2626;
+  --sf-threshold: #ea580c;
+  --sf-baseline: #3b82f6;
+}
+
+[data-md-color-scheme="slate"] {
+  /* Dark palette */
+  --sf-viz-bg: transparent;
+  --sf-viz-fg: #f3f4f6;
+  --sf-viz-muted: #9ca3af;
+  --sf-viz-border: #374151;
+  --sf-viz-panel-bg: #1f2937;
+  --sf-viz-panel-fg: #f9fafb;
+
+  --sf-entity-user: #38bdf8;
+  --sf-entity-ip: #fbbf24;
+  --sf-entity-host: #34d399;
+  --sf-entity-process: #c084fc;
+  --sf-entity-file: #f87171;
+  --sf-entity-domain: #f472b6;
+
+  --sf-edge: #4b5563;
+  --sf-edge-highlight: #e5e7eb;
+  --sf-anomaly: #f87171;
+  --sf-threshold: #fb923c;
+  --sf-baseline: #60a5fa;
+}
+
+.seerflow-viz {
+  display: block;
+  width: 100%;
+  min-height: 300px;
+  margin: 1.5rem 0;
+  border: 1px solid var(--sf-viz-border);
+  border-radius: 0.5rem;
+  background: var(--sf-viz-bg);
+  position: relative;
+  overflow: hidden;
+}
+
+.seerflow-viz-caption {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  color: var(--sf-viz-muted);
+  border-top: 1px solid var(--sf-viz-border);
+}
+
+.seerflow-viz-error {
+  padding: 2rem;
+  text-align: center;
+  color: var(--sf-viz-muted);
+  font-style: italic;
+}
+
+/* Entity graph nodes */
+.seerflow-entity-graph svg {
+  width: 100%;
+  height: 500px;
+  display: block;
+}
+
+.seerflow-entity-graph .node {
+  cursor: pointer;
+  stroke: var(--sf-viz-fg);
+  stroke-width: 1.5px;
+}
+
+.seerflow-entity-graph .node:focus {
+  outline: 2px solid var(--sf-edge-highlight);
+  outline-offset: 2px;
+}
+
+.seerflow-entity-graph .node-label {
+  fill: var(--sf-viz-fg);
+  font-size: 11px;
+  pointer-events: none;
+  user-select: none;
+}
+
+.seerflow-entity-graph .link {
+  stroke: var(--sf-edge);
+  stroke-opacity: 0.6;
+  stroke-width: 1.5px;
+}
+
+.seerflow-entity-graph .link-label {
+  fill: var(--sf-viz-muted);
+  font-size: 10px;
+  pointer-events: none;
+}
+
+.seerflow-entity-graph .node.user { fill: var(--sf-entity-user); }
+.seerflow-entity-graph .node.ip { fill: var(--sf-entity-ip); }
+.seerflow-entity-graph .node.host { fill: var(--sf-entity-host); }
+.seerflow-entity-graph .node.process { fill: var(--sf-entity-process); }
+.seerflow-entity-graph .node.file { fill: var(--sf-entity-file); }
+.seerflow-entity-graph .node.domain { fill: var(--sf-entity-domain); }
+
+.seerflow-entity-graph .details-panel {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  padding: 1rem;
+  background: var(--sf-viz-panel-bg);
+  color: var(--sf-viz-panel-fg);
+  border: 1px solid var(--sf-viz-border);
+  border-radius: 0.25rem;
+  min-width: 180px;
+  max-width: 280px;
+  font-size: 0.8125rem;
+  display: none;
+  z-index: 10;
+}
+
+.seerflow-entity-graph .details-panel.open { display: block; }
+
+.seerflow-entity-graph .details-panel dt {
+  font-weight: 600;
+  margin-top: 0.25rem;
+}
+
+.seerflow-entity-graph .details-panel dd {
+  margin: 0 0 0.25rem 0;
+  color: var(--sf-viz-muted);
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .seerflow-entity-graph svg { height: 360px; }
+  .seerflow-entity-graph .node-label { font-size: 9px; }
+  .seerflow-entity-graph .details-panel {
+    position: static;
+    max-width: 100%;
+    margin-top: 0.5rem;
+  }
+}
+
+/* Tuning flowchart sizing fix — re-added in S-139H */
+.seerflow-tuning-flowchart .mermaid {
+  min-height: 600px;
+  max-width: 100%;
+}
+
+.seerflow-tuning-flowchart .mermaid svg {
+  width: 100% !important;
+  max-width: none !important;
+  height: auto !important;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .seerflow-entity-graph .node,
+  .seerflow-entity-graph .link {
+    transition: none !important;
+  }
+}
