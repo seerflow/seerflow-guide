@@ -34,7 +34,11 @@ import numpy as np
 
 
 OUTPUT_DIR = (
-    Path(__file__).resolve().parent.parent / "docs" / "assets" / "viz-data" / "detector-ts"
+    Path(__file__).resolve().parent.parent
+    / "docs"
+    / "assets"
+    / "viz-data"
+    / "detector-ts"
 )
 RNG_SEED = 2026
 N_POINTS = 240  # 4 hours at 1-minute resolution
@@ -96,7 +100,7 @@ def gen_holt_winters() -> None:
             "timestamps": iso_timestamps(N_POINTS),
             "values": [round(float(v), 2) for v in values],
             "threshold_upper": [round(float(u), 2) for u in upper],
-            "threshold_lower": [round(float(l), 2) for l in lower],
+            "threshold_lower": [round(float(x), 2) for x in lower],
             "anomaly_indices": anomaly_indices,
             "y_axis_label": "Events per minute",
         },
@@ -180,7 +184,7 @@ def gen_dspot() -> None:
         if i < warmup:
             threshold[i] = 0.55
         else:
-            window = stream[max(0, i - warmup): i]
+            window = stream[max(0, i - warmup) : i]
             threshold[i] = float(np.quantile(window, 0.98)) + 0.15
     anomaly_indices = [i for i, v in enumerate(stream) if v > threshold[i]]
     write_json(
