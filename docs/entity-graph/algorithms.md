@@ -33,7 +33,7 @@ A node with **suddenly high betweenness** that was previously a leaf is suspicio
 |-----------|---------|-------------|
 | `detection.graph_structural.betweenness_threshold` | `0.3` | Alert when betweenness exceeds this value |
 
-Betweenness scores are scaled by a fixed 1.5x multiplier: `risk = min(1.0, betweenness × 1.5)` (not configurable).
+Betweenness scores are scaled by a fixed 1.5x multiplier: `risk = min(1.0, betweenness x 1.5)` (not configurable).
 
 ---
 
@@ -132,7 +132,7 @@ Community crossing is Seerflow's most intuitive graph-structural alert: *this en
 
 | Parameter | Default | Description |
 |-----------|---------|-------------|
-| `detection.graph_structural.fan_out_sigma` | `3.0` | Alert when fan-out exceeds mean + (sigma × std_dev) |
+| `detection.graph_structural.fan_out_sigma` | `3.0` | Alert when fan-out exceeds mean + (sigma x std_dev) |
 | `detection.graph_structural.fan_out_history_size` | `20` | Rolling window size for baseline calculation |
 | `detection.graph_structural.fan_out_min_floor` | `5` | Minimum outgoing connections before alerting |
 
