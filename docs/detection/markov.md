@@ -21,7 +21,7 @@
 
     <div class="seerflow-viz"
          data-viz="detector-ts"
-         data-src="../assets/viz-data/detector-ts/markov.json"
+         data-src="../../assets/viz-data/detector-ts/markov.json"
          data-caption="Transition probability scores. A rare login to write transition at minute 180 scores above the threshold."></div>
 
 ## Theory

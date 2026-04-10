@@ -20,7 +20,7 @@
 
     <div class="seerflow-viz"
          data-viz="detector-ts"
-         data-src="../assets/viz-data/detector-ts/cusum.json"
+         data-src="../../assets/viz-data/detector-ts/cusum.json"
          data-caption="CUSUM statistic with mean shift at minute 120. The statistic accumulates and crosses the threshold shortly after."></div>
 
 ## Theory

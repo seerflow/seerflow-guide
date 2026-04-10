@@ -19,7 +19,7 @@
 
     <div class="seerflow-viz"
          data-viz="detector-ts"
-         data-src="../assets/viz-data/detector-ts/holt-winters.json"
+         data-src="../../assets/viz-data/detector-ts/holt-winters.json"
          data-caption="Seasonal volume with prediction band. The 3am spike exceeds the upper threshold, triggering an anomaly."></div>
 
 ## Theory

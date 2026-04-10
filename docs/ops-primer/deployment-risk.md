@@ -79,7 +79,7 @@ Here is the full timeline of the v2.3.1 deployment failure, showing how symptoms
 
 <div class="seerflow-viz"
      data-viz="deployment-cascade"
-     data-src="../assets/viz-data/deployment-cascade.json"
+     data-src="../../assets/viz-data/deployment-cascade.json"
      data-caption="Interactive timeline: hover any bar for source and severity details. Green diamonds mark instant events (deploy, Seerflow alerts, OOM kill); colored bars show the duration of each degradation phase."
      style="min-height: 540px;"></div>
 

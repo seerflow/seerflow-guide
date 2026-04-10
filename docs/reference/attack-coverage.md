@@ -6,7 +6,7 @@ This page maps Seerflow's detection capabilities to the [MITRE ATT&CK](https://a
 
     <div class="seerflow-viz"
          data-viz="attack-heatmap"
-         data-src="../assets/viz-data/attack-matrix.json"
+         data-src="../../assets/viz-data/attack-matrix.json"
          data-caption="MITRE ATT&CK techniques covered by Seerflow. Hover for technique details; click a cell to jump to the relevant guide section."
          style="min-height: 600px;"></div>
 

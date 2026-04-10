@@ -6,7 +6,7 @@ Once Seerflow builds the entity graph, it runs **graph algorithms** to analyze i
 
     <div class="seerflow-viz"
          data-viz="entity-graph"
-         data-src="../assets/viz-data/entity-graph-sample.json"
+         data-src="../../assets/viz-data/entity-graph-sample.json"
          data-caption="The same sample graph used throughout this page — risk scores shown on click are pre-computed examples."></div>
 
 ---

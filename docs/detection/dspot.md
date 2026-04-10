@@ -20,7 +20,7 @@
 
     <div class="seerflow-viz"
          data-viz="detector-ts"
-         data-src="../assets/viz-data/detector-ts/dspot.json"
+         data-src="../../assets/viz-data/detector-ts/dspot.json"
          data-caption="DSPOT's EVT-derived threshold adapts to the stream. The minute-180 spike clearly exceeds the current threshold."></div>
 
 ## Theory
