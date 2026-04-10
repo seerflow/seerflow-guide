@@ -80,6 +80,7 @@ nav:
   - Operations:
     - operations/index.md
     - Alerting: operations/alerting.md
+    - Storage: operations/storage.md
     - Tuning: operations/tuning.md
     - Testing: operations/testing.md
   - Reference:
