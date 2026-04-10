@@ -179,7 +179,7 @@ Parameters for the storage backend used to persist events, alerts, and ML model 
 | `storage.backend` | `str` | `"sqlite"` | Storage backend to use. One of `sqlite` or `postgresql`. |
 | `storage.data_dir` | `str` | `~/.local/share/seerflow` | Base directory for all data files. Respects `$XDG_DATA_HOME`. Can also be set via `$SEERFLOW_DATA_DIR`. |
 | `storage.sqlite_path` | `str` | `{data_dir}/seerflow.db` | Absolute path to the SQLite database file. Defaults to `seerflow.db` inside `data_dir`. |
-| `storage.postgresql_url` | `str` | `""` | PostgreSQL connection URL. Required when `backend` is `postgresql`. Example: `postgresql+asyncpg://user:pass@host/db`. |
+| `storage.postgresql_url` | `str` | `""` | PostgreSQL connection URL. Required when `backend` is `postgresql`. Example: `postgresql://user:pass@host/db`. |
 
 !!! example "Storage Configuration Example"
     ```yaml
@@ -382,6 +382,14 @@ detection:
   weights_pattern: 0.20
   max_sources: 512
   model_save_interval_seconds: 300
+  kill_chain:
+    tactic_threshold: 3
+    window_seconds: 86400
+  graph_structural:
+    betweenness_threshold: 0.3
+    fan_out_sigma: 3.0
+    fan_out_min_floor: 5
+    community_crossing_enabled: true
 
 # Temporal correlation
 correlation:
@@ -412,16 +420,4 @@ alerting:
   otlp_endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:-}
   otlp_protocol: grpc
   otlp_export_interval_seconds: 5
-
-# Kill chain detection
-  kill_chain:
-    tactic_threshold: 3
-    window_seconds: 86400
-
-  # Graph-structural detection
-  graph_structural:
-    betweenness_threshold: 0.3
-    fan_out_sigma: 3.0
-    fan_out_min_floor: 5
-    community_crossing_enabled: true
 ```

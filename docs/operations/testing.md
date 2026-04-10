@@ -191,7 +191,7 @@ uv run pytest tests/unit/test_sigma_engine.py -k "test_custom" -v
 The `-k "test_custom"` selector matches any test function containing `test_custom` in its name, avoiding a full suite run during rule development. Add `-s` to see stdout output, which includes the compiled pySigma condition for debugging.
 
 !!! warning "Validation errors at startup"
-    If your rule YAML is malformed, Seerflow logs a warning and skips the rule — the rest of the engine continues. Run `seerflow validate-rules rules/custom/` to surface validation errors before starting the full service.
+    If your rule YAML is malformed, Seerflow logs a warning and skips the rule — the rest of the engine continues. Check the Seerflow logs at startup (`log_level: DEBUG`) to surface validation errors before relying on the rule in production.
 
 ### Correlation Rules
 
@@ -219,19 +219,17 @@ import datetime
 import msgspec.structs
 
 def test_custom_correlation_rule(sample_event, sqlite_backend, correlation_engine):
-    base_time = datetime.datetime(2026, 4, 9, 12, 0, 0, tzinfo=datetime.UTC)
+    base_ns = 1_712_664_000_000_000_000  # 2026-04-09 12:00:00 UTC
 
     failed_login = msgspec.structs.replace(
         sample_event,
-        timestamp=base_time,
+        timestamp_ns=base_ns,
         message="Failed password for root from 10.0.0.99",
-        related_ips=("10.0.0.99",),
     )
     success_login = msgspec.structs.replace(
         sample_event,
-        timestamp=base_time + datetime.timedelta(seconds=120),
+        timestamp_ns=base_ns + 120_000_000_000,  # +120 seconds
         message="Accepted publickey for deploy from 10.0.0.99",
-        related_ips=("10.0.0.99",),
     )
 
     correlation_engine.process(failed_login)
