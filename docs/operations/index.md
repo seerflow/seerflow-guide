@@ -25,7 +25,8 @@ receivers:
 
 detection:
   hst_window_size: 1000
-  dspot_risk_level: 0.0001
+  dspot:
+    risk_level: 0.0001
 EOF
 
 # 2. Start the pipeline
