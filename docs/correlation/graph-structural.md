@@ -114,11 +114,12 @@ The AlertDispatcher fires a webhook with all three contributing signals, entity 
 
 | Parameter | Default | When to raise | When to lower |
 |-----------|---------|---------------|---------------|
-| `graph.betweenness_threshold` | `0.3` | Too many alerts from legitimate bridge nodes (jump hosts, shared services) | Missing pivot detections |
-| `graph.fan_out_sigma` | `3.0` | Noisy alerts from batch jobs or monitoring agents | Missing scanning activity |
-| `graph.fan_out_history_size` | `20` | Baselines shift too slowly for your environment | Baselines are too noisy |
-| `graph.fan_out_min_floor` | `5` | Small environments where 5 connections is normal | Larger networks where 5 is trivially low |
-| `graph.community_crossing_risk` | `0.6` | Cross-team access is routine in your org | Security-sensitive environment with strict segmentation |
+| `detection.graph_structural.betweenness_threshold` | `0.3` | Too many alerts from legitimate bridge nodes (jump hosts, shared services) | Missing pivot detections |
+| `detection.graph_structural.fan_out_sigma` | `3.0` | Noisy alerts from batch jobs or monitoring agents | Missing scanning activity |
+| `detection.graph_structural.fan_out_history_size` | `20` | Baselines shift too slowly for your environment | Baselines are too noisy |
+| `detection.graph_structural.fan_out_min_floor` | `5` | Small environments where 5 connections is normal | Larger networks where 5 is trivially low |
+
+Community crossing risk is fixed at 0.6 (not configurable). If cross-team access is routine in your org, disable community crossing detection entirely via `detection.graph_structural.community_crossing_enabled: false`.
 
 !!! tip "Tuning Strategy"
     Start with defaults. Run for a week and review the alert volume. Adjust one parameter at a time — changing multiple parameters simultaneously makes it impossible to attribute improvements or regressions.

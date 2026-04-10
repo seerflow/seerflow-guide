@@ -62,9 +62,9 @@ The lower threshold mirrors this: excesses are computed as deficits below the 2n
 
 | Parameter | Type | Default | Range | Description |
 |-----------|------|---------|-------|-------------|
-| `dspot_calibration_window` | `int` | `1000` | 200–5000 | Number of scores collected before GPD fitting begins. Larger values produce more stable initial thresholds at the cost of a longer warmup period. |
-| `dspot_risk_level` | `float` | `0.0001` | 0.00001–0.01 | Target false positive rate per observation. Lower values produce a higher (more conservative) z_q threshold. |
-| `dspot_initial_percentile` | `int` | `98` | 90–99 | Percentile used to set the initial tail threshold after calibration. Upper tail at the P-th percentile, lower tail at the (100 − P)-th percentile. |
+| `dspot.calibration_window` | `int` | `1000` | 200–5000 | Number of scores collected before GPD fitting begins. Larger values produce more stable initial thresholds at the cost of a longer warmup period. |
+| `dspot.risk_level` | `float` | `0.0001` | 0.00001–0.01 | Target false positive rate per observation. Lower values produce a higher (more conservative) z_q threshold. |
+| `dspot.initial_percentile` | `int` | `98` | 90–99 | Percentile used to set the initial tail threshold after calibration. Upper tail at the P-th percentile, lower tail at the (100 − P)-th percentile. |
 
 ### Calibration Phase
 
@@ -164,11 +164,11 @@ This is useful for detecting service outages, log pipeline breaks, or an attacke
 
 | Symptom | Adjustment | Effect |
 |---------|-----------|--------|
-| Too many false positives | Decrease `dspot_risk_level` to `0.00001` | Raises z_q — only the most extreme scores fire |
-| Missing real anomalies | Increase `dspot_risk_level` to `0.001` | Lowers z_q — more sensitive, more alerts |
-| Thresholds too volatile | Increase `dspot_calibration_window` to `2000` | More data before initial GPD fit = more stable thresholds |
+| Too many false positives | Decrease `dspot.risk_level` to `0.00001` | Raises z_q — only the most extreme scores fire |
+| Missing real anomalies | Increase `dspot.risk_level` to `0.001` | Lowers z_q — more sensitive, more alerts |
+| Thresholds too volatile | Increase `dspot.calibration_window` to `2000` | More data before initial GPD fit = more stable thresholds |
 | Want to catch drops | Monitor `anomaly_direction == "lower"` | Lower z_q fires on silence, metric drops, service outages |
-| Threshold drifting too fast | Review excess accumulation rate | If many scores exceed the initial percentile, consider raising `dspot_initial_percentile` to 99 |
+| Threshold drifting too fast | Review excess accumulation rate | If many scores exceed the initial percentile, consider raising `dspot.initial_percentile` to 99 |
 
 **Risk level as false positive budget:** at `risk_level = 0.0001`, you expect at most 1 anomaly flag per 10,000 normal scores. At `risk_level = 0.00001`, the budget is 1 per 100,000. Choose based on your alert fatigue tolerance and downstream dedup strategy.
 
@@ -183,7 +183,7 @@ This is useful for detecting service outages, log pipeline breaks, or an attacke
 - [Scoring & Attack Mapping](scoring.md) — how DSPOT's `ThresholdResult` combines with other detectors
 - [Ensemble Overview](index.md) — how all detectors and DSPOT connect end-to-end
 - [Anomaly Detection concepts](../security-primer/anomaly-detection.md) — background on EVT and streaming thresholds
-- [Configuration Reference](../reference/config.md) — `dspot_calibration_window`, `dspot_risk_level`, `dspot_initial_percentile`
+- [Configuration Reference](../reference/config.md) — `dspot.calibration_window`, `dspot.risk_level`, `dspot.initial_percentile`
 - [Deployment Risk](../ops-primer/deployment-risk.md) — ops context for threshold adaptation during deploys
 
 **Next:** [Scoring & Attack Mapping →](scoring.md) — how detector scores are blended and mapped to MITRE ATT&CK.

@@ -262,7 +262,7 @@ The 2.0× cap is intentional: beyond a certain point, adding more detectors prov
 
 ### When Only One Detector Fires
 
-A single high-confidence detector (e.g. HST at z = 5.2) still produces a blended score above the DSPOT threshold if its z-score is large enough. Amplification is not required for an alert to fire — it is a confidence booster, not a gate. Adjust `dspot_risk_level` to tune sensitivity independently of the amplification logic.
+A single high-confidence detector (e.g. HST at z = 5.2) still produces a blended score above the DSPOT threshold if its z-score is large enough. Amplification is not required for an alert to fire — it is a confidence booster, not a gate. Adjust `dspot.risk_level` to tune sensitivity independently of the amplification logic.
 
 ### Warmup and Partial Ensembles
 
