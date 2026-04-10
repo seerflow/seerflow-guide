@@ -15,15 +15,6 @@ description: Comprehensive guide to Seerflow — streaming log intelligence
 
 !!! tip "Choose your path"
 
-    === "Security Novice"
-
-        New to security tooling? Start here:
-
-        1. [Security Concepts Primer](security-primer/index.md) — learn the fundamentals
-        2. [Architecture Overview](architecture/index.md) — how Seerflow works
-        3. [Detection Overview](detection/index.md) — what Seerflow detects
-        4. [Operations Guide](operations/index.md) — running Seerflow
-
     === "Security Operator"
 
         Deploying or tuning Seerflow? Go here:
@@ -32,15 +23,6 @@ description: Comprehensive guide to Seerflow — streaming log intelligence
         2. [Detection Deep Dives](detection/index.md) — understand each detector
         3. [Tuning Guide](operations/tuning.md) — reduce false positives
         4. [Configuration Reference](reference/config.md) — every parameter
-
-    === "Contributor"
-
-        Extending Seerflow? Start with:
-
-        1. [Architecture](architecture/index.md) — system internals
-        2. [Entity Graph](entity-graph/index.md) — graph data model
-        3. [Detection Internals](detection/index.md) — add detectors
-        4. [Testing Guide](operations/testing.md) — quality gates
 
     === "SRE / DevOps"
 

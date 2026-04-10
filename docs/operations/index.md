@@ -44,7 +44,6 @@ Seerflow starts with sensible defaults — no config file is needed for a first 
 |----------|-----------------|
 | **Security operator** | [Alerting](alerting.md) → [Configuration](../reference/config.md) → [CLI](../reference/cli.md) → [Tuning](tuning.md) |
 | **Platform engineer** | [Storage](storage.md) → [Configuration](../reference/config.md) → [Testing](testing.md) → [Tuning](tuning.md) |
-| **Contributor** | [Testing](testing.md) → [Storage](storage.md) → [Configuration](../reference/config.md) → [CLI](../reference/cli.md) |
 
 ## Section Overview
 
