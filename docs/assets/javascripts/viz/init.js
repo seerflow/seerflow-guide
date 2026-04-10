@@ -37,6 +37,7 @@
       'detector-ts': window.SeerflowViz.detectorTimeSeries,
       'attack-heatmap': window.SeerflowViz.attackHeatmap,
       'deployment-cascade': window.SeerflowViz.deploymentCascade,
+      'pipeline-sequence': window.SeerflowViz.pipelineSequence,
     };
     const factory = factoryMap[kind];
     if (typeof factory !== 'function') {

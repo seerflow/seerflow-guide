@@ -343,7 +343,106 @@
     };
   }
 
+  function pipelineSequence(el, data) {
+    // Vertical sequence/flow diagram. Each stage renders as a horizontal bar
+    // with the stage name on the left (y-axis) and an inline description
+    // inside the bar. Stages stack top-to-bottom in the order given.
+    if (!data || !Array.isArray(data.stages)) {
+      throw new Error('invalid pipeline sequence data');
+    }
+
+    // Reverse so the first stage appears at the top of the chart
+    const stages = data.stages.slice().reverse();
+    const stepColors = [
+      '--sf-baseline',
+      '--sf-entity-host',
+      '--sf-entity-user',
+      '--sf-entity-process',
+      '--sf-threshold',
+      '--sf-anomaly',
+      '--sf-entity-domain',
+      '--sf-entity-file',
+    ];
+    const fallbackColors = [
+      '#3b82f6',
+      '#10b981',
+      '#0ea5e9',
+      '#a855f7',
+      '#ea580c',
+      '#dc2626',
+      '#ec4899',
+      '#ef4444',
+    ];
+
+    function stageColor(index) {
+      const idx = index % stepColors.length;
+      return getCssVar(stepColors[idx]) || fallbackColors[idx];
+    }
+
+    function buildTraces() {
+      // Colors indexed by the ORIGINAL (un-reversed) order so stage 1 always
+      // gets the first color regardless of display order.
+      const nStages = stages.length;
+      return [
+        {
+          type: 'bar',
+          orientation: 'h',
+          x: stages.map(() => 1),
+          y: stages.map((s) => s.name),
+          text: stages.map((s) => s.description || s.note || ''),
+          textposition: 'inside',
+          insidetextanchor: 'start',
+          textfont: { size: 12, color: '#ffffff' },
+          marker: {
+            color: stages.map((_, i) => stageColor(nStages - 1 - i)),
+            line: { width: 0 },
+          },
+          hovertemplate:
+            '<b>%{y}</b><br>%{text}<br><i>Step %{customdata}</i><extra></extra>',
+          customdata: stages.map((_, i) => nStages - i),
+          showlegend: false,
+        },
+      ];
+    }
+
+    function buildLayout() {
+      const layout = layoutBase();
+      layout.title = {
+        text: data.title || 'Pipeline sequence',
+        font: { size: 14, color: getCssVar('--sf-viz-fg') || '#1a1a1a' },
+      };
+      layout.margin = { l: 160, r: 30, t: 50, b: 30 };
+      layout.xaxis.visible = false;
+      layout.xaxis.showgrid = false;
+      layout.xaxis.zeroline = false;
+      layout.yaxis.title.text = '';
+      layout.yaxis.automargin = true;
+      layout.yaxis.showgrid = false;
+      layout.bargap = 0.35;
+      layout.showlegend = false;
+      layout.hovermode = 'closest';
+      return layout;
+    }
+
+    const config = {
+      displayModeBar: false,
+      responsive: true,
+    };
+
+    Plotly.newPlot(el, buildTraces(), buildLayout(), config);
+
+    return {
+      updateTheme() {
+        Plotly.react(el, buildTraces(), buildLayout(), config);
+      },
+      destroy() {
+        Plotly.purge(el);
+      },
+    };
+  }
+
   window.SeerflowViz.detectorTimeSeries = detectorTimeSeries;
   window.SeerflowViz.attackHeatmap = attackHeatmap;
   window.SeerflowViz.deploymentCascade = deploymentCascade;
+  window.SeerflowViz.pipelineSequence = pipelineSequence;
 })();
