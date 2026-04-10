@@ -77,6 +77,8 @@ Seerflow can alert on these patterns automatically. **DSPOT** --- the adaptive t
 
 Here is the full timeline of the v2.3.1 deployment failure, showing how symptoms cascade across log sources and when Seerflow's detectors fire:
 
+<div class="seerflow-mermaid-wide" markdown="1">
+
 ```mermaid
 gantt
     title Deployment v2.3.1 — Failure Cascade
@@ -101,6 +103,8 @@ gantt
         HW volume alert           :done, 14:18, 0min
         Blended alert fires       :done, 14:20, 0min
 ```
+
+</div>
 
 The cascade tells a story: a new database query in v2.3.1 was less efficient than the one it replaced. Under load, it held connections longer, draining the pool. As the pool thinned, requests backed up, latency climbed, and the application buffered more data in memory trying to compensate. Eventually, memory pressure triggered an OOM kill.
 

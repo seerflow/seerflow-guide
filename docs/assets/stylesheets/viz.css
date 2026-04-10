@@ -159,12 +159,19 @@
   }
 }
 
-/* Tuning flowchart sizing fix — re-added in S-139H */
+/* Mermaid sizing fix — forces wide Mermaid diagrams (flowcharts, gantts)
+   to render at full container width instead of the cramped default. */
+.seerflow-mermaid-wide .mermaid,
 .seerflow-tuning-flowchart .mermaid {
-  min-height: 600px;
+  min-height: 400px;
   max-width: 100%;
 }
 
+.seerflow-tuning-flowchart .mermaid {
+  min-height: 600px;
+}
+
+.seerflow-mermaid-wide .mermaid svg,
 .seerflow-tuning-flowchart .mermaid svg {
   width: 100% !important;
   max-width: none !important;
