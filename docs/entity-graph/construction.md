@@ -2,6 +2,14 @@
 
 Seerflow builds its entity graph from log events in three steps: **extract** entities from each event, **resolve** them to deterministic IDs, and **infer** edges from co-occurring entities. This page covers each step.
 
+!!! example "Interactive: explore a sample entity graph"
+
+    Sample entity graph showing an SSH pivot attack. Click any node for details, drag to reposition, scroll to zoom.
+
+    <div class="seerflow-viz"
+         data-viz="entity-graph"
+         data-src="../../assets/viz-data/entity-graph-sample.json"></div>
+
 ---
 
 ## Entity Types

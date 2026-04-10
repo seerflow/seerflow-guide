@@ -142,65 +142,52 @@ The security and observability industry has no single standard for log events. F
 | **OCSF** | AWS + Splunk (2022) | Numeric taxonomy for machine processing (`category_uid/class_uid/type_uid`) | AWS Security Lake, Splunk, CrowdStrike |
 | **Sigma** | Open-source (2017) | Portable detection rules via `logsource.category/product/service` matching | 3,000+ SigmaHQ rules, every major SIEM |
 
-Traditional tools pick one schema and translate everything into it — losing information in the process. Seerflow takes a different approach: **carry all four schemas simultaneously** in a single struct. No translation, no lossy mapping, no schema conversion at query time.
+Traditional tools pick one schema and translate everything into it — losing information in the process. Seerflow takes a different approach: **carry all four schemas simultaneously** in a single `SeerflowEvent` struct. No translation, no lossy mapping, no schema conversion at query time. Select a tab below to see which fields Seerflow borrows from each schema:
 
-```mermaid
-graph LR
-    SE["🔷 <b>SeerflowEvent</b><br/>One struct, four schemas"]
+=== "📡 OpenTelemetry"
 
-    subgraph OTel["📡 OpenTelemetry"]
-        OT1["<b>trace_id</b><br/>Distributed trace correlation"]
-        OT2["<b>span_id</b><br/>Span within a trace"]
-        OT3["<b>otel_severity</b><br/>Severity 1-24"]
-        OT4["<b>body</b><br/>Raw payload (deferred decode)"]
-        OT5["<b>resource_attrs</b><br/>service.name, host.name, ..."]
-    end
+    Distributed tracing schema from CNCF (2019). Strength: nanosecond timestamps, trace/span correlation, resource attributes.
 
-    subgraph ECS["📋 Elastic Common Schema"]
-        ECS1["<b>event_kind</b><br/>alert · event · metric · state"]
-        ECS2["<b>event_category</b><br/>authentication · process · network"]
-        ECS3["<b>event_type</b><br/>start · end · info · error"]
-        ECS4["<b>event_outcome</b><br/>success · failure · unknown"]
-        ECS5["<b>event_action</b><br/>ssh_login · file_create · ..."]
-    end
+    | Field | Description |
+    |-------|-------------|
+    | `trace_id` | Distributed trace correlation |
+    | `span_id` | Span within a trace |
+    | `otel_severity` | Severity 1–24 |
+    | `body` | Raw payload (deferred decode) |
+    | `resource_attrs` | `service.name`, `host.name`, … |
 
-    subgraph OCSF_g["🔢 OCSF"]
-        OC1["<b>category_uid</b><br/>1=System · 3=Identity · 4=Network"]
-        OC2["<b>class_uid</b><br/>3002=Authentication"]
-        OC3["<b>type_uid</b><br/>300201=Logon Failed"]
-        OC4["<b>activity_id</b><br/>1=Logon · 3=Terminate"]
-    end
+=== "📋 Elastic Common Schema"
 
-    subgraph Sigma_g["🛡️ Sigma"]
-        SG1["<b>log_source_category</b><br/>process_creation · firewall"]
-        SG2["<b>log_source_product</b><br/>linux · windows · aws"]
-        SG3["<b>log_source_service</b><br/>sshd · nginx · cloudtrail"]
-    end
+    Elastic's human-readable event classification (2019). Strength: descriptive string taxonomy that operators can read directly.
 
-    SE --> OT1 & OT2 & OT3 & OT4 & OT5
-    SE --> ECS1 & ECS2 & ECS3 & ECS4 & ECS5
-    SE --> OC1 & OC2 & OC3 & OC4
-    SE --> SG1 & SG2 & SG3
+    | Field | Description |
+    |-------|-------------|
+    | `event_kind` | `alert` · `event` · `metric` · `state` |
+    | `event_category` | `authentication` · `process` · `network` |
+    | `event_type` | `start` · `end` · `info` · `error` |
+    | `event_outcome` | `success` · `failure` · `unknown` |
+    | `event_action` | `ssh_login` · `file_create` · … |
 
-    style SE fill:#5154B4,stroke:#333,color:#fff
-    style OT1 fill:#1565c0,stroke:#0d47a1,color:#fff
-    style OT2 fill:#1565c0,stroke:#0d47a1,color:#fff
-    style OT3 fill:#1565c0,stroke:#0d47a1,color:#fff
-    style OT4 fill:#1565c0,stroke:#0d47a1,color:#fff
-    style OT5 fill:#1565c0,stroke:#0d47a1,color:#fff
-    style ECS1 fill:#e65100,stroke:#bf360c,color:#fff
-    style ECS2 fill:#e65100,stroke:#bf360c,color:#fff
-    style ECS3 fill:#e65100,stroke:#bf360c,color:#fff
-    style ECS4 fill:#e65100,stroke:#bf360c,color:#fff
-    style ECS5 fill:#e65100,stroke:#bf360c,color:#fff
-    style OC1 fill:#6a1b9a,stroke:#4a148c,color:#fff
-    style OC2 fill:#6a1b9a,stroke:#4a148c,color:#fff
-    style OC3 fill:#6a1b9a,stroke:#4a148c,color:#fff
-    style OC4 fill:#6a1b9a,stroke:#4a148c,color:#fff
-    style SG1 fill:#2e7d32,stroke:#1b5e20,color:#fff
-    style SG2 fill:#2e7d32,stroke:#1b5e20,color:#fff
-    style SG3 fill:#2e7d32,stroke:#1b5e20,color:#fff
-```
+=== "🔢 OCSF"
+
+    Open Cybersecurity Schema Framework from AWS + Splunk (2022). Strength: numeric taxonomy for fast machine processing.
+
+    | Field | Description |
+    |-------|-------------|
+    | `category_uid` | `1`=System · `3`=Identity · `4`=Network |
+    | `class_uid` | `3002`=Authentication |
+    | `type_uid` | `300201`=Logon Failed |
+    | `activity_id` | `1`=Logon · `3`=Terminate |
+
+=== "🛡️ Sigma"
+
+    Portable detection rule matching (2017). Strength: 3,000+ SigmaHQ rules dispatch against these three fields.
+
+    | Field | Description |
+    |-------|-------------|
+    | `log_source_category` | `process_creation` · `firewall` |
+    | `log_source_product` | `linux` · `windows` · `aws` |
+    | `log_source_service` | `sshd` · `nginx` · `cloudtrail` |
 
 ### Who Reads What
 

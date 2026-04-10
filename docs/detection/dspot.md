@@ -16,6 +16,14 @@
 
     Seerflow's DSPOT detector catches this by fitting a Generalized Pareto Distribution to the score tail — the threshold auto-adjusts for seasonal variation and gradual drift, but the post-deploy values land well beyond the expected extreme. See the [Ops Primer](../ops-primer/deployment-risk.md) for how deployment risk windows interact with adaptive thresholds.
 
+!!! example "Interactive: DSPOT adaptive thresholding"
+
+    DSPOT's EVT-derived threshold adapts to the stream. The minute-180 spike clearly exceeds the current threshold.
+
+    <div class="seerflow-viz"
+         data-viz="detector-ts"
+         data-src="../../assets/viz-data/detector-ts/dspot.json"></div>
+
 ## Theory
 
 ### Intuition

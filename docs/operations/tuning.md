@@ -15,6 +15,29 @@ This page helps operators systematically reduce false positives, recover missed 
 | **Wrong alerts** — wrong detector emphasis | Rebalance `weights_*` parameters | [Detector Tuning](#detector-tuning) |
 | **High memory / CPU** | Tune LRU caps and `score_interval` | [Performance](#performance-tuning) |
 
+<div class="seerflow-tuning-flowchart" markdown="1">
+
+```mermaid
+flowchart TD
+    Start[Alert volume feels wrong] --> TooMany{Too many or too few?}
+    TooMany -->|Too many| Quality{Mostly correct<br/>but noisy?}
+    TooMany -->|Too few| Detector[Lower relevant detector<br/>threshold]
+    Quality -->|Noisy but correct| Dedup[Increase<br/>dedup_window_seconds<br/>or lower detector weights]
+    Quality -->|Mostly false positives| FPFlow{Which lever?}
+    FPFlow --> DspotRisk[Raise dspot.risk_level<br/>from 0.0001 to 0.001]
+    FPFlow --> Feedback[Use seerflow feedback fp<br/>for per-entity adjustment]
+    Start --> WrongKind{Wrong alerts?}
+    WrongKind -->|Correlation groups wrong| Correlation[Tune window_duration_seconds<br/>and late_tolerance_seconds]
+    WrongKind -->|Wrong detector fires| Weights[Rebalance weights_*<br/>parameters]
+    Start --> Performance{High memory<br/>or CPU?}
+    Performance -->|Yes| PerfTune[Tune LRU caps<br/>and score_interval]
+
+    classDef action fill:#10b981,stroke:#059669,color:#fff
+    class Detector,Dedup,DspotRisk,Feedback,Correlation,Weights,PerfTune action
+```
+
+</div>
+
 ---
 
 ## Flowchart Walkthrough

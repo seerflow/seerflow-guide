@@ -2,6 +2,14 @@
 
 Once Seerflow builds the entity graph, it runs **graph algorithms** to analyze its structure. These algorithms assign scores to each entity — centrality, community membership, connection counts — and detect anomalies when the structure deviates from established patterns.
 
+!!! example "Interactive: explore the graph used in the examples below"
+
+    The same sample graph used throughout this page. Risk scores shown on click are pre-computed examples.
+
+    <div class="seerflow-viz"
+         data-viz="entity-graph"
+         data-src="../../assets/viz-data/entity-graph-sample.json"></div>
+
 ---
 
 ## Betweenness Centrality

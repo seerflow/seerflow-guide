@@ -2,6 +2,15 @@
 
 This page maps Seerflow's detection capabilities to the [MITRE ATT&CK](https://attack.mitre.org/) framework. Coverage comes from two sources: **Sigma rules** (pattern-based) and **ML anomaly detection** (behavior-based).
 
+!!! example "Interactive: explore Seerflow's ATT&CK coverage"
+
+    MITRE ATT&CK techniques covered by Seerflow. Hover any cell for technique details; click to jump to the relevant guide section.
+
+    <div class="seerflow-viz"
+         data-viz="attack-heatmap"
+         data-src="../../assets/viz-data/attack-matrix.json"
+         style="min-height: 600px;"></div>
+
 ## Coverage by Tactic
 
 | Tactic | Sigma Rules | ML Coverage | Total Techniques Covered |

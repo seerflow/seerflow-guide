@@ -15,6 +15,14 @@
 
     The trend component catches the steady post-deploy climb while the seasonal component says "this should be dropping at 3 AM — traffic is always low here." Both signals point in the same direction: predicted 15 connections, observed 48, residual 33. That residual is far outside the normal band, producing a score of 1.0. See the [Ops Primer](../ops-primer/deployment-risk.md) for more on deployment risk windows.
 
+!!! example "Interactive: Holt-Winters volume tracking"
+
+    Seasonal volume with prediction band. The 3am spike exceeds the upper threshold, triggering an anomaly.
+
+    <div class="seerflow-viz"
+         data-viz="detector-ts"
+         data-src="../../assets/viz-data/detector-ts/holt-winters.json"></div>
+
 ## Theory
 
 ### Intuition

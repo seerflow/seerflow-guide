@@ -26,30 +26,12 @@ Backpressure is handled by a bounded `asyncio.Queue` (default 10,000 events). Wh
 
 ### Event Lifecycle
 
-```mermaid
-sequenceDiagram
-    participant Recv as 📡 Receiver
-    participant Queue as 📬 Queue
-    participant Parse as 🔍 Parser
-    participant Detect as 🧠 Detection
-    participant Corr as 🔗 Correlation
-    participant Alert as 🔔 Alerting
+Each raw event travels through six stages from ingestion to alerting. Hover any stage for its full description; stages are colored in flow order.
 
-    Recv->>Queue: RawEvent
-    Note over Recv,Queue: Syslog, File Tail, OTLP gRPC/HTTP, Webhook<br/>→ asyncio.Queue(10K max, backpressure at 80%)
-
-    Queue->>Parse: RawEvent
-    Note over Parse: Drain3 → template + params<br/>Entity extract → IPs, users, hosts<br/>→ SeerflowEvent (30+ fields)
-
-    Parse->>Detect: SeerflowEvent
-    Note over Detect: HST + Holt-Winters + CUSUM + Markov + DSPOT<br/>→ blended anomaly_score<br/>3,000+ Sigma rules → mitre_tactics
-
-    Detect->>Corr: scored event + rule matches
-    Note over Corr: Entity graph (igraph) update<br/>Risk accumulation (half-life decay)<br/>Kill-chain progression check
-
-    Corr->>Alert: alerts (if threshold crossed)
-    Note over Alert: Dedup (15 min window)<br/>→ Webhook / PagerDuty
-```
+<div class="seerflow-viz"
+     data-viz="pipeline-sequence"
+     data-src="../../assets/viz-data/pipeline-lifecycle.json"
+     style="min-height: 420px;"></div>
 
 **Step by step:**
 

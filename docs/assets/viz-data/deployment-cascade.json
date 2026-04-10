@@ -1,0 +1,17 @@
+{
+  "title": "Deployment v2.3.1 — Failure Cascade",
+  "tasks": [
+    {"source": "Deployment", "start_offset": 0, "duration": 0, "label": "Deploy completes", "severity": "milestone"},
+    {"source": "App Logs", "start_offset": 12, "duration": 6, "label": "Error rate 1% → 3%", "severity": "warning"},
+    {"source": "Seerflow", "start_offset": 12, "duration": 0, "label": "CUSUM change point", "severity": "alert"},
+    {"source": "App Logs", "start_offset": 18, "duration": 6, "label": "Error rate 3% → 8%", "severity": "critical"},
+    {"source": "DB Logs", "start_offset": 18, "duration": 4, "label": "Pool warnings", "severity": "warning"},
+    {"source": "Seerflow", "start_offset": 18, "duration": 0, "label": "HW volume alert", "severity": "alert"},
+    {"source": "Proxy Logs", "start_offset": 20, "duration": 4, "label": "p99 latency 200ms → 800ms", "severity": "warning"},
+    {"source": "Seerflow", "start_offset": 20, "duration": 0, "label": "Blended alert fires", "severity": "alert"},
+    {"source": "DB Logs", "start_offset": 22, "duration": 8, "label": "Pool exhausted", "severity": "critical"},
+    {"source": "Proxy Logs", "start_offset": 24, "duration": 6, "label": "p99 latency 800ms → 2s", "severity": "critical"},
+    {"source": "System Logs", "start_offset": 26, "duration": 4, "label": "Memory pressure", "severity": "warning"},
+    {"source": "System Logs", "start_offset": 30, "duration": 0, "label": "OOM Kill", "severity": "critical"}
+  ]
+}

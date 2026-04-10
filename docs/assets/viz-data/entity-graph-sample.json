@@ -1,0 +1,31 @@
+{
+  "title": "SSH Pivot Attack — Compromised svc-deploy account",
+  "nodes": [
+    {"id": "u-attacker", "type": "user", "label": "attacker@external", "risk": 0.95},
+    {"id": "u-svc-deploy", "type": "user", "label": "svc-deploy", "risk": 0.88},
+    {"id": "u-admin", "type": "user", "label": "admin", "risk": 0.12},
+    {"id": "ip-203", "type": "ip", "label": "203.0.113.42", "risk": 0.90},
+    {"id": "ip-10-1", "type": "ip", "label": "10.0.1.15", "risk": 0.30},
+    {"id": "ip-10-42", "type": "ip", "label": "10.0.42.8", "risk": 0.70},
+    {"id": "h-bastion", "type": "host", "label": "bastion-01", "risk": 0.85},
+    {"id": "h-web", "type": "host", "label": "web-03", "risk": 0.45},
+    {"id": "h-db", "type": "host", "label": "prod-db-01", "risk": 0.92},
+    {"id": "p-ssh-bastion", "type": "process", "label": "sshd@bastion", "risk": 0.80},
+    {"id": "p-psql", "type": "process", "label": "psql@prod-db", "risk": 0.88},
+    {"id": "f-creds", "type": "file", "label": "/root/.aws/credentials", "risk": 0.95},
+    {"id": "d-c2", "type": "domain", "label": "evil-c2.example.com", "risk": 0.98}
+  ],
+  "edges": [
+    {"source": "u-attacker", "target": "ip-203", "kind": "originates_from"},
+    {"source": "ip-203", "target": "h-bastion", "kind": "connects_to"},
+    {"source": "h-bastion", "target": "p-ssh-bastion", "kind": "runs"},
+    {"source": "p-ssh-bastion", "target": "u-svc-deploy", "kind": "authenticates_as"},
+    {"source": "u-svc-deploy", "target": "ip-10-1", "kind": "assumed"},
+    {"source": "ip-10-1", "target": "h-web", "kind": "connects_to"},
+    {"source": "h-web", "target": "ip-10-42", "kind": "connects_to"},
+    {"source": "ip-10-42", "target": "h-db", "kind": "connects_to"},
+    {"source": "h-db", "target": "p-psql", "kind": "runs"},
+    {"source": "p-psql", "target": "f-creds", "kind": "reads"},
+    {"source": "h-bastion", "target": "d-c2", "kind": "beacons_to"}
+  ]
+}

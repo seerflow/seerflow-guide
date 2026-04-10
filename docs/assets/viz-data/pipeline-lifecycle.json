@@ -1,0 +1,29 @@
+{
+  "title": "Event Lifecycle",
+  "stages": [
+    {
+      "name": "Receiver",
+      "description": "Syslog, File Tail, OTLP gRPC/HTTP, Webhook — raw bytes arrive"
+    },
+    {
+      "name": "Queue",
+      "description": "asyncio.Queue (10K max, backpressure at 80%)"
+    },
+    {
+      "name": "Parser",
+      "description": "Drain3 template + params → entity extract → SeerflowEvent"
+    },
+    {
+      "name": "Detection",
+      "description": "HST + Holt-Winters + CUSUM + Markov + DSPOT → blended score + Sigma rules"
+    },
+    {
+      "name": "Correlation",
+      "description": "Entity graph (igraph) + risk accumulation + kill-chain progression"
+    },
+    {
+      "name": "Alerting",
+      "description": "Dedup (15 min window) → Webhook / PagerDuty"
+    }
+  ]
+}

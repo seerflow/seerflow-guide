@@ -6,25 +6,12 @@ Our SSH attacker didn't just guess a password and call it a day. After getting i
 
 In 2011, researchers at Lockheed Martin published [a paper](https://www.lockheedmartin.com/content/dam/lockheed-martin/rms/documents/cyber/LM-White-Paper-Intel-Driven-Defense.pdf) describing cyberattacks as a sequence of stages, borrowing the military concept of a "kill chain" -- a systematic process an adversary must complete to achieve their objective. The insight: **an attack is not a single event. It is a chain of dependent steps, and breaking any one link stops the entire attack.**
 
-They identified seven stages that virtually all intrusions follow:
+They identified seven stages that virtually all intrusions follow. Hover any stage below for its full description — stages are colored in sequence to emphasize the linear progression.
 
-```mermaid
-graph TD
-    R["<b>1. Reconnaissance</b><br/>Research the target"]:::stage1 --> W["<b>2. Weaponization</b><br/>Build the payload"]:::stage2
-    W --> D["<b>3. Delivery</b><br/>Transmit to victim"]:::stage3
-    D --> E["<b>4. Exploitation</b><br/>Trigger the vulnerability"]:::stage4
-    E --> I["<b>5. Installation</b><br/>Establish foothold"]:::stage5
-    I --> C2["<b>6. Command & Control</b><br/>Open remote channel"]:::stage6
-    C2 --> A["<b>7. Actions on Objectives</b><br/>Achieve the goal"]:::stage7
-
-    classDef stage1 fill:#e8f5e9,stroke:#388e3c,color:#1b5e20
-    classDef stage2 fill:#fff9c4,stroke:#f9a825,color:#f57f17
-    classDef stage3 fill:#ffe0b2,stroke:#ef6c00,color:#e65100
-    classDef stage4 fill:#ffccbc,stroke:#d84315,color:#bf360c
-    classDef stage5 fill:#f8bbd0,stroke:#c2185b,color:#880e4f
-    classDef stage6 fill:#e1bee7,stroke:#7b1fa2,color:#4a148c
-    classDef stage7 fill:#d32f2f,stroke:#b71c1c,color:#ffffff
-```
+<div class="seerflow-viz"
+     data-viz="pipeline-sequence"
+     data-src="../../assets/viz-data/kill-chain.json"
+     style="min-height: 460px;"></div>
 
 Let's walk through each stage, then map them to our running SSH attack example.
 

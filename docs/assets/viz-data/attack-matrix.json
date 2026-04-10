@@ -1,0 +1,72 @@
+{
+  "title": "Seerflow ATT&CK Coverage",
+  "tactics": [
+    "Initial Access",
+    "Execution",
+    "Persistence",
+    "Privilege Esc",
+    "Defense Evasion",
+    "Credential Access",
+    "Discovery",
+    "Lateral Movement",
+    "Command & Control",
+    "Exfiltration",
+    "Impact"
+  ],
+  "techniques": [
+    [
+      {"id": "T1190", "name": "T1190 Exploit Public App", "covered_by": ["sigma"], "href": "../../correlation/sigma/#t1190"},
+      {"id": "T1133", "name": "T1133 External Services", "covered_by": ["sigma"], "href": "../../correlation/sigma/#t1133"},
+      {"id": "T1078", "name": "T1078 Valid Accounts", "covered_by": ["sigma", "ml"], "href": "../../detection/hst/"},
+      {"id": "T1189", "name": "T1189 Drive-by", "covered_by": ["sigma"], "href": "../../correlation/sigma/#t1189"}
+    ],
+    [
+      {"id": "T1059", "name": "T1059 Cmd Scripting", "covered_by": ["sigma", "ml"], "href": "../../detection/markov/"},
+      {"id": "T1053", "name": "T1053 Scheduled Task", "covered_by": ["sigma"], "href": "../../correlation/sigma/#t1053"},
+      {"id": "T1204", "name": "T1204 User Execution", "covered_by": ["sigma"], "href": "../../correlation/sigma/#t1204"}
+    ],
+    [
+      {"id": "T1136", "name": "T1136 Create Account", "covered_by": ["sigma"], "href": "../../correlation/sigma/#t1136"},
+      {"id": "T1098", "name": "T1098 Account Manip", "covered_by": ["sigma"], "href": "../../correlation/sigma/#t1098"},
+      {"id": "T1543", "name": "T1543 Create/Mod Service", "covered_by": ["sigma"], "href": "../../correlation/sigma/#t1543"},
+      {"id": "T1546", "name": "T1546 Event Trigger", "covered_by": ["sigma"], "href": "../../correlation/sigma/#t1546"}
+    ],
+    [
+      {"id": "T1548", "name": "T1548 Abuse Elevation", "covered_by": ["sigma"], "href": "../../correlation/sigma/#t1548"},
+      {"id": "T1068", "name": "T1068 Exploit Privilege", "covered_by": ["sigma"], "href": "../../correlation/sigma/#t1068"},
+      {"id": "T1574", "name": "T1574 Hijack Flow", "covered_by": ["sigma"], "href": "../../correlation/sigma/#t1574"}
+    ],
+    [
+      {"id": "T1562", "name": "T1562 Impair Defenses", "covered_by": ["sigma"], "href": "../../correlation/sigma/#t1562"},
+      {"id": "T1070", "name": "T1070 Indicator Removal", "covered_by": ["sigma"], "href": "../../correlation/sigma/#t1070"},
+      {"id": "T1140", "name": "T1140 Deobfuscate", "covered_by": ["sigma"], "href": "../../correlation/sigma/#t1140"}
+    ],
+    [
+      {"id": "T1552", "name": "T1552 Unsecured Creds", "covered_by": ["sigma", "ml"], "href": "../../detection/hst/"},
+      {"id": "T1110", "name": "T1110 Brute Force", "covered_by": ["ml"], "href": "../../detection/holt-winters/"}
+    ],
+    [
+      {"id": "T1033", "name": "T1033 Owner/User Discovery", "covered_by": ["sigma"], "href": "../../correlation/sigma/#t1033"},
+      {"id": "T1082", "name": "T1082 System Info", "covered_by": ["sigma"], "href": "../../correlation/sigma/#t1082"},
+      {"id": "T1083", "name": "T1083 File Discovery", "covered_by": ["sigma"], "href": "../../correlation/sigma/#t1083"}
+    ],
+    [
+      {"id": "T1021", "name": "T1021 Remote Services", "covered_by": ["sigma", "ml"], "href": "../../correlation/graph-structural/"}
+    ],
+    [
+      {"id": "T1071", "name": "T1071 App Layer Protocol", "covered_by": ["sigma", "ml"], "href": "../../correlation/sigma/#t1071"},
+      {"id": "T1572", "name": "T1572 Protocol Tunneling", "covered_by": ["sigma"], "href": "../../correlation/sigma/#t1572"},
+      {"id": "T1090", "name": "T1090 Proxy", "covered_by": ["sigma"], "href": "../../correlation/sigma/#t1090"},
+      {"id": "T1102", "name": "T1102 Web Service", "covered_by": ["sigma"], "href": "../../correlation/sigma/#t1102"},
+      {"id": "T1105", "name": "T1105 Ingress Transfer", "covered_by": ["sigma"], "href": "../../correlation/sigma/#t1105"}
+    ],
+    [
+      {"id": "T1048", "name": "T1048 Exfil Alt Protocol", "covered_by": ["sigma", "ml"], "href": "../../detection/holt-winters/"},
+      {"id": "T1567", "name": "T1567 Exfil Web Service", "covered_by": ["sigma"], "href": "../../correlation/sigma/#t1567"}
+    ],
+    [
+      {"id": "T1496", "name": "T1496 Resource Hijacking", "covered_by": ["sigma"], "href": "../../correlation/sigma/#t1496"},
+      {"id": "T1565", "name": "T1565 Data Manipulation", "covered_by": ["sigma"], "href": "../../correlation/sigma/#t1565"}
+    ]
+  ]
+}

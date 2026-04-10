@@ -1,0 +1,3 @@
+# Dependencies required only to regenerate sample data via scripts/gen_viz_data.py.
+# Not needed for mkdocs build.
+numpy>=1.26
