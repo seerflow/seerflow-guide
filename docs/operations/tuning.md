@@ -6,47 +6,14 @@ This page helps operators systematically reduce false positives, recover missed 
 
 ## Decision Flowchart
 
-```mermaid
-flowchart TD
-    Start{Alert volume\nproblem?} --> TooMany[Too many alerts]
-    Start --> TooFew[Too few alerts]
-    Start --> WrongAlerts[Right volume,\nwrong alerts]
-
-    TooMany --> FP{Mostly\nfalse positives?}
-    FP -->|Yes| RaiseDspot[Raise DSPOT risk level\ndspot_risk_level ↑]
-    FP -->|No| IncreaseDedup[Increase dedup window\ndedup_window_seconds ↑]
-
-    RaiseDspot --> Feedback[Use feedback loop\nseerflow feedback id fp]
-    IncreaseDedup --> ReduceWeights[Reduce noisy detector weights\nweights_content / weights_volume ↓]
-
-    TooFew --> WhichDetector{Which detector\nis missing events?}
-    WhichDetector -->|Content| LowerHST[Lower hst_window_size\n← smaller reference window]
-    WhichDetector -->|Volume| LowerHW[Lower hw_n_std\n← tighter std band]
-    WhichDetector -->|Change| LowerCUSUM[Lower cusum_drift\n← more sensitive shift]
-    WhichDetector -->|Sequence| LowerMarkov[Lower markov_min_events\n← score sooner]
-
-    WrongAlerts --> CorrIssue{Correlation\nissue?}
-    CorrIssue -->|Yes| AdjustWindows[Adjust window_duration_seconds\nor late_tolerance_seconds]
-    CorrIssue -->|No| RebalanceWeights[Rebalance detector weights\nweights_* parameters]
-
-    style Start fill:#7c3aed,color:#fff,stroke:#a78bfa
-    style FP fill:#7c3aed,color:#fff,stroke:#a78bfa
-    style WhichDetector fill:#7c3aed,color:#fff,stroke:#a78bfa
-    style CorrIssue fill:#7c3aed,color:#fff,stroke:#a78bfa
-    style TooMany fill:#dc2626,color:#fff,stroke:#f87171
-    style TooFew fill:#2563eb,color:#fff,stroke:#60a5fa
-    style WrongAlerts fill:#d97706,color:#fff,stroke:#fbbf24
-    style RaiseDspot fill:#059669,color:#fff,stroke:#34d399
-    style Feedback fill:#059669,color:#fff,stroke:#34d399
-    style IncreaseDedup fill:#059669,color:#fff,stroke:#34d399
-    style ReduceWeights fill:#059669,color:#fff,stroke:#34d399
-    style LowerHST fill:#059669,color:#fff,stroke:#34d399
-    style LowerHW fill:#059669,color:#fff,stroke:#34d399
-    style LowerCUSUM fill:#059669,color:#fff,stroke:#34d399
-    style LowerMarkov fill:#059669,color:#fff,stroke:#34d399
-    style AdjustWindows fill:#059669,color:#fff,stroke:#34d399
-    style RebalanceWeights fill:#059669,color:#fff,stroke:#34d399
-```
+| Symptom | First thing to try | Section |
+|---------|-------------------|---------|
+| **Too many alerts** — mostly false positives | Raise `dspot_risk_level` or use `seerflow feedback <id> fp` | [False Positives](#too-many-alerts--mostly-false-positives) |
+| **Too many alerts** — correct but noisy | Increase `dedup_window_seconds` or lower detector weights | [Dedup & Weights](#too-many-alerts--correct-but-noisy) |
+| **Too few alerts** | Lower the relevant detector threshold | [Detector Tuning](#detector-tuning) |
+| **Wrong alerts** — correlation misfires | Adjust `window_duration_seconds` or `late_tolerance_seconds` | [Correlation Tuning](#correlation-tuning) |
+| **Wrong alerts** — wrong detector emphasis | Rebalance `weights_*` parameters | [Detector Tuning](#detector-tuning) |
+| **High memory / CPU** | Tune LRU caps and `score_interval` | [Performance](#performance-tuning) |
 
 ---
 
