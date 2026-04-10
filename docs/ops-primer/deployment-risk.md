@@ -86,18 +86,18 @@ Same timeline as a precise-reference table:
 
 | Time  | T+   | Source       | Event                          | Severity  |
 |-------|------|--------------|--------------------------------|-----------|
-| 14:00 | 0    | Deployment   | Deploy v2.3.1 completes        | milestone |
-| 14:12 | +12  | App Logs     | Error rate 1% → 3%             | warning   |
-| 14:12 | +12  | **Seerflow** | **CUSUM change point detected** | signal    |
-| 14:18 | +18  | App Logs     | Error rate 3% → 8%             | critical  |
-| 14:18 | +18  | DB Logs      | Pool connection warnings       | warning   |
-| 14:18 | +18  | **Seerflow** | **HW volume divergence alert** | signal    |
-| 14:20 | +20  | Proxy Logs   | p99 latency 200ms → 800ms      | warning   |
-| 14:20 | +20  | **Seerflow** | **Blended alert fires**        | signal    |
-| 14:22 | +22  | DB Logs      | Pool exhausted                 | critical  |
-| 14:24 | +24  | Proxy Logs   | p99 latency 800ms → 2s         | critical  |
-| 14:26 | +26  | System Logs  | Memory pressure                | warning   |
-| 14:30 | +30  | System Logs  | OOM Kill                       | critical  |
+| 14:00 | 0    | Deployment   | Deploy v2.3.1 completes         | milestone      |
+| 14:12 | +12  | App Logs     | Error rate 1% → 3%              | warning        |
+| 14:12 | +12  | **Seerflow** | **CUSUM change point detected** | Seerflow alert |
+| 14:18 | +18  | App Logs     | Error rate 3% → 8%              | critical       |
+| 14:18 | +18  | DB Logs      | Pool connection warnings        | warning        |
+| 14:18 | +18  | **Seerflow** | **HW volume divergence alert**  | Seerflow alert |
+| 14:20 | +20  | Proxy Logs   | p99 latency 200ms → 800ms       | warning        |
+| 14:20 | +20  | **Seerflow** | **Blended alert fires**         | Seerflow alert |
+| 14:22 | +22  | DB Logs      | Pool exhausted                  | critical       |
+| 14:24 | +24  | Proxy Logs   | p99 latency 800ms → 2s          | critical       |
+| 14:26 | +26  | System Logs  | Memory pressure                 | warning        |
+| 14:30 | +30  | System Logs  | OOM Kill                        | critical       |
 
 The cascade tells a story: a new database query in v2.3.1 was less efficient than the one it replaced. Under load, it held connections longer, draining the pool. As the pool thinned, requests backed up, latency climbed, and the application buffered more data in memory trying to compensate. Eventually, memory pressure triggered an OOM kill.
 

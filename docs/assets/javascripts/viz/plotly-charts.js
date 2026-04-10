@@ -285,13 +285,13 @@
     function buildTraces() {
       const warning = getCssVar('--sf-threshold') || '#ea580c';
       const critical = getCssVar('--sf-anomaly') || '#dc2626';
-      const signal = getCssVar('--sf-baseline') || '#3b82f6';
+      const alertBlue = getCssVar('--sf-baseline') || '#3b82f6';
       const milestone = getCssVar('--sf-entity-host') || '#10b981';
       return [
         barTrace('Warning', 'warning', warning),
         barTrace('Critical', 'critical', critical),
         markerTrace('Deploy milestone', 'milestone', milestone),
-        markerTrace('Seerflow detection', 'signal', signal),
+        markerTrace('Seerflow alert', 'alert', alertBlue),
         markerTrace('Critical event', 'critical', critical),
       ].filter((t) => t !== null);
     }
