@@ -17,6 +17,13 @@
 
     The expected restart sequence is pull → start → migrate → healthcheck. The observed sequence — start → healthcheck → migrate — means `P(healthcheck | start)` is near-zero in the learned model: healthcheck has never followed start directly. Each event is individually familiar, but the order is anomalous. Markov score: 0.88. See the [Ops Primer](../ops-primer/failure-patterns.md) for more on sequence-based failure detection.
 
+!!! example "Interactive: Markov sequence anomaly"
+
+    <div class="seerflow-viz"
+         data-viz="detector-ts"
+         data-src="../assets/viz-data/detector-ts/markov.json"
+         data-caption="Transition probability scores. A rare login to write transition at minute 180 scores above the threshold."></div>
+
 ## Theory
 
 ### Intuition

@@ -20,6 +20,13 @@
 
     See the [Ops Primer](../ops-primer/failure-patterns.md) for more failure pattern examples.
 
+!!! example "Interactive: HST on a real event stream"
+
+    <div class="seerflow-viz"
+         data-viz="detector-ts"
+         data-src="../assets/viz-data/detector-ts/hst.json"
+         data-caption="Half-Space Trees score over 4 hours. Baseline noise around 0.3; a novel template at minute 180 crosses the 0.75 threshold."></div>
+
 ## Theory
 
 ### Intuition

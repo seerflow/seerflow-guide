@@ -16,6 +16,13 @@
 
     Seerflow's CUSUM detector catches this by accumulating the deviation between observed error rate and baseline — when the cumulative sum exceeds the threshold, it marks the exact change point at T+12. See the [Ops Primer](../ops-primer/deployment-risk.md) for how Seerflow uses change-point detection during deployments.
 
+!!! example "Interactive: CUSUM change-point detection"
+
+    <div class="seerflow-viz"
+         data-viz="detector-ts"
+         data-src="../assets/viz-data/detector-ts/cusum.json"
+         data-caption="CUSUM statistic with mean shift at minute 120. The statistic accumulates and crosses the threshold shortly after."></div>
+
 ## Theory
 
 ### Intuition
