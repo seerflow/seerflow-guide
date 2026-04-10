@@ -31,8 +31,9 @@ A node with **suddenly high betweenness** that was previously a leaf is suspicio
 
 | Parameter | Default | Description |
 |-----------|---------|-------------|
-| `graph.betweenness_threshold` | `0.3` | Alert when betweenness exceeds this value |
-| `graph.betweenness_risk_multiplier` | `1.5` | Risk score = `min(1.0, betweenness x 1.5)` |
+| `detection.graph_structural.betweenness_threshold` | `0.3` | Alert when betweenness exceeds this value |
+
+Betweenness scores are scaled by a fixed 1.5x multiplier: `risk = min(1.0, betweenness × 1.5)` (not configurable).
 
 ---
 
@@ -131,9 +132,9 @@ Community crossing is Seerflow's most intuitive graph-structural alert: *this en
 
 | Parameter | Default | Description |
 |-----------|---------|-------------|
-| `graph.fan_out_sigma` | `3.0` | Alert when fan-out exceeds mean + (sigma x std_dev) |
-| `graph.fan_out_history_size` | `20` | Rolling window size for baseline calculation |
-| `graph.fan_out_min_floor` | `5` | Minimum outgoing connections before alerting |
+| `detection.graph_structural.fan_out_sigma` | `3.0` | Alert when fan-out exceeds mean + (sigma × std_dev) |
+| `detection.graph_structural.fan_out_history_size` | `20` | Rolling window size for baseline calculation |
+| `detection.graph_structural.fan_out_min_floor` | `5` | Minimum outgoing connections before alerting |
 
 Fan-out risk score: `min(1.0, current_fan_out / max(computed_threshold, 1.0))`
 
@@ -181,12 +182,11 @@ graph LR
 
 **Trigger:** A new edge connects entities in **different Louvain communities**.
 
-**Risk score:** Fixed at `0.6` (configurable via `graph.community_crossing_risk`) — community crossing is always moderately suspicious but not inherently critical (legitimate cross-team access does happen).
+**Risk score:** Fixed at 0.6 (not configurable) — community crossing is always moderately suspicious but not inherently critical (legitimate cross-team access does happen).
 
 | Parameter | Default | Description |
 |-----------|---------|-------------|
-| `graph.community_crossing_enabled` | `true` | Enable or disable community crossing detection |
-| `graph.community_crossing_risk` | `0.6` | Fixed risk score for community crossing alerts |
+| `detection.graph_structural.community_crossing_enabled` | `true` | Enable or disable community crossing detection |
 
 **Example:** User `alice` (community 0, dev team) creates an `authenticated_from` edge to `prod-db` (community 1, production). Seerflow generates a `graph-community-crossing` alert.
 
