@@ -75,12 +75,11 @@ Seerflow can alert on these patterns automatically. **DSPOT** --- the adaptive t
 
 ## The v2.3.1 Failure Cascade
 
-Here is the full timeline of the v2.3.1 deployment failure, showing how symptoms cascade across log sources and when Seerflow's detectors fire:
+Here is the full timeline of the v2.3.1 deployment failure, showing how symptoms cascade across log sources and when Seerflow's detectors fire. Hover any bar for source and severity details. Green diamonds mark instant events (deploy, Seerflow alerts, OOM kill); colored bars show the duration of each degradation phase.
 
 <div class="seerflow-viz"
      data-viz="deployment-cascade"
      data-src="../../assets/viz-data/deployment-cascade.json"
-     data-caption="Interactive timeline: hover any bar for source and severity details. Green diamonds mark instant events (deploy, Seerflow alerts, OOM kill); colored bars show the duration of each degradation phase."
      style="min-height: 540px;"></div>
 
 The cascade tells a story: a new database query in v2.3.1 was less efficient than the one it replaced. Under load, it held connections longer, draining the pool. As the pool thinned, requests backed up, latency climbed, and the application buffered more data in memory trying to compensate. Eventually, memory pressure triggered an OOM kill.

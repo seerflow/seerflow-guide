@@ -62,11 +62,16 @@
   overflow: hidden;
 }
 
-.seerflow-viz-caption {
+.md-typeset .seerflow-viz-caption,
+.seerflow-viz .seerflow-viz-caption {
+  display: block;
   padding: 0.5rem 1rem;
-  font-size: 0.875rem;
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.4;
   color: var(--sf-viz-muted);
   border-top: 1px solid var(--sf-viz-border);
+  background: var(--sf-viz-bg);
 }
 
 .seerflow-viz-error {
