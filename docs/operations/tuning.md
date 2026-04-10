@@ -8,7 +8,7 @@ This page helps operators systematically reduce false positives, recover missed 
 
 | Symptom | First thing to try | Section |
 |---------|-------------------|---------|
-| **Too many alerts** — mostly false positives | Raise `dspot_risk_level` or use `seerflow feedback <id> fp` | [False Positives](#too-many-alerts-mostly-false-positives) |
+| **Too many alerts** — mostly false positives | Raise `dspot.risk_level` or use `seerflow feedback <id> fp` | [False Positives](#too-many-alerts-mostly-false-positives) |
 | **Too many alerts** — correct but noisy | Increase `dedup_window_seconds` or lower detector weights | [Dedup & Weights](#too-many-alerts-not-false-positives-just-noisy) |
 | **Too few alerts** | Lower the relevant detector threshold | [Detector Tuning](#detector-tuning) |
 | **Wrong alerts** — correlation misfires | Adjust `window_duration_seconds` or `late_tolerance_seconds` | [Correlation Tuning](#correlation-tuning) |
@@ -21,11 +21,12 @@ This page helps operators systematically reduce false positives, recover missed 
 
 ### Too Many Alerts — Mostly False Positives
 
-The DSPOT algorithm sets anomaly thresholds automatically using extreme-value theory. Its sensitivity is controlled by `detection.dspot_risk_level`, which is the tail-probability cutoff (default `0.0001`, meaning 1-in-10,000 chance of a legitimate value exceeding the threshold). Raising this to `0.001` or higher makes the threshold more permissive, cutting false positives at the cost of slightly reduced recall.
+The DSPOT algorithm sets anomaly thresholds automatically using extreme-value theory. Its sensitivity is controlled by `detection.dspot.risk_level`, which is the tail-probability cutoff (default `0.0001`, meaning 1-in-10,000 chance of a legitimate value exceeding the threshold). Raising this to `0.001` or higher makes the threshold more permissive, cutting false positives at the cost of slightly reduced recall.
 
 ```yaml
 detection:
-  dspot_risk_level: 0.001   # was 0.0001 — 10x more permissive
+  dspot:
+    risk_level: 0.001   # was 0.0001 — 10x more permissive
 ```
 
 For sustained improvement without manual threshold tinkering, use the operator feedback CLI. Marking an alert as a false positive nudges the affected detector's threshold upward by 5% for that entity:
@@ -94,7 +95,7 @@ The table below lists common tuning goals with the exact parameter to change and
 | Reduce volume alert noise | `hw_n_std` | Raise (e.g. 4.0) | Wider normal band — only fires on large spikes |
 | Detect gradual drift / slow mean shift | `cusum_drift` | Lower (e.g. 0.2) | More sensitive to small persistent shifts |
 | Score sequences with sparse data sooner | `markov_min_events` | Lower (e.g. 50) | Starts scoring after fewer observed events |
-| Prevent noisy DSPOT thresholds early on | `dspot_calibration_window` | Raise (e.g. 2000) | Longer calibration phase before thresholds activate |
+| Prevent noisy DSPOT thresholds early on | `dspot.calibration_window` | Raise (e.g. 2000) | Longer calibration phase before thresholds activate |
 
 For detailed parameter semantics and worked examples, see the per-detector pages:
 
