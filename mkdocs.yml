@@ -115,6 +115,13 @@ markdown_extensions:
       permalink: true
   - pymdownx.arithmatex:
       generic: true
+  - abbr
+  - pymdownx.snippets:
+      auto_append:
+        - includes/abbreviations.md
+      base_path:
+        - docs
+      check_paths: true
 
 extra_css:
   - assets/stylesheets/extra.css
