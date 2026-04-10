@@ -220,6 +220,111 @@
     };
   }
 
+  function deploymentCascade(el, data) {
+    // Horizontal bar chart used as a gantt — rows are log sources, bars span
+    // from start_offset to start_offset+duration minutes past the deploy time.
+    // Zero-duration rows render as diamond markers (milestones).
+    if (!data || !Array.isArray(data.tasks)) {
+      throw new Error('invalid deployment cascade data');
+    }
+
+    function severityColor(sev) {
+      switch (sev) {
+        case 'critical': return getCssVar('--sf-anomaly') || '#dc2626';
+        case 'warning': return getCssVar('--sf-threshold') || '#ea580c';
+        case 'signal': return getCssVar('--sf-baseline') || '#3b82f6';
+        case 'milestone': return getCssVar('--sf-entity-host') || '#10b981';
+        default: return getCssVar('--sf-viz-muted') || '#6b7280';
+      }
+    }
+
+    // Reverse so the first task appears at the top of the chart
+    const tasks = data.tasks.slice().reverse();
+
+    function buildTraces() {
+      const bars = tasks.filter((t) => t.duration > 0);
+      const milestones = tasks.filter((t) => t.duration === 0);
+
+      const traces = [];
+
+      if (bars.length) {
+        traces.push({
+          type: 'bar',
+          orientation: 'h',
+          y: bars.map((t) => t.label),
+          x: bars.map((t) => t.duration),
+          base: bars.map((t) => t.start_offset),
+          marker: {
+            color: bars.map((t) => severityColor(t.severity)),
+            line: { width: 0 },
+          },
+          text: bars.map((t) => t.source),
+          textposition: 'inside',
+          insidetextanchor: 'start',
+          textfont: { size: 11, color: '#ffffff' },
+          hovertemplate:
+            '<b>%{y}</b><br>Source: %{text}<br>T+%{base} → T+%{x}<extra></extra>',
+          showlegend: false,
+        });
+      }
+
+      if (milestones.length) {
+        traces.push({
+          type: 'scatter',
+          mode: 'markers',
+          y: milestones.map((t) => t.label),
+          x: milestones.map((t) => t.start_offset),
+          marker: {
+            symbol: 'diamond',
+            size: 14,
+            color: milestones.map((t) => severityColor(t.severity)),
+            line: { width: 2, color: getCssVar('--sf-viz-fg') || '#1a1a1a' },
+          },
+          text: milestones.map((t) => t.source),
+          hovertemplate: '<b>%{y}</b><br>Source: %{text}<br>T+%{x}<extra></extra>',
+          showlegend: false,
+        });
+      }
+
+      return traces;
+    }
+
+    function buildLayout() {
+      const layout = layoutBase();
+      layout.title = {
+        text: data.title || 'Deployment cascade',
+        font: { size: 14, color: getCssVar('--sf-viz-fg') || '#1a1a1a' },
+      };
+      layout.margin = { l: 220, r: 30, t: 50, b: 60 };
+      layout.xaxis.title.text = 'Minutes after deploy (T+minutes)';
+      layout.xaxis.rangemode = 'tozero';
+      layout.xaxis.dtick = 5;
+      layout.yaxis.title.text = '';
+      layout.yaxis.automargin = true;
+      layout.barmode = 'stack';
+      layout.bargap = 0.3;
+      layout.showlegend = false;
+      return layout;
+    }
+
+    const config = {
+      displayModeBar: false,
+      responsive: true,
+    };
+
+    Plotly.newPlot(el, buildTraces(), buildLayout(), config);
+
+    return {
+      updateTheme() {
+        Plotly.react(el, buildTraces(), buildLayout(), config);
+      },
+      destroy() {
+        Plotly.purge(el);
+      },
+    };
+  }
+
   window.SeerflowViz.detectorTimeSeries = detectorTimeSeries;
   window.SeerflowViz.attackHeatmap = attackHeatmap;
+  window.SeerflowViz.deploymentCascade = deploymentCascade;
 })();

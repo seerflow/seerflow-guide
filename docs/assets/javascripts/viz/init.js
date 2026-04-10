@@ -36,6 +36,7 @@
       'entity-graph': window.SeerflowViz.entityGraph,
       'detector-ts': window.SeerflowViz.detectorTimeSeries,
       'attack-heatmap': window.SeerflowViz.attackHeatmap,
+      'deployment-cascade': window.SeerflowViz.deploymentCascade,
     };
     const factory = factoryMap[kind];
     if (typeof factory !== 'function') {
