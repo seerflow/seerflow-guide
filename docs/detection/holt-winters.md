@@ -17,10 +17,11 @@
 
 !!! example "Interactive: Holt-Winters volume tracking"
 
+    Seasonal volume with prediction band. The 3am spike exceeds the upper threshold, triggering an anomaly.
+
     <div class="seerflow-viz"
          data-viz="detector-ts"
-         data-src="../../assets/viz-data/detector-ts/holt-winters.json"
-         data-caption="Seasonal volume with prediction band. The 3am spike exceeds the upper threshold, triggering an anomaly."></div>
+         data-src="../../assets/viz-data/detector-ts/holt-winters.json"></div>
 
 ## Theory
 

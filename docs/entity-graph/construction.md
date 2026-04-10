@@ -4,10 +4,11 @@ Seerflow builds its entity graph from log events in three steps: **extract** ent
 
 !!! example "Interactive: explore a sample entity graph"
 
+    Sample entity graph showing an SSH pivot attack. Click any node for details, drag to reposition, scroll to zoom.
+
     <div class="seerflow-viz"
          data-viz="entity-graph"
-         data-src="../../assets/viz-data/entity-graph-sample.json"
-         data-caption="Sample entity graph showing an SSH pivot attack — click any node for details, drag to reposition, scroll to zoom."></div>
+         data-src="../../assets/viz-data/entity-graph-sample.json"></div>
 
 ---
 

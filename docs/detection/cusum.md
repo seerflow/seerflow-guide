@@ -18,10 +18,11 @@
 
 !!! example "Interactive: CUSUM change-point detection"
 
+    CUSUM statistic with a mean shift at minute 120. The statistic accumulates and crosses the threshold shortly after, marking the change point.
+
     <div class="seerflow-viz"
          data-viz="detector-ts"
-         data-src="../../assets/viz-data/detector-ts/cusum.json"
-         data-caption="CUSUM statistic with mean shift at minute 120. The statistic accumulates and crosses the threshold shortly after."></div>
+         data-src="../../assets/viz-data/detector-ts/cusum.json"></div>
 
 ## Theory
 

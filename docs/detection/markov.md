@@ -19,10 +19,11 @@
 
 !!! example "Interactive: Markov sequence anomaly"
 
+    Transition probability scores. A rare login → write transition at minute 180 scores above the threshold.
+
     <div class="seerflow-viz"
          data-viz="detector-ts"
-         data-src="../../assets/viz-data/detector-ts/markov.json"
-         data-caption="Transition probability scores. A rare login to write transition at minute 180 scores above the threshold."></div>
+         data-src="../../assets/viz-data/detector-ts/markov.json"></div>
 
 ## Theory
 

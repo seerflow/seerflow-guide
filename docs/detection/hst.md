@@ -22,10 +22,11 @@
 
 !!! example "Interactive: HST on a real event stream"
 
+    Half-Space Trees score over 4 hours. Baseline noise stays around 0.3; a novel template at minute 180 crosses the 0.75 threshold and triggers an anomaly.
+
     <div class="seerflow-viz"
          data-viz="detector-ts"
-         data-src="../../assets/viz-data/detector-ts/hst.json"
-         data-caption="Half-Space Trees score over 4 hours. Baseline noise around 0.3; a novel template at minute 180 crosses the 0.75 threshold."></div>
+         data-src="../../assets/viz-data/detector-ts/hst.json"></div>
 
 ## Theory
 
