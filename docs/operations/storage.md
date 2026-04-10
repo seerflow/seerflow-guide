@@ -26,8 +26,8 @@ flowchart TB
     EntityStore -.-> PG
     GraphStore -.-> PG
 
-    style SQLite fill:#1e40af,color:#fff
-    style PG fill:#374151,color:#fff,stroke-dasharray:5 5
+    style SQLite fill:#3b82f6,color:#fff,stroke:#60a5fa
+    style PG fill:#6b7280,color:#fff,stroke:#9ca3af,stroke-dasharray:5 5
 ```
 
 One config line switches all five interfaces at once:
