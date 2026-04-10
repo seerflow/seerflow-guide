@@ -269,53 +269,68 @@ erDiagram
     events {
         TEXT event_id PK
         INTEGER timestamp_ns
-        INTEGER observed_timestamp_ns
-        TEXT source_type
-        TEXT body
-        INTEGER template_id
+        INTEGER observed_ns
         INTEGER severity_id
-        TEXT entity_uuid
+        TEXT source_type
+        TEXT source_id
+        INTEGER template_id
+        TEXT message
+        TEXT entity_refs
+        BLOB data
+    }
+    entity_events {
+        TEXT entity_uuid PK
+        INTEGER timestamp_ns PK
+        TEXT event_id PK
     }
     alerts {
         TEXT alert_id PK
-        INTEGER timestamp_ns
         TEXT alert_type
+        INTEGER timestamp_ns
+        INTEGER severity_id
         TEXT rule_name
+        TEXT entity_uuid
+        TEXT entity_type
+        TEXT entity_value
         TEXT dedup_key UK
-        REAL risk_score
         INTEGER dedup_count
+        REAL risk_score
         TEXT feedback
+        BLOB data
     }
-    models {
+    model_state {
         TEXT key PK
         BLOB data
-        INTEGER updated_ns
+        INTEGER updated_at
     }
-    edges {
-        TEXT source_id
-        TEXT target_id
-        TEXT rel_type
-        INTEGER first_seen_ns
-        INTEGER last_seen_ns
-        INTEGER count
+    graph_edges {
+        TEXT source_id PK
+        TEXT target_id PK
+        TEXT rel_type PK
+        INTEGER first_seen
+        INTEGER last_seen
+        INTEGER event_count
     }
     events_fts {
-        TEXT body
+        TEXT message
     }
 
+    events ||--o{ entity_events : "maps to entities"
     events ||--o{ alerts : "triggers"
-    events ||--o{ edges : "creates"
+    events ||--o{ graph_edges : "creates"
     events_fts ||--|| events : "indexes"
 ```
 
 ### Table Notes
 
-**`events`** — Primary event store. `template_id` is `NULL` when no Drain3 template matched (sentinel `-1` is converted on write). `entity_uuid` is stored in a separate junction table (`entity_events`) for the many-to-many relationship between events and entities.
+**`events`** — Primary event store. `template_id` is `NULL` when no Drain3 template matched (sentinel `-1` is converted on write). Entity associations are stored in the `entity_events` junction table.
+
+**`entity_events`** — Many-to-many junction between events and entities. Composite primary key `(entity_uuid, timestamp_ns, event_id)`. Used by `EntityStore.get_timeline()` for per-entity queries.
 
 **`alerts`** — `dedup_key` has a unique index. The upsert logic increments `dedup_count` and preserves the original `timestamp_ns` when a duplicate arrives within the dedup window. Outside the window, `dedup_count` resets to 1.
 
-**`models`** — Simple key-value store. Upsert-on-conflict replaces both `data` and `updated_ns`.
+**`model_state`** — Simple key-value store. Upsert-on-conflict replaces both `data` and `updated_at`.
 
-**`edges`** — Composite primary key `(source_id, target_id, rel_type)`. Upserts update `last_seen_ns` and increment `event_count`; `first_seen_ns` is immutable after the initial insert.
+**`graph_edges`** — Composite primary key `(source_id, target_id, rel_type)`. Upserts update `last_seen` and increment `event_count`; `first_seen` is immutable after the initial insert.
 
 **`events_fts`** — Content-table FTS5 index backed by `events.message`. Kept in sync via `AFTER INSERT`, `AFTER DELETE`, and `AFTER UPDATE` triggers on the `events` table.

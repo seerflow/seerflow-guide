@@ -171,12 +171,13 @@ contributing.event_ids
 
 ```yaml
 alerting:
-  otlp:
-    endpoint: "http://otel-collector:4317"
-    protocol: grpc          # "grpc" or "http"
-    export_interval: 5      # seconds between flushes
-    max_pending: 10000      # maximum buffered alerts before dropping
+  otlp_endpoint: "otel-collector:4317"     # gRPC: host:port (no scheme)
+  otlp_protocol: grpc                       # "grpc" or "http"
+  otlp_export_interval_seconds: 5           # seconds between batch flushes
 ```
+
+!!! note "Batch buffer"
+    The internal pending buffer holds up to 10,000 alerts before dropping. This is not configurable — reduce `otlp_export_interval_seconds` if you see drop warnings.
 
 ---
 

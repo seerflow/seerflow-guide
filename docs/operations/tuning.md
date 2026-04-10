@@ -65,8 +65,8 @@ For per-type control without changing the global default, use `dedup_window_over
 ```yaml
 alerting:
   dedup_window_overrides:
-    - [ssh_brute_force, 3600]    # 1 hour for brute-force alerts
-    - [disk_usage_high, 300]     # 5 minutes for disk alerts
+    ssh_brute_force: 3600        # 1 hour for brute-force alerts
+    disk_usage_high: 300         # 5 minutes for disk alerts
 ```
 
 If noise comes from a specific detector producing high scores, reduce its blending weight. Weights are relative — only their ratios matter because the pipeline divides each weight by the sum:

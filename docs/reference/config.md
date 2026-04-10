@@ -413,8 +413,12 @@ alerting:
   otlp_protocol: grpc
   otlp_export_interval_seconds: 5
 
-# Graph-structural detection (nested under detection)
-detection:
+# Kill chain detection
+  kill_chain:
+    tactic_threshold: 3
+    window_seconds: 86400
+
+  # Graph-structural detection
   graph_structural:
     betweenness_threshold: 0.3
     fan_out_sigma: 3.0
