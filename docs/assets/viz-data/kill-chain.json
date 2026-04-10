@@ -1,0 +1,33 @@
+{
+  "title": "Lockheed Martin Cyber Kill Chain",
+  "stages": [
+    {
+      "name": "1. Reconnaissance",
+      "description": "Research the target — scan IPs, enumerate services, profile employees"
+    },
+    {
+      "name": "2. Weaponization",
+      "description": "Build the payload — credential dictionaries, malware, exploit tooling"
+    },
+    {
+      "name": "3. Delivery",
+      "description": "Transmit to victim — phishing, brute force, compromised website"
+    },
+    {
+      "name": "4. Exploitation",
+      "description": "Trigger the vulnerability — valid credential found, exploit fires, shell opens"
+    },
+    {
+      "name": "5. Installation",
+      "description": "Establish foothold — backdoors, authorized_keys, cron jobs, new users"
+    },
+    {
+      "name": "6. Command & Control",
+      "description": "Open remote channel — reverse tunnels, beaconing, HTTPS covert traffic"
+    },
+    {
+      "name": "7. Actions on Objectives",
+      "description": "Achieve the goal — exfiltration, ransomware, lateral movement, data destruction"
+    }
+  ]
+}
