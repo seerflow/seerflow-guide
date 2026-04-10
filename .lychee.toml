@@ -2,7 +2,7 @@
 # https://lychee.cli.rs/usage/config/
 
 # Exclude the custom domain until DNS is configured
-exclude = ["docs\\.seerflow\\.dev"]
+exclude = ["docs\\.seerflow\\.dev", "datasets\\.lanl\\.gov"]
 
 # Don't check mailto links
 exclude_mail = true
