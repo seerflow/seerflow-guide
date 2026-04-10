@@ -80,6 +80,7 @@ Here is the full timeline of the v2.3.1 deployment failure, showing how symptoms
 <div class="seerflow-mermaid-wide" markdown="1">
 
 ```mermaid
+%%{init: {'gantt': {'fontSize': 16, 'sectionFontSize': 18, 'barHeight': 28, 'barGap': 6, 'topPadding': 60, 'leftPadding': 140, 'useMaxWidth': true}}}%%
 gantt
     title Deployment v2.3.1 — Failure Cascade
     dateFormat HH:mm
