@@ -28,6 +28,24 @@ flowchart TD
     WrongAlerts --> CorrIssue{Correlation\nissue?}
     CorrIssue -->|Yes| AdjustWindows[Adjust window_duration_seconds\nor late_tolerance_seconds]
     CorrIssue -->|No| RebalanceWeights[Rebalance detector weights\nweights_* parameters]
+
+    style Start fill:#7c3aed,color:#fff,stroke:#a78bfa
+    style FP fill:#7c3aed,color:#fff,stroke:#a78bfa
+    style WhichDetector fill:#7c3aed,color:#fff,stroke:#a78bfa
+    style CorrIssue fill:#7c3aed,color:#fff,stroke:#a78bfa
+    style TooMany fill:#dc2626,color:#fff,stroke:#f87171
+    style TooFew fill:#2563eb,color:#fff,stroke:#60a5fa
+    style WrongAlerts fill:#d97706,color:#fff,stroke:#fbbf24
+    style RaiseDspot fill:#059669,color:#fff,stroke:#34d399
+    style Feedback fill:#059669,color:#fff,stroke:#34d399
+    style IncreaseDedup fill:#059669,color:#fff,stroke:#34d399
+    style ReduceWeights fill:#059669,color:#fff,stroke:#34d399
+    style LowerHST fill:#059669,color:#fff,stroke:#34d399
+    style LowerHW fill:#059669,color:#fff,stroke:#34d399
+    style LowerCUSUM fill:#059669,color:#fff,stroke:#34d399
+    style LowerMarkov fill:#059669,color:#fff,stroke:#34d399
+    style AdjustWindows fill:#059669,color:#fff,stroke:#34d399
+    style RebalanceWeights fill:#059669,color:#fff,stroke:#34d399
 ```
 
 ---
