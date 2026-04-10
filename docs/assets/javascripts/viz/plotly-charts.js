@@ -8,8 +8,9 @@
 //   attackHeatmap(el, data) — MITRE ATT&CK coverage heatmap
 //     data: { tactics: [str], techniques: [[{id, name, covered_by, href}]] }
 //
-// Both factories call window.SeerflowViz.register() so theme.js can
-// trigger a re-render on palette toggle.
+// Both factories return a handle with updateTheme() / destroy(). The
+// caller (init.js) registers the handle with window.SeerflowViz.register()
+// so theme.js can invoke updateTheme() on palette toggle.
 
 (function () {
   'use strict';
@@ -57,66 +58,74 @@
       throw new Error('invalid detector time series data');
     }
 
-    const baselineColor = getCssVar('--sf-baseline') || '#3b82f6';
-    const thresholdColor = getCssVar('--sf-threshold') || '#ea580c';
-    const anomalyColor = getCssVar('--sf-anomaly') || '#dc2626';
-
     const anomalyIndices = Array.isArray(data.anomaly_indices) ? data.anomaly_indices : [];
     const anomalyX = anomalyIndices.map((i) => data.timestamps[i]);
     const anomalyY = anomalyIndices.map((i) => data.values[i]);
 
-    const traces = [
-      {
-        x: data.timestamps,
-        y: data.values,
-        mode: 'lines',
-        name: data.detector_name || 'Score',
-        line: { color: baselineColor, width: 2 },
-      },
-    ];
+    function buildTraces() {
+      // Re-reads CSS vars so dark/light toggle picks up the active palette
+      const baselineColor = getCssVar('--sf-baseline') || '#3b82f6';
+      const thresholdColor = getCssVar('--sf-threshold') || '#ea580c';
+      const anomalyColor = getCssVar('--sf-anomaly') || '#dc2626';
 
-    if (Array.isArray(data.threshold_upper)) {
-      traces.push({
-        x: data.timestamps,
-        y: data.threshold_upper,
-        mode: 'lines',
-        name: 'Upper threshold',
-        line: { color: thresholdColor, width: 1, dash: 'dash' },
-      });
-    }
-    if (Array.isArray(data.threshold_lower)) {
-      traces.push({
-        x: data.timestamps,
-        y: data.threshold_lower,
-        mode: 'lines',
-        name: 'Lower threshold',
-        line: { color: thresholdColor, width: 1, dash: 'dash' },
-      });
+      const traces = [
+        {
+          x: data.timestamps,
+          y: data.values,
+          mode: 'lines',
+          name: data.detector_name || 'Score',
+          line: { color: baselineColor, width: 2 },
+        },
+      ];
+      if (Array.isArray(data.threshold_upper)) {
+        traces.push({
+          x: data.timestamps,
+          y: data.threshold_upper,
+          mode: 'lines',
+          name: 'Upper threshold',
+          line: { color: thresholdColor, width: 1, dash: 'dash' },
+        });
+      }
+      if (Array.isArray(data.threshold_lower)) {
+        traces.push({
+          x: data.timestamps,
+          y: data.threshold_lower,
+          mode: 'lines',
+          name: 'Lower threshold',
+          line: { color: thresholdColor, width: 1, dash: 'dash' },
+        });
+      }
+      if (anomalyX.length) {
+        traces.push({
+          x: anomalyX,
+          y: anomalyY,
+          mode: 'markers',
+          name: 'Anomaly',
+          marker: { color: anomalyColor, size: 10, symbol: 'circle' },
+        });
+      }
+      return traces;
     }
 
-    if (anomalyX.length) {
-      traces.push({
-        x: anomalyX,
-        y: anomalyY,
-        mode: 'markers',
-        name: 'Anomaly',
-        marker: { color: anomalyColor, size: 10, symbol: 'circle' },
-      });
+    function buildLayout() {
+      // Base layout plus per-chart overrides; called on init and on theme toggle
+      const layout = layoutBase();
+      layout.yaxis.title.text = data.y_axis_label || 'Score';
+      return layout;
     }
-
-    const layout = layoutBase();
-    layout.yaxis.title.text = data.y_axis_label || 'Score';
 
     const config = {
       displayModeBar: false,
       responsive: true,
     };
 
-    Plotly.newPlot(el, traces, layout, config);
+    Plotly.newPlot(el, buildTraces(), buildLayout(), config);
 
     return {
       updateTheme() {
-        Plotly.relayout(el, layoutBase());
+        // Plotly.react rebuilds both traces and layout so CSS-var-driven
+        // colors and per-chart layout overrides both update cleanly
+        Plotly.react(el, buildTraces(), buildLayout(), config);
       },
       destroy() {
         Plotly.purge(el);
@@ -153,37 +162,43 @@
       }
     }
 
-    const trace = {
-      z,
-      x: data.tactics,
-      type: 'heatmap',
-      colorscale: [
-        [0, 'rgba(107,114,128,0.15)'],
-        [0.5, '#fbbf24'],
-        [1, '#dc2626'],
-      ],
-      showscale: true,
-      hoverongaps: false,
-      text,
-      texttemplate: '%{text}',
-      textfont: { size: 9 },
-      hovertemplate: '<b>%{text}</b><br>Tactic: %{x}<br>Coverage: %{z}<extra></extra>',
-    };
+    function buildTrace() {
+      return {
+        z,
+        x: data.tactics,
+        type: 'heatmap',
+        colorscale: [
+          [0, 'rgba(107,114,128,0.15)'],
+          [0.5, '#fbbf24'],
+          [1, '#dc2626'],
+        ],
+        showscale: true,
+        hoverongaps: false,
+        text,
+        texttemplate: '%{text}',
+        textfont: { size: 9 },
+        hovertemplate: '<b>%{text}</b><br>Tactic: %{x}<br>Coverage: %{z}<extra></extra>',
+      };
+    }
 
-    const layout = layoutBase();
-    layout.xaxis.title.text = 'Tactic';
-    layout.yaxis.title.text = 'Technique';
-    layout.yaxis.showticklabels = false;
-    layout.margin.b = 100;
-    layout.xaxis.tickangle = -30;
-    layout.showlegend = false;
+    function buildLayout() {
+      // Base layout plus heatmap-specific overrides; called on init and theme toggle
+      const layout = layoutBase();
+      layout.xaxis.title.text = 'Tactic';
+      layout.yaxis.title.text = 'Technique';
+      layout.yaxis.showticklabels = false;
+      layout.margin.b = 100;
+      layout.xaxis.tickangle = -30;
+      layout.showlegend = false;
+      return layout;
+    }
 
     const config = {
       displayModeBar: false,
       responsive: true,
     };
 
-    Plotly.newPlot(el, [trace], layout, config);
+    Plotly.newPlot(el, [buildTrace()], buildLayout(), config);
 
     // Click-to-navigate
     el.on('plotly_click', (eventData) => {
@@ -196,7 +211,8 @@
 
     return {
       updateTheme() {
-        Plotly.relayout(el, layoutBase());
+        // Plotly.react reapplies per-chart layout overrides that relayout would clobber
+        Plotly.react(el, [buildTrace()], buildLayout(), config);
       },
       destroy() {
         Plotly.purge(el);

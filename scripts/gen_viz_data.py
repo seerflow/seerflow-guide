@@ -120,7 +120,18 @@ def gen_cusum() -> None:
         s_pos = max(0.0, s_pos + x - k)
         cusum[i] = s_pos
     threshold = np.full(N_POINTS, 5.0)
-    anomaly_indices = [i for i, v in enumerate(cusum) if v > threshold[i]]
+    # Cap to the first contiguous run above threshold so the chart highlights
+    # the change-point crossing rather than flooding the post-shift region with
+    # redundant markers. The CUSUM statistic mathematically stays above 5.0 for
+    # all post-shift points, but pedagogically the interesting moment is the crossing.
+    above = [i for i, v in enumerate(cusum) if v > threshold[i]]
+    anomaly_indices: list[int] = []
+    for idx in above:
+        if not anomaly_indices or idx == anomaly_indices[-1] + 1:
+            anomaly_indices.append(idx)
+        else:
+            break
+    anomaly_indices = anomaly_indices[:5]
     write_json(
         "cusum",
         {
