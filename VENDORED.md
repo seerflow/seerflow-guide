@@ -6,8 +6,11 @@ The Seerflow Guide vendors its JavaScript dependencies to support air-gapped / o
 
 - Upstream: https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js
 - License: ISC
-- Consumed by: `docs/assets/javascripts/viz/entity-graph.js` (added in a later S-139H task). Also loaded globally via `mkdocs.yml` `extra_javascript`, so any future D3-using component can reuse the same global.
+- Consumed by:
+  - `docs/assets/javascripts/viz/entity-graph.js` (loaded globally via `mkdocs.yml` `extra_javascript`, so any D3-using component can reuse the same global).
+  - `docs/entity-graph/assets/entity-graph-explorer.html` (standalone iframe embedded in `docs/entity-graph/algorithms.md`; loads D3 directly via relative `<script src="../../assets/javascripts/d3.v7.min.js" integrity="sha384-...">`. Both the `src` path and the `integrity` SRI hash must be updated in lock-step whenever this file is re-vendored.)
 - SHA256: f2094bbf6141b359722c4fe454eb6c4b0f0e42cc10cc7af921fc158fceb86539
+- SRI (sha384, base64): `CjloA8y00+1SDAUkjs099PVfnY2KmDC2BZnws9kh8D/lX1s46w6EPhpXdqMfjK6i`
 
 ## Plotly.js cartesian 2.35.2
 
