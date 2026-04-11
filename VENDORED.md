@@ -24,6 +24,9 @@ The Seerflow Guide vendors its JavaScript dependencies to support air-gapped / o
 
 1. Update the URL above to the new version
 2. Download with curl -L -o <path> <url>
-3. Update the SHA256 in this file
-4. Run mkdocs build --strict to verify
-5. Manual test at least one page per viz type
+3. Update the SHA256 in this file (compute with `sha256sum <path>`)
+4. Recompute the SRI base64 hash (`openssl dgst -sha384 -binary <path> | openssl base64 -A`) and update the `SRI (sha384, base64)` line
+5. Update every consumer file that pins the SRI inline — currently `docs/entity-graph/assets/entity-graph-explorer.html` carries a matching `integrity="sha384-..."` attribute that must be kept in lock-step with the SRI line above
+6. Run mkdocs build --strict to verify
+7. Manual test at least one page per viz type
+8. Audit that no CDN references leaked into content files: `grep -rnE --include='*.md' --include='*.html' "https?://[^\"' ]*(d3js\.org|cdn\.(jsdelivr|cdnjs|unpkg)[^\"' ]*d3|plotly[^\"' ]*\.js)" docs/` must return zero matches. The `--include` filter is required because vendored library copyright comments reference their upstream URL.
