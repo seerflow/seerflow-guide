@@ -6,8 +6,11 @@ The Seerflow Guide vendors its JavaScript dependencies to support air-gapped / o
 
 - Upstream: https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js
 - License: ISC
-- Consumed by: `docs/assets/javascripts/viz/entity-graph.js` (added in a later S-139H task). Also loaded globally via `mkdocs.yml` `extra_javascript`, so any future D3-using component can reuse the same global.
+- Consumed by:
+  - `docs/assets/javascripts/viz/entity-graph.js` (loaded globally via `mkdocs.yml` `extra_javascript`, so any D3-using component can reuse the same global).
+  - `docs/entity-graph/assets/entity-graph-explorer.html` (standalone iframe embedded in `docs/entity-graph/algorithms.md`; loads D3 directly via relative `<script src="../../assets/javascripts/d3.v7.min.js" integrity="sha384-...">`. Both the `src` path and the `integrity` SRI hash must be updated in lock-step whenever this file is re-vendored.)
 - SHA256: f2094bbf6141b359722c4fe454eb6c4b0f0e42cc10cc7af921fc158fceb86539
+- SRI (sha384, base64): `CjloA8y00+1SDAUkjs099PVfnY2KmDC2BZnws9kh8D/lX1s46w6EPhpXdqMfjK6i`
 
 ## Plotly.js cartesian 2.35.2
 
@@ -21,6 +24,9 @@ The Seerflow Guide vendors its JavaScript dependencies to support air-gapped / o
 
 1. Update the URL above to the new version
 2. Download with curl -L -o <path> <url>
-3. Update the SHA256 in this file
-4. Run mkdocs build --strict to verify
-5. Manual test at least one page per viz type
+3. Update the SHA256 in this file (compute with `sha256sum <path>`)
+4. Recompute the SRI base64 hash (`openssl dgst -sha384 -binary <path> | openssl base64 -A`) and update the `SRI (sha384, base64)` line
+5. Update every consumer file that pins the SRI inline — currently `docs/entity-graph/assets/entity-graph-explorer.html` carries a matching `integrity="sha384-..."` attribute that must be kept in lock-step with the SRI line above
+6. Run mkdocs build --strict to verify
+7. Manual test at least one page per viz type
+8. Audit that no CDN references leaked into content files: `grep -rnE --include='*.md' --include='*.html' "https?://[^\"' ]*(d3js\.org|cdn\.(jsdelivr|cdnjs|unpkg)[^\"' ]*d3|plotly[^\"' ]*\.js)" docs/` must return zero matches. The `--include` filter is required because vendored library copyright comments reference their upstream URL.
