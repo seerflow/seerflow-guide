@@ -1,7 +1,18 @@
 # CLI Reference
 
-Seerflow ships a single entry-point binary, `seerflow`, with five subcommands:
-`start`, `tail`, `import`, `query`, and `feedback`.
+Seerflow ships a single entry-point binary, `seerflow`, with eleven
+top-level subcommands:
+
+| Group | Commands |
+|-------|----------|
+| Runtime | `start`, `status`, `tail` |
+| Ingest | `import` |
+| Read / inspect | `query`, `export`, `templates`, `rules` |
+| LLM / hunt | `hunt` |
+| Operator feedback | `feedback` |
+| Graph maintenance | `graph migrate` |
+
+All subcommands accept `--help` and respect the global `--config` flag.
 
 ---
 
@@ -41,6 +52,41 @@ seerflow start
 
 # Start with an explicit config path
 seerflow --config /etc/seerflow/seerflow.yaml start
+```
+
+---
+
+## seerflow status
+
+### Synopsis
+
+```
+seerflow [--config PATH] status [--json] [--timeout SECONDS]
+```
+
+### Description
+
+Polls the local health endpoint of a running Seerflow daemon (default
+`http://127.0.0.1:<dashboard_port>`) and prints a merged **health + stats**
+document — pipeline state, receiver throughput, detector health, queue
+depths, and storage readiness. Useful for systemd / container health
+probes and post-deploy smoke tests.
+
+### Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `--json` | flag | `false` | Emit the merged document as JSON instead of a formatted summary. |
+| `--timeout SECONDS` | `float` | `3.0` | HTTP timeout per request. Must be in `[0.1, 30]` seconds. |
+
+### Examples
+
+```bash
+# Human-readable summary
+seerflow status
+
+# Strict timeout, JSON output for an external probe
+seerflow status --json --timeout 1.5
 ```
 
 ---
@@ -92,8 +138,10 @@ seerflow import [--db PATH] PATH [PATH ...]
 
 Batch-imports one or more static log files into the Seerflow database. Events
 are parsed, templated via Drain3, scored, and written to the configured storage
-backend. Use this command to backfill historical data or to pre-load a test
-dataset before starting the live pipeline.
+backend. Plain `.log` and compressed `.gz`, `.bz2`, `.xz` archives are
+auto-detected; binary files are skipped. Use this command to backfill
+historical data or to pre-load a test dataset before starting the live
+pipeline.
 
 ### Arguments and Options
 
@@ -110,6 +158,9 @@ seerflow import /var/log/auth.log
 
 # Import multiple files with a glob pattern
 seerflow import /backup/logs/2026-03/*.log
+
+# Import a compressed archive (auto-detected)
+seerflow import /backup/logs/auth-2026-03.log.gz
 
 # Import into a specific database
 seerflow import --db /data/seerflow.db /var/log/app.log
@@ -273,6 +324,209 @@ seerflow query health --json
 
 ---
 
+## seerflow export
+
+### Synopsis
+
+```
+seerflow export {events,alerts} [OPTIONS]
+```
+
+Stream events or alerts to a file (or stdout) for offline analysis,
+backups, or feeding downstream SIEMs. Output is **NDJSON** by default —
+one record per line — or **CSV** when requested. Memory usage is O(1)
+regardless of result size; rows are written as they are read.
+
+Filters mirror `query` so the same dataset can be inspected interactively
+and exported reproducibly.
+
+### Shared options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `--format {json,csv}` | choice | `json` | `json` produces NDJSON (one record per line). |
+| `--since WINDOW` | `str` | `24h` | Time window relative to now (e.g., `1h`, `7d`). |
+| `--severity INT` | `int` | — | Minimum severity. |
+| `--limit INT` | `int` | `100000` | Maximum rows exported. |
+| `--output PATH` | `str` | stdout | Output file path. |
+
+### export events
+
+```
+seerflow export events [--format {json,csv}] [--since WINDOW]
+                       [--source TYPE] [--severity INT] [--limit INT]
+                       [--output PATH]
+```
+
+| Extra option | Description |
+|--------------|-------------|
+| `--source TYPE` | Filter by source type (e.g., `nginx`). |
+
+### export alerts
+
+```
+seerflow export alerts [--format {json,csv}] [--since WINDOW]
+                       [--type TYPE] [--severity INT] [--limit INT]
+                       [--output PATH]
+```
+
+| Extra option | Description |
+|--------------|-------------|
+| `--type TYPE` | Alert type filter (`ml`, `sigma`, `correlation`, `ueba`, `ioc`). |
+
+### Examples
+
+```bash
+# Last 24h of events to stdout as NDJSON
+seerflow export events
+
+# Last 7d of high-severity Sigma alerts to a CSV file
+seerflow export alerts --since 7d --type sigma --severity 4 \
+                       --format csv --output sigma-alerts.csv
+
+# Pipe NDJSON into jq
+seerflow export events --since 1h | jq '.entity_uuid' | sort -u
+```
+
+---
+
+## seerflow templates
+
+### Synopsis
+
+```
+seerflow templates {list,prune,reset} [OPTIONS]
+```
+
+Manage the persistent Drain3 template store. Templates accumulate as the
+parser observes new log formats; `prune` removes infrequent templates
+that bloat the working set without contributing detection signal, and
+`reset` wipes the parser state entirely (useful after a major log-source
+change).
+
+### templates list
+
+```
+seerflow templates list [--limit INT] [--json]
+```
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `--limit INT` | `int` | `100` | Max rows to print (cap: 10000). |
+| `--json` | flag | `false` | Emit JSON instead of a table. |
+
+### templates prune
+
+```
+seerflow templates prune --min-count N [--yes] [--json]
+```
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `--min-count N` | `int` (required) | — | Delete templates with `event_count` strictly less than `N`. `N >= 0`. |
+| `--yes` | flag | `false` | Skip the interactive confirmation prompt. |
+| `--json` | flag | `false` | One-line JSON summary. |
+
+### templates reset
+
+```
+seerflow templates reset [--yes] [--json]
+```
+
+Wipes **all** templates *and* the persisted Drain3 parser state. The
+parser will re-learn from scratch on the next run.
+
+### Examples
+
+```bash
+# Show the 100 most-used templates
+seerflow templates list
+
+# Drop templates seen fewer than 5 times (with confirmation)
+seerflow templates prune --min-count 5
+
+# Reset Drain3 state non-interactively in a script
+seerflow templates reset --yes --json
+```
+
+---
+
+## seerflow rules
+
+### Synopsis
+
+```
+seerflow rules list [--technique ID] [--tactic NAME_OR_ID]
+                    [--format {table,json}]
+```
+
+Inspect the Sigma rules loaded into the running configuration. Useful
+for confirming which rules cover a given ATT&CK technique before
+incident response, and for verifying that a custom rule loaded
+successfully.
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `--technique ID` | `str` | — | Filter by ATT&CK technique. Prefix match — `T1053` includes sub-techniques (`T1053.001`, …). |
+| `--tactic NAME_OR_ID` | `str` | — | Filter by tactic name (`persistence`) or ID (`TA0003`). |
+| `--format {table,json}` | choice | `table` | Output format. |
+
+### Examples
+
+```bash
+# Every rule mapping to T1053 scheduled-task techniques
+seerflow rules list --technique T1053
+
+# JSON dump of persistence rules
+seerflow rules list --tactic persistence --format json
+```
+
+---
+
+## seerflow hunt
+
+### Synopsis
+
+```
+seerflow hunt "NATURAL LANGUAGE QUERY" [--limit INT] [--db PATH] [--json]
+```
+
+### Description
+
+Natural-language threat hunt. The configured LLM backend
+(`llm.backend = llama_cpp | ollama | cloud`) translates the prompt
+into an internal `EventQuery` and runs it against the event store. If
+the LLM is unavailable or the query contains an entity-style token
+(IPv4, hostname, entity UUID5), Seerflow falls back to a deterministic
+entity-timeline lookup so the command remains useful without LLM
+configured.
+
+### Arguments and Options
+
+| Argument / Option | Type | Default | Description |
+|-------------------|------|---------|-------------|
+| `QUERY` | `str` (required) | — | Free-text hunt query. |
+| `--limit INT` | `int` | from config (`llm.hunt_max_results`, 100) | Max events returned. |
+| `--db PATH` | `str` | from config | Override the database path. |
+| `--json` | flag | `false` | Output as JSON. |
+
+### Examples
+
+```bash
+# Conceptual hunt — requires an LLM backend
+seerflow hunt "any failed logins from new IPs in the last hour"
+
+# Entity hunt — works without an LLM (timeline fallback)
+seerflow hunt "10.0.1.42"
+
+# Cap results and emit JSON for a notebook
+seerflow hunt "PowerShell execution by service accounts" --limit 50 --json
+```
+
+See [LLM Integration](../detection/llm.md) for backend setup.
+
+---
+
 ## seerflow feedback
 
 ### Synopsis
@@ -286,8 +540,10 @@ seerflow feedback ALERT_ID {tp,fp} [--note TEXT]
 Submit a true-positive or false-positive judgment on a specific alert. False
 positive (`fp`) feedback is propagated to the DSPOT auto-threshold system,
 raising the alert threshold for that detector to reduce noise on similar future
-events. See [Alerting — Feedback Loop](../operations/alerting.md#feedback-loop)
-for details on how feedback adjusts detection sensitivity.
+events. True positives can also be used by the LLM rule-suggestion service to
+seed Sigma drafts. Feedback is persisted alongside the alert. See
+[Alerting — Feedback Loop](../operations/alerting.md#feedback-loop) for
+details on how feedback adjusts detection sensitivity.
 
 ### Arguments and Options
 
@@ -309,3 +565,51 @@ seerflow feedback alert-abc123 fp --note "Scheduled maintenance window, expected
 # True positive with analyst note
 seerflow feedback alert-xyz789 tp --note "Confirmed lateral movement from IR team"
 ```
+
+---
+
+## seerflow graph
+
+### Synopsis
+
+```
+seerflow graph migrate --from {igraph,falkordb,postgres_age}
+                       --to   {igraph,falkordb,postgres_age}
+                       [--batch-size N] [--dry-run] [--wipe-destination]
+```
+
+### Description
+
+Move the persisted entity graph between backends. Use this when switching
+from the zero-config `igraph` in-process backend to a clustered backend
+(`falkordb`, `postgres_age`) for production scale, or back down for
+debugging.
+
+The migration streams edges in batches and verifies counts at the end.
+With `--wipe-destination`, the destination is emptied first and strict
+count equality is enforced.
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `--from {igraph,falkordb,postgres_age}` | choice (required) | — | Source graph backend. |
+| `--to {igraph,falkordb,postgres_age}` | choice (required) | — | Destination graph backend. |
+| `--batch-size N` | positive `int` | `5000` | Edges per write batch. |
+| `--dry-run` | flag | `false` | Report projected edge/vertex counts only. |
+| `--wipe-destination` | flag | `false` | Empty the destination before streaming (strict count check). |
+
+### Examples
+
+```bash
+# Dry-run estimate before committing to a backend swap
+seerflow graph migrate --from igraph --to falkordb --dry-run
+
+# Hot migration into FalkorDB
+seerflow graph migrate --from igraph --to falkordb \
+                       --batch-size 10000 --wipe-destination
+
+# Roll back to in-process igraph
+seerflow graph migrate --from falkordb --to igraph --wipe-destination
+```
+
+See [Graph Backends](../entity-graph/backends.md) for backend trade-offs
+and required configuration.

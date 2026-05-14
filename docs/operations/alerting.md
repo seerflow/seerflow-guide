@@ -11,24 +11,29 @@ Every alert passes through five stages before reaching an operator and, when mar
 ```mermaid
 flowchart LR
     A[Detection] --> B[Dedup]
-    B --> C[Format]
-    C --> D[Webhook Sinks\nSlack / Teams / JSON]
+    B --> R[Router]
+    R --> C[Format]
+    C --> D[Webhooks\nSlack / Teams / JSON]
     C --> E[PagerDuty]
-    C --> F[OTLP Export]
+    C --> F[OTLP]
+    C --> M[Email / SMS\nTelegram / WhatsApp]
     D --> G[Feedback]
     E --> G
     F --> G
+    M --> G
     G -->|FP| H[DSPOT Threshold ↑]
     G -->|FP| I[PagerDuty Resolve]
+    G -->|TP/FP| J[Persist to store]
 ```
 
 | Stage | What happens |
 |---|---|
-| **Detection** | A detector (HST, Holt-Winters, CUSUM, Markov, or Sigma) produces a scored event that crosses its DSPOT upper threshold. |
+| **Detection** | A detector (HST, Holt-Winters, CUSUM, Markov, UEBA, IoC, or Sigma) produces a scored event that crosses its DSPOT upper threshold. |
 | **Dedup** | A composite dedup key (`alert_type:rule_name:entity_uuid`) collapses repeated firings into a single alert, incrementing `dedup_count`. |
-| **Format** | The alert is serialised into one or more target-specific payloads (Slack Block Kit, Teams Adaptive Card, or flat JSON). |
-| **Delivery** | The `AlertDispatcher` posts to webhook targets; `PagerDutySink` triggers an incident; `OtlpSink` batches the alert as an OTel `LogRecord`. All transports share the same retry policy: 3 attempts with back-off delays of 1 s, 2 s, and 4 s. |
-| **Feedback** | An operator marks the alert `tp` (true positive) or `fp` (false positive) via the CLI. An FP adjusts the DSPOT threshold and optionally auto-resolves the PagerDuty incident. |
+| **Router** | The `NotificationRouter` evaluates `alerting.routing_rules` (first-match-wins) and picks the channels for this alert. Out-of-window severities are dropped by per-channel `quiet_hours_by_channel`. |
+| **Format** | The alert is serialised into one or more channel-specific payloads (Slack Block Kit, Teams Adaptive Card, flat JSON, HTML email, SMS body, Telegram MarkdownV2, WhatsApp template). |
+| **Delivery** | Each channel has an independent worker with its own rate-limit token bucket. Common retry policy: 3 attempts with back-off delays of 1 s, 2 s, 4 s. WhatsApp adds a per-target circuit breaker. |
+| **Feedback** | An operator marks the alert `tp` or `fp` via the CLI, REST API, or dashboard. Feedback is **persisted** alongside the alert and feeds the DSPOT threshold adjuster, PagerDuty resolve, and the LLM Sigma rule-suggestion service. |
 
 ---
 
@@ -116,10 +121,157 @@ The dispatcher holds an internal queue capped at **10,000 alerts**. If the queue
           min_severity: 0
     ```
 
+### URL safety / SSRF defence
+
+All webhook URLs are validated at startup and on each delivery:
+
+- Scheme must be `http` or `https`.
+- The host is resolved at request time and rejected if it resolves to
+  a private, loopback, link-local, or reserved IP range.
+- DNS rebinding is mitigated by re-resolving on each request rather
+  than caching the result.
+
+This protects against an internal SSRF when an operator with config
+write access pastes a URL pointing at the host's metadata service.
+
 ### HMAC Authentication
 
 !!! note "Planned Feature"
     HMAC webhook authentication (signing the request body with a shared secret and passing the signature in a custom header) is planned for a future release. Until then, protect webhook endpoints at the network level or use token-based URL authentication built into the receiving service.
+
+---
+
+## Email, SMS, Telegram, WhatsApp
+
+Seerflow also delivers alerts directly to operator inboxes and phones.
+Each channel has its own target dataclass with `min_severity`, a
+token-bucket rate limiter, and credentials redacted from `repr`.
+
+| Channel | Provider | Config key |
+|---------|----------|-----------|
+| Email | SMTP (STARTTLS) | `alerting.email_targets` |
+| SMS | Twilio | `alerting.sms_targets` |
+| Telegram | Bot API | `alerting.telegram_targets` |
+| WhatsApp | WhatsApp Cloud API + pre-approved template | `alerting.whatsapp_targets` |
+
+Each target carries a unique `name` — routing rules reference channels
+by name, not by index. See
+[Config Reference → Alerting](../reference/config.md#alerting) for the
+full field set.
+
+### Minimal example
+
+```yaml
+alerting:
+  email_targets:
+    - name: ops-email
+      smtp_host: smtp.example.com
+      smtp_port: 587
+      use_starttls: true
+      from_address: alerts@example.com
+      to_addresses: [oncall@example.com]
+      smtp_user: alerts
+      smtp_password: ${SMTP_PASSWORD}
+      max_per_minute: 30
+
+  telegram_targets:
+    - name: ops-telegram
+      bot_token: ${TELEGRAM_BOT_TOKEN}
+      chat_id:   ${TELEGRAM_CHAT_ID}
+      min_severity: 2
+```
+
+### Header injection safety
+
+Free-text alert fields are sanitised before being placed into email
+subject lines and SMS bodies — CR / LF are stripped to block header
+injection via attacker-controlled rule names.
+
+### Circuit breaker (WhatsApp)
+
+The WhatsApp Cloud API is rate-limited by Meta. The WhatsApp target
+trips a per-target circuit breaker after a burst of failures: while
+the breaker is open, alerts to that target are logged and dropped
+instead of being queued (queueing during an outage would amplify the
+rate-limit breach on recovery).
+
+---
+
+## Routing Rules
+
+By default, every alert flows to every configured channel. **Routing
+rules** override that, picking the channels for each alert based on
+its type, name, entity type, and severity. The first matching rule
+wins; remaining rules are skipped.
+
+```yaml
+alerting:
+  routing_rules:
+    - match:
+        alert_type: [sigma, correlation]
+        min_severity: 5            # CRITICAL+
+      notify:
+        - { channel: ops-sms,   mode: immediate }
+        - { channel: ops-email, mode: immediate }
+
+    - match:
+        alert_type: ml             # ML-only signal, lower urgency
+        min_severity: 3
+      notify:
+        - { channel: ops-telegram, mode: digest, digest_window_minutes: 15 }
+
+  default_routing:
+    action: notify                 # alerts matching no rule
+    notify:
+      - { channel: ops-email, mode: digest, digest_window_minutes: 60 }
+```
+
+| `match.*` field | Description |
+|-----------------|-------------|
+| `alert_type` | One or more of `ml`, `sigma`, `correlation`, `ueba`, `ioc`. |
+| `rule_name` | `fnmatch` glob (case-sensitive) on the alert's rule name. |
+| `entity_type` | One or more of `user`, `ip`, `host`, … |
+| `min_severity` / `max_severity` | Inclusive bounds (0–6). |
+
+`notify[].mode` is either `immediate` (deliver as soon as routed) or
+`digest` (buffer for `digest_window_minutes` and deliver the batch).
+
+### Digest mode
+
+When a rule selects `digest` mode, alerts are accumulated per
+`(rule_index, channel_name)` and flushed after the configured window.
+Each channel's `deliver_digest` formatter produces a compact summary
+— one message containing the N alerts in the window — to avoid
+operator pager fatigue during alert storms.
+
+### Default routing
+
+`default_routing.action` is either `drop` (the default — silently
+discard unmatched alerts) or `notify` with its own `notify` list.
+`default_routing` is only accepted when `routing_rules` is non-empty.
+
+---
+
+## Quiet Hours
+
+`alerting.quiet_hours_by_channel` mutes individual channels during a
+UTC window:
+
+```yaml
+alerting:
+  quiet_hours_by_channel:
+    ops-sms:
+      start: "22:00"
+      end:   "07:00"        # wraps midnight
+      min_severity: 5       # only suppress < CRITICAL
+```
+
+While inside the window, alerts to that channel with
+`severity_id < min_severity` are dropped (and logged at INFO). When
+`start > end`, the window wraps midnight.
+
+Severities at or above `min_severity` always go through — quiet hours
+never suppress true critical incidents.
 
 ---
 
@@ -176,6 +328,33 @@ alerting:
   otlp_export_interval_seconds: 5           # seconds between batch flushes
 ```
 
+### Custom CA and mTLS
+
+For private collectors signed by an internal CA, or when the
+collector requires client certificates:
+
+```yaml
+alerting:
+  otlp_endpoint: "otel-collector.internal:4317"
+  otlp_protocol: grpc
+  otlp_tls: true
+  otlp_tls_ca_file: /etc/seerflow/tls/internal-ca.pem
+  otlp_mtls_cert_file: /etc/seerflow/tls/seerflow.crt
+  otlp_mtls_key_file:  /etc/seerflow/tls/seerflow.key
+```
+
+- `otlp_tls: null` (the default) auto-selects TLS based on protocol
+  and URL scheme. Set explicitly to `true`/`false` to override.
+- `otlp_tls_ca_file` adds a custom CA bundle on top of the system
+  trust store.
+- `otlp_mtls_cert_file` / `otlp_mtls_key_file` enable mutual TLS.
+  Either both or neither must be set.
+
+The CA, cert, and key are read **once** at sink construction.
+Rotating any of them requires a process restart — matching the
+behaviour of every other static-credential TLS stack (Go
+`tls.Config`, OpenSSL `SSL_CTX`).
+
 !!! note "Batch buffer"
     The internal pending buffer holds up to 10,000 alerts before dropping. This is not configurable — reduce `otlp_export_interval_seconds` if you see drop warnings.
 
@@ -208,8 +387,7 @@ Provide the **32-character hexadecimal integration key** from your PagerDuty ser
 
 ```yaml
 alerting:
-  pagerduty:
-    routing_key: "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4"  # 32-char hex
+  pagerduty_routing_key: "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4"  # 32-char hex
 ```
 
 !!! warning "Keep the routing key secret"
@@ -244,37 +422,71 @@ When an alert is marked as a false positive and `pagerduty_routing_key` is confi
 
 ```yaml
 alerting:
-  pagerduty:
-    routing_key: "${PAGERDUTY_ROUTING_KEY}"
+  pagerduty_routing_key: ${PAGERDUTY_ROUTING_KEY}
 ```
 
 ---
 
 ## Feedback Loop
 
-Operators close the detection loop by marking alerts as true positives (TP) or false positives (FP).
+Operators close the detection loop by marking alerts as true positives (TP) or false positives (FP). Feedback can be submitted via the CLI, the REST API, or the dashboard — all three paths land in the same persisted feedback record.
 
-### CLI usage
+### Submitting feedback
 
 ```bash
+# CLI
 seerflow feedback <alert_id> tp
-seerflow feedback <alert_id> fp
+seerflow feedback <alert_id> fp --note "Scheduled maintenance"
+```
+
+```bash
+# REST API
+curl -X POST http://localhost:8080/api/v1/alerts/<alert_id>/feedback \
+     -H 'content-type: application/json' \
+     -d '{"feedback":"fp","note":"Scheduled maintenance","origin":"console"}'
 ```
 
 `<alert_id>` is the UUID shown in the alert payload (the `alert_id` field).
 
+### What is persisted
+
+Every feedback submission is appended to a per-alert audit log
+(retrievable via `GET /api/v1/alerts/{id}/feedback`):
+
+| Field | Description |
+|-------|-------------|
+| `feedback` | `tp` or `fp` |
+| `note` | Free-text operator note (optional) |
+| `origin` | `cli`, `api`, `console`, or other caller identifier |
+| `timestamp_ns` | Submission time |
+| `analyst_id` | Resolved from the auth layer when present |
+
+Persistence has two downstream effects:
+
+- **DSPOT threshold adjustment** — see below.
+- **LLM rule-suggestion eligibility** — once an alert pattern
+  accumulates ≥ `llm.rule_suggestion_min_tp` TPs, that pattern is
+  eligible for [Sigma rule drafting](../detection/llm.md#sigma-rule-suggestion).
+
 ### What happens on FP
 
-1. The alert record in storage is updated with the `fp` label.
-2. If a `DetectionEnsemble` is available, the DSPOT upper threshold for the alert's source is multiplied by **1.05** (`_FP_THRESHOLD_FACTOR`). The source key is derived from the alert's `dedup_key`: for HST alerts (format `hst:{template_id}:{source_type}:{entity_uuid}`), the `source_type` at index 2 is used; for all other alert types, the `alert_type` field is used as a fallback.
-3. If a PagerDuty routing key is configured, a `resolve` event is posted immediately.
+1. The feedback record is persisted.
+2. If a `DetectionEnsemble` is available, the DSPOT upper threshold
+   for the alert's source is multiplied by **1.05**
+   (`_FP_THRESHOLD_FACTOR`). The source key is derived from the
+   alert's `dedup_key`: for HST alerts (format
+   `hst:{template_id}:{source_type}:{entity_uuid}`), the
+   `source_type` at index 2 is used; for all other alert types, the
+   `alert_type` field is used as a fallback.
+3. The threshold cannot grow without bound — `detection.dspot_threshold_cap_multiplier` (default `5.0`) caps the maximum factor over the calibrated baseline, so repeated FPs can never silently disable a detector.
+4. If a PagerDuty routing key is configured, a `resolve` event is posted immediately for that alert's dedup key.
 
 !!! note "Threshold accumulation"
-    Each FP multiplies the current DSPOT upper threshold by 1.05. Three consecutive FP marks on the same source raise the threshold by approximately 16% (`1.05³`), progressively suppressing noisy detectors without permanently disabling them.
+    Each FP multiplies the current DSPOT upper threshold by 1.05. Three consecutive FP marks on the same source raise the threshold by approximately 16% (`1.05³`), progressively suppressing noisy detectors. The cap multiplier ensures the threshold never exceeds `5.0×` the calibrated baseline.
 
 ### What happens on TP
 
-The alert record in storage is updated with the `tp` label. No threshold or PagerDuty changes are made.
+The feedback record is persisted. No threshold or PagerDuty changes are made. If the alert's pattern accumulates enough TPs, an LLM Sigma rule suggestion may be drafted on the operator's next visit to the **Rule Suggestions** tab.
 
 ---
 
