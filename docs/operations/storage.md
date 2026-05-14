@@ -1,6 +1,15 @@
 # Storage Layer
 
-Seerflow separates storage concerns into five Protocol interfaces. A single configuration line selects which backend implements all five simultaneously. The two supported backends are SQLite (zero-config default) and PostgreSQL (production scale). For where storage fits in the overall data flow, see [Pipeline Architecture](../architecture/pipeline.md).
+Seerflow separates storage concerns into five Protocol interfaces. The
+event / alert / model / entity stores are switched together by a
+single backend selector (`storage.backend`). The entity graph has its
+own backend selector (`storage.graph_backend`) so the graph can run
+on `igraph`, `falkordb`, or `postgres_age` independently of where
+events live — see [Graph Backends](../entity-graph/backends.md) for
+the graph-specific trade-offs.
+
+For where storage fits in the overall data flow, see
+[Pipeline Architecture](../architecture/pipeline.md).
 
 ## Architecture Overview
 
@@ -30,11 +39,12 @@ flowchart TB
     style PG fill:#6b7280,color:#fff,stroke:#9ca3af,stroke-dasharray:5 5
 ```
 
-One config line switches all five interfaces at once:
+One config line switches the event/alert/model/entity stores at once:
 
 ```yaml
 storage:
-  backend: sqlite      # or: postgresql
+  backend: sqlite          # or: postgresql
+  graph_backend: igraph    # or: falkordb | postgres_age (independent)
 ```
 
 The pipeline never imports a concrete backend class directly — it depends only on the Protocol types, so swapping backends requires no code changes.
@@ -210,7 +220,20 @@ The PostgreSQL backend uses `asyncpg` for connection pooling and prepared statem
 storage:
   backend: postgresql
   postgresql_url: "postgresql://user:password@host:5432/seerflow"
+  postgresql_pool_min_size: 2
+  postgresql_pool_max_size: 10
+  postgresql_command_timeout_s: 30.0
 ```
+
+Pool sizing notes:
+
+- `postgresql_pool_min_size` keeps a warm baseline (default 2).
+- `postgresql_pool_max_size` caps concurrent connections (default 10).
+  Size this against the queries Seerflow can issue concurrently: one
+  ingest writer + one dashboard reader per browser tab + any graph
+  algorithm tasks if `graph_backend == postgres_age`.
+- `postgresql_command_timeout_s` is the per-statement timeout. Raise
+  for long graph traversals; lower for tight latency SLOs on writes.
 
 !!! tip "Environment variable interpolation"
     Keep credentials out of config files. Set the URL via an environment variable and reference it:

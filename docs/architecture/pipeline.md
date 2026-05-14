@@ -2,13 +2,14 @@
 
 ## Concept
 
-Seerflow processes every log event through a five-stage streaming pipeline:
+Seerflow processes every log event through a six-stage streaming pipeline:
 
-1. **Ingest** — Receivers accept logs from external sources and produce `RawEvent` objects
-2. **Parse** — Drain3 extracts templates; entity extractor identifies IPs, users, hosts
-3. **Detect** — Five online ML models score the event; Sigma rules check for known patterns
-4. **Correlate** — Entity graph, risk accumulation, kill-chain tracking connect related events
-5. **Alert** — Dispatchers send notifications via webhooks and PagerDuty with deduplication
+1. **Ingest** — Receivers accept logs from external sources and produce `RawEvent` objects.
+2. **Parse** — Drain3 extracts templates; entity extractor identifies IPs, users, hosts.
+3. **Enrich** — Threat-intel matcher annotates IoC hits; UEBA computes per-entity behavioural sub-scores; the LLM (when configured) is called only on operator demand, not in the hot path.
+4. **Detect** — Online ML models score the event; Sigma rules check for known patterns.
+5. **Correlate** — Entity graph, risk accumulation, kill-chain tracking connect related events.
+6. **Alert** — The notification router picks channels (webhooks, PagerDuty, OTLP, email, SMS, Telegram, WhatsApp) and dispatchers deliver with deduplication.
 
 The entire pipeline runs in a **single asyncio event loop**. There are no threads, no multiprocessing, no GIL contention. This design gives predictable memory usage, simpler debugging, and throughput of 10,000+ events per second on a single core.
 
@@ -41,13 +42,15 @@ Each raw event travels through six stages from ingestion to alerting. Hover any 
 
 3. **ReceiverManager → EventNormalizer:** The main event loop pulls the next `RawEvent` from the queue. The normalizer decodes bytes to UTF-8, runs Drain3 to extract a template and parameters, then runs entity extraction to identify IPs, users, hosts, files, domains, and processes. The result is a fully populated `SeerflowEvent`.
 
-4. **EventNormalizer → DetectionEnsemble:** Five online ML models score the event in sequence: Half-Space Trees for content anomalies, Holt-Winters for volume spikes, CUSUM for change points, Markov chains for sequence anomalies, and DSPOT for auto-thresholds. Scores are blended into a single `anomaly_score`.
+4. **EventNormalizer → IoC Matcher & UEBA:** When [threat intel](../correlation/threat-intel.md) is enabled, the event's IPs / domains / hashes / URLs are probed against the in-process Bloom filter; matches annotate the event with `ioc.*` fields and feed an `ioc` alert. When [UEBA](../detection/ueba.md) is enabled, the event is scored against the entity's behavioural baseline (post-warmup) and may produce a `ueba` alert.
 
-5. **DetectionEnsemble → SigmaEngine:** The enriched event is matched against 3,000+ Sigma rules (logsource-indexed for throughput). Matching rules populate `mitre_tactics` and `mitre_techniques` fields.
+5. **Enriched event → DetectionEnsemble:** Online ML models score the event: Half-Space Trees for content anomalies, Holt-Winters for volume spikes, CUSUM for change points, Markov chains for sequence anomalies, and DSPOT for auto-thresholds. Scores are blended into a single `anomaly_score`.
 
-6. **SigmaEngine → CorrelationEngine:** The correlation engine updates the entity graph (linking IPs, users, and hosts seen in this event), accumulates risk per entity (with configurable half-life decay), and checks kill-chain progression. If an entity crosses the risk threshold or reaches 3+ ATT&CK tactics, an alert is generated.
+6. **DetectionEnsemble → SigmaEngine:** The enriched event is matched against thousands of Sigma rules (logsource-indexed for throughput). Matching rules populate `mitre_tactics` and `mitre_techniques` fields.
 
-7. **CorrelationEngine → AlertDispatcher → Sinks:** The dispatcher checks the dedup window (default 15 minutes, per-rule overrides). If this alert hasn't been sent recently, it fires to configured sinks — webhook endpoints (Slack, Teams) and/or PagerDuty.
+7. **SigmaEngine → CorrelationEngine:** The correlation engine updates the entity graph (linking IPs, users, and hosts seen in this event), accumulates risk per entity (with configurable half-life decay), and checks kill-chain progression. If an entity crosses the risk threshold or reaches `kill_chain.tactic_threshold` distinct ATT&CK tactics within `kill_chain.window_seconds`, an alert is generated.
+
+8. **CorrelationEngine → NotificationRouter → Channels:** The router evaluates `alerting.routing_rules` (first-match-wins) and picks the channels for this alert. Each channel has its own dispatcher worker — webhooks (Slack / Teams / JSON), PagerDuty, OTLP, email, SMS, Telegram, WhatsApp. Quiet hours and per-channel rate limiters apply before delivery. The dedup window (default 15 min, per-rule overridable) suppresses duplicate firings; LLM-driven explanations are produced lazily on operator request.
 
 ### The Handler Factory
 
@@ -75,16 +78,19 @@ This closure-based composition means the pipeline has no global state. Every com
 
 `_run_with_config()` in `pipeline/run.py` orchestrates startup:
 
-1. **Storage:** Connect SQLite backend, create data directory
-2. **Detection:** Build `DetectionEnsemble`, restore saved model states
-3. **Attack mapping:** Load MITRE ATT&CK regex patterns (if configured)
-4. **Sigma:** Load Sigma rules from configured directories
-5. **Entity graph:** Initialize igraph-based entity graph
-6. **Correlation:** Build correlation engine with window buffer, risk register, kill-chain tracker
-7. **Alerting:** Configure webhook targets and PagerDuty sink
-8. **Handler:** Wire everything into `make_handler()` closure
-9. **Receivers:** Start all configured receivers (syslog, file, OTLP, webhook)
-10. **Event loop:** Pull events from queue, run handler, repeat
+1. **Storage:** Connect the event/alert backend (SQLite or PostgreSQL) and the graph backend (igraph / falkordb / postgres_age); create data directories.
+2. **Detection:** Build `DetectionEnsemble`, restore saved model states.
+3. **Attack mapping:** Load MITRE ATT&CK regex patterns (bundled + `detection.attack_mappings`).
+4. **Sigma:** Load Sigma rules from `detection.sigma_rules_dirs` and `detection.sigma_custom_upload_dir`.
+5. **UEBA / Threat Intel:** Initialise the UEBA baseline store and any configured TAXII feed consumers; populate the IoC Bloom matcher.
+6. **Entity graph:** Connect the configured graph backend.
+7. **Correlation:** Build correlation engine with window buffer, risk register, kill-chain tracker.
+8. **LLM:** Initialise the LLM backend if `llm.backend != ""` (lazy — no calls until first hunt / explain request).
+9. **Alerting:** Build delivery targets (webhooks, PagerDuty, OTLP, email, SMS, Telegram, WhatsApp) and the notification router from `alerting.routing_rules`.
+10. **API + Dashboard:** Start FastAPI app, REST routes, and WebSocket worker.
+11. **Handler:** Wire everything into `make_handler()` closure.
+12. **Receivers:** Start all configured receivers (syslog, file, OTLP, webhook).
+13. **Event loop:** Pull events from queue, run handler, repeat.
 
 ## Configuration
 

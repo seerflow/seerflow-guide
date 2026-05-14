@@ -62,6 +62,7 @@ nav:
     - entity-graph/index.md
     - Building the Graph: entity-graph/construction.md
     - Algorithms & Detection: entity-graph/algorithms.md
+    - Backends: entity-graph/backends.md
   - Detection:
     - detection/index.md
     - Half-Space Trees: detection/hst.md
@@ -70,6 +71,8 @@ nav:
     - Markov Chains: detection/markov.md
     - DSPOT: detection/dspot.md
     - Scoring & Attack Mapping: detection/scoring.md
+    - UEBA: detection/ueba.md
+    - LLM Integration: detection/llm.md
   - Correlation:
     - correlation/index.md
     - Sigma Rules: correlation/sigma.md
@@ -77,8 +80,10 @@ nav:
     - Kill Chain: correlation/kill-chain.md
     - Risk Accumulation: correlation/risk-accumulation.md
     - Graph-Structural: correlation/graph-structural.md
+    - Threat Intel: correlation/threat-intel.md
   - Operations:
     - operations/index.md
+    - Dashboard: operations/dashboard.md
     - Alerting: operations/alerting.md
     - Storage: operations/storage.md
     - Tuning: operations/tuning.md
@@ -86,6 +91,7 @@ nav:
   - Reference:
     - Configuration: reference/config.md
     - CLI: reference/cli.md
+    - REST API & WebSocket: reference/api.md
     - Bundled Sigma Rules: reference/sigma-rules.md
     - ATT&CK Coverage: reference/attack-coverage.md
     - Glossary: reference/glossary.md
