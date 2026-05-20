@@ -1,0 +1,30 @@
+[project]
+name = "seerflow-guide"
+version = "1.1.0"
+description = "Seerflow Guide — comprehensive documentation site for the Seerflow streaming log intelligence agent."
+requires-python = ">=3.11"
+dependencies = [
+    "mkdocs>=1.6",
+    "mkdocs-material>=9.5",
+    "mkdocstrings[python]>=0.24",
+    "pymdown-extensions>=10.21",
+    "mike>=2.1",
+    "pyyaml>=6.0",
+    # The docs-drift workflow installs `seerflow` from git separately so the
+    # drift checker can import the real schema. Pinning it here would pull
+    # the whole runtime stack into local doc builds, which is unnecessary.
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-cov>=5.0",
+]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

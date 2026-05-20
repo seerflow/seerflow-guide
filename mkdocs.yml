@@ -39,6 +39,7 @@ theme:
 
 nav:
   - Home: index.md
+  - Quickstart: quickstart.md
   - Security Primer:
     - security-primer/index.md
     - What is a SIEM?: security-primer/siem-basics.md
@@ -88,13 +89,18 @@ nav:
     - Storage: operations/storage.md
     - Tuning: operations/tuning.md
     - Testing: operations/testing.md
+  - Frontend:
+    - frontend/index.md
   - Reference:
-    - Configuration: reference/config.md
+    - Configuration (full): reference/config.md
+    - Configuration (v1.1 minimum-viable): reference/configuration.md
     - CLI: reference/cli.md
     - REST API & WebSocket: reference/api.md
     - Bundled Sigma Rules: reference/sigma-rules.md
     - ATT&CK Coverage: reference/attack-coverage.md
     - Glossary: reference/glossary.md
+  - Retros:
+    - EPIC-DOC (2026-04): retros/epic-doc-2026-04.md
 
 plugins:
   - search
@@ -102,6 +108,11 @@ plugins:
       assets_exclude:
         - cdn.jsdelivr.net/npm/mathjax@3/*
   - tags
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            docstring_style: google
 
 markdown_extensions:
   - pymdownx.highlight
