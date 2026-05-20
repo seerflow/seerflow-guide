@@ -1,8 +1,13 @@
 # Lychee link checker configuration
 # https://lychee.cli.rs/usage/config/
 
-# Exclude the custom domain until DNS is configured
-exclude = ["docs\\.seerflow\\.dev"]
+# Exclude the custom domain until DNS is configured.
+# Also exclude links to files added by this branch but not yet on `main`
+# (chicken-and-egg: the link target will resolve once this PR merges).
+exclude = [
+    "docs\\.seerflow\\.dev",
+    "https://github.com/seerflow/seerflow-guide/blob/main/scripts/check_docs_drift\\.py",
+]
 
 # Don't check mailto links
 exclude_mail = true
