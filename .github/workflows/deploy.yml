@@ -23,7 +23,13 @@ jobs:
           cache-dependency-path: requirements.txt
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: |
+          pip install -r requirements.txt
+          # seerflow is required so mkdocstrings can resolve the API reference
+          # directives in docs/reference/api.md. Installed from main to track
+          # the public schema; pin to a release tag if/when this docs site
+          # moves to a versioned cadence.
+          pip install "seerflow @ git+https://github.com/seerflow/seerflow@main"
 
       - name: Build site (strict mode validates internal links)
         run: mkdocs build --strict
