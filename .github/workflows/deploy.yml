@@ -37,7 +37,11 @@ jobs:
       - name: Check links
         uses: lycheeverse/lychee-action@v2
         with:
-          args: --no-progress --root-dir site/ --exclude 'docs\.seerflow\.dev' site/
+          # Exclude links added by this branch that resolve to `main` paths;
+          # the chicken-and-egg link to `scripts/check_docs_drift.py` on `main`
+          # will succeed once this PR merges. Re-tighten the exclude list in a
+          # follow-up PR after the merge lands.
+          args: --no-progress --root-dir site/ --exclude 'docs\.seerflow\.dev' --exclude 'github\.com/seerflow/seerflow-guide/blob/main/scripts/check_docs_drift\.py' site/
           fail: true
 
       - name: Upload artifact
