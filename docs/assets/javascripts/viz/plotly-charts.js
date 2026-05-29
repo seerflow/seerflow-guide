@@ -176,9 +176,9 @@
         x: data.tactics,
         type: 'heatmap',
         colorscale: [
-          [0, 'rgba(107,114,128,0.15)'],
-          [0.5, '#fbbf24'],
-          [1, '#dc2626'],
+          [0, 'rgba(0,0,0,0)'],
+          [0.5, getCssVar('--sf-threshold') || '#fbbf24'],
+          [1, getCssVar('--sf-anomaly') || '#dc2626'],
         ],
         showscale: true,
         hoverongaps: false,

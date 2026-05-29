@@ -50,15 +50,17 @@
   --sf-viz-border:   var(--sf-hex-line-2);
   --sf-viz-panel-bg: var(--sf-hex-surface-2);
   --sf-viz-panel-fg: var(--sf-hex-text);
+  --sf-viz-bg:       transparent;
   --sf-baseline:     var(--sf-hex-accent);
   --sf-threshold:    var(--sf-hex-warn);
   --sf-anomaly:      var(--sf-hex-crit);
   --sf-edge:         var(--sf-hex-line-2);
-  /* entity node hues (categorical, brand-tinted) */
-  --sf-entity-host:    var(--sf-hex-info);
+  --sf-edge-highlight: var(--sf-hex-text-2);
+  /* entity node hues (categorical, brand-tinted, kept distinguishable) */
   --sf-entity-user:    var(--sf-hex-accent);
-  --sf-entity-ip:      var(--sf-hex-accent-2);
-  --sf-entity-process: var(--sf-hex-warn);
+  --sf-entity-host:    var(--sf-hex-info);
+  --sf-entity-ip:      var(--sf-hex-warn);
+  --sf-entity-process: var(--sf-hex-accent-2);
   --sf-entity-file:    var(--sf-hex-text-2);
   --sf-entity-domain:  var(--sf-hex-crit);
 }
