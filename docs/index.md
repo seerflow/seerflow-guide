@@ -1,41 +1,48 @@
 ---
 title: Seerflow Guide
 description: Comprehensive guide to Seerflow — streaming log intelligence
+hide:
+  - navigation
 ---
 
-# Welcome to the Seerflow Guide
+<span class="sf-eyebrow">The Guide · v0.5.0 · Read start to finish or jump in</span>
 
-**Seerflow** is a streaming, entity-centric log intelligence agent that detects operational failures and security threats across log sources. It combines traditional ML for bulk detection with LLMs for edge cases and root cause analysis.
+# Welcome to the <span class="sf-accent">Seerflow</span> Guide { .sf-hero-title }
 
-*See what single sources can't.*
+**Seerflow** is a streaming, entity-centric log intelligence agent that detects operational
+failures and security threats across log sources. It combines traditional ML for bulk detection
+with LLMs for edge cases and root cause analysis.
 
----
+<p class="sf-tagline">See what single sources can't.</p>
 
 ## Who is this guide for?
 
-!!! tip "Choose your path"
+<div class="sf-grid cols-2" markdown>
+<div class="sf-card" markdown>
+<span class="sf-card-label">Path 01</span>
+<span class="sf-card-title">Security Operator</span>
 
-    === "Security Operator"
+Deploying or tuning Seerflow? Go here:
 
-        Deploying or tuning Seerflow? Go here:
+1. [Architecture](architecture/index.md) — pipeline and data flow
+2. [Detection Deep Dives](detection/index.md) — understand each detector
+3. [Tuning Guide](operations/tuning.md) — reduce false positives
+4. [Configuration Reference](reference/config.md) — every parameter
+</div>
+<div class="sf-card" markdown>
+<span class="sf-card-label">Path 02</span>
+<span class="sf-card-title">SRE / DevOps</span>
 
-        1. [Architecture](architecture/index.md) — pipeline and data flow
-        2. [Detection Deep Dives](detection/index.md) — understand each detector
-        3. [Tuning Guide](operations/tuning.md) — reduce false positives
-        4. [Configuration Reference](reference/config.md) — every parameter
+Running infrastructure and want log intelligence?
 
-    === "SRE / DevOps"
+1. [Ops Primer](ops-primer/index.md) — operational intelligence concepts
+2. [Architecture](architecture/index.md) — how Seerflow processes logs
+3. [Detection](detection/index.md) — anomaly detection for ops patterns
+4. [Tuning Guide](operations/tuning.md) — reduce noise, focus on real issues
+</div>
+</div>
 
-        Running infrastructure and want log intelligence?
-
-        1. [Ops Primer](ops-primer/index.md) — operational intelligence concepts
-        2. [Architecture](architecture/index.md) — how Seerflow processes logs
-        3. [Detection](detection/index.md) — anomaly detection for ops patterns
-        4. [Tuning Guide](operations/tuning.md) — reduce noise, focus on real issues
-
----
-
-## How Seerflow Works
+## How Seerflow works
 
 ```mermaid
 graph TD
@@ -58,18 +65,33 @@ graph TD
 | **Correlation** | Sigma rules, temporal windows, kill chain, graph analysis |
 | **Alerting** | Webhooks (Slack, Teams, PagerDuty), dedup, feedback |
 
----
-
-## Guide Structure
+## Guide structure
 
 Every concept page follows a three-layer structure:
 
-1. **Theory** — what it is, why it matters
-2. **Seerflow Implementation** — how it's built, code references
-3. **Practical Examples** — real scenarios, config samples, expected output
+<div class="sf-grid cols-3" markdown>
+<div class="sf-card" markdown>
+<span class="sf-card-label">Step 01</span>
+<span class="sf-card-title">Theory</span>
 
----
+What it is, why it matters.
+</div>
+<div class="sf-card" markdown>
+<span class="sf-card-label">Step 02</span>
+<span class="sf-card-title">Seerflow Implementation</span>
 
-## Source Code
+How it's built, with code references.
+</div>
+<div class="sf-card" markdown>
+<span class="sf-card-label">Step 03</span>
+<span class="sf-card-title">Practical Examples</span>
 
-Seerflow is open source: [github.com/seerflow/seerflow](https://github.com/seerflow/seerflow)
+Real scenarios, config samples, expected output.
+</div>
+</div>
+
+## Source code
+
+Seerflow is open source.
+
+[github.com/seerflow/seerflow](https://github.com/seerflow/seerflow){ .sf-btn .primary }
