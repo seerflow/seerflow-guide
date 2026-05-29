@@ -6,19 +6,13 @@ repo_name: seerflow/seerflow
 
 theme:
   name: material
-  logo: assets/logo.svg
+  custom_dir: overrides
+  logo: assets/seerflow_logo_color.svg
   favicon: assets/favicon.png
   font:
-    text: Inter
-    code: IBM Plex Mono
+    text: Geist
+    code: Geist Mono
   palette:
-    - media: "(prefers-color-scheme: light)"
-      scheme: default
-      primary: custom
-      accent: custom
-      toggle:
-        icon: material/brightness-7
-        name: Switch to dark mode
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
       primary: custom
@@ -26,12 +20,20 @@ theme:
       toggle:
         icon: material/brightness-4
         name: Switch to light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
   features:
     - navigation.tabs
     - navigation.sections
     - navigation.expand
     - navigation.path
     - navigation.top
+    - toc.follow
     - search.highlight
     - search.suggest
     - content.code.copy
@@ -130,6 +132,7 @@ markdown_extensions:
       check_paths: true
 
 extra_css:
+  - assets/stylesheets/tokens.css
   - assets/stylesheets/extra.css
   - assets/stylesheets/viz.css
 
