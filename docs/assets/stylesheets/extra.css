@@ -191,3 +191,16 @@ pre.mermaid .messageText, pre.mermaid .noteText, pre.mermaid text.actor { font-s
   font-size: .78rem; padding: .6em .9em; border-radius: 0; text-decoration: none; }
 .md-typeset .sf-btn.primary { background: var(--accent); color: var(--accent-ink); font-weight: 600; }
 .md-typeset .sf-btn.secondary { background: transparent; color: var(--text); border: 1px solid var(--line-2); }
+
+/* ===== Header chrome ========================================== */
+.md-header { background: color-mix(in oklch, var(--bg) 88%, transparent);
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line); color: var(--text); }
+.md-header__title { color: var(--text); font-weight: 600; letter-spacing: -0.01em; }
+.sf-guide-eyebrow { font-family: var(--font-mono); text-transform: uppercase;
+  letter-spacing: 0.14em; font-size: .58rem; color: var(--text-3); align-self: center;
+  margin-left: .7rem; padding-left: .7rem; border-left: 1px solid var(--line); white-space: nowrap; }
+.md-header__button.md-logo img { height: 1.7rem; width: auto; }
+.md-header__option .md-header__button { color: var(--text-2); }
+.md-header__option .md-header__button:hover { color: var(--accent); }
+@media screen and (max-width: 76.1875em) { .sf-guide-eyebrow { display: none; } }
