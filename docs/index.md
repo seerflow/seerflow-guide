@@ -1,8 +1,6 @@
 ---
 title: Seerflow Guide
 description: Comprehensive guide to Seerflow — streaming log intelligence
-hide:
-  - navigation
 ---
 
 <span class="sf-eyebrow">The Guide · v0.5.0 · Read start to finish or jump in</span>
