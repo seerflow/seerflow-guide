@@ -28,7 +28,6 @@ theme:
         icon: material/brightness-7
         name: Switch to dark mode
   features:
-    - navigation.tabs
     - navigation.sections
     - navigation.expand
     - navigation.path
@@ -36,6 +35,7 @@ theme:
     - toc.follow
     - search.highlight
     - search.suggest
+    - search.share
     - content.code.copy
     - content.tabs.link
 

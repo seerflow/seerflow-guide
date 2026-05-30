@@ -51,7 +51,7 @@
 [data-md-color-scheme] .md-typeset table:not([class]) { box-shadow: none; border-radius: 0; }
 .md-typeset ::selection { background: color-mix(in oklch, var(--accent) 30%, transparent); }
 
-/* ---- Layout: spacious 3-col, prose measure 720 (mock) ----------- */
+/* ---- Layout: spacious 3-col, prose measure ~760 (mock) ---------- */
 .md-grid { max-width: 90rem; }
 .md-content__inner { padding: 40px 56px 80px; }
 .md-content__inner > :first-child { margin-top: 0; }
@@ -65,17 +65,47 @@
 .md-header { background: color-mix(in oklch, var(--bg) 88%, transparent);
   -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--line); color: var(--text); }
-.md-header__inner { min-height: 3.5rem; }
-.md-header__title { color: var(--text); font-weight: 600; letter-spacing: -0.01em; font-size: .92rem; }
+.md-header__inner { min-height: 3.5rem; gap: .2rem; }
+.md-header__title { color: var(--text); margin-left: .4rem; }
+/* single topic laid out inline (we removed Material's scroll-swap 2nd topic) */
+.md-header__title .md-header__ellipsis { display: flex; align-items: center; }
+.md-header__title .md-header__topic { position: static; display: flex; align-items: center;
+  opacity: 1; transform: none; pointer-events: auto; }
+.sf-wordmark { font-family: var(--font-display); font-weight: 600; font-size: 1.02rem;
+  letter-spacing: -0.01em; color: var(--text); }
 .sf-guide-eyebrow { font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.14em;
-  font-size: 11px; color: var(--text-3); align-self: center;
+  font-size: 11px; color: var(--text-3);
   margin-left: 12px; padding-left: 12px; border-left: 1px solid var(--line); white-space: nowrap; }
-.md-header__button.md-logo img { height: 1.4rem; width: auto; }
-.md-header__option .md-header__button { color: var(--text-2); }
-.md-header__option .md-header__button:hover { color: var(--accent); }
-@media screen and (max-width: 76.1875em) { .sf-guide-eyebrow { display: none; } }
+.md-header__button.md-logo { margin-right: 0; padding: .2rem; }
+.md-header__button.md-logo img { height: 1.45rem; width: auto; }
+/* right-side text links (seerflow.dev / GitHub) */
+.sf-header-links { display: flex; align-items: center; gap: 16px; margin: 0 14px; }
+.sf-header-link { font-size: 13px; color: var(--text-2); text-decoration: none; white-space: nowrap; }
+.sf-header-link:hover { color: var(--accent); }
+/* palette toggle on the far right */
+.md-header [data-md-component="palette"] { color: var(--text-2); }
+.md-header [data-md-component="palette"] .md-header__button:hover { color: var(--accent); }
+@media screen and (max-width: 76.1875em) {
+  .sf-guide-eyebrow, .sf-header-links { display: none; }
+}
 
-/* ===== Tabs strip ============================================ */
+/* ===== Persistent search box (mockup: ~320px bordered field) === */
+@media screen and (min-width: 60em) {
+  .md-search__form { background: var(--surface); border: 1px solid var(--line); border-radius: 0;
+    width: 18rem; height: 2.1rem; transition: width .2s, background .2s; }
+  .md-search__form:hover { background: var(--surface-2); }
+  [data-md-toggle="search"]:checked ~ .md-header .md-search__form { width: 26rem; background: var(--surface); }
+  .md-search__input { font-size: 12.5px; }
+  .md-search__input::placeholder { color: var(--text-3); }
+  .md-search__icon[for="__search"] { color: var(--text-3); }
+}
+.md-search__form { background: var(--surface); border: 1px solid var(--line); border-radius: 0; }
+.md-search__input { color: var(--text); }
+.md-search__output, .md-search-result__meta { background: var(--bg); color: var(--text-2); }
+.md-search-result__article { border-bottom: 1px solid var(--line); }
+.md-search-result mark { color: var(--accent); }
+
+/* ===== Tabs strip (only if navigation.tabs re-enabled) ======= */
 .md-tabs { background: var(--bg); border-bottom: 1px solid var(--line); }
 .md-tabs__link { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.02em;
   color: var(--text-2); opacity: .85; }
@@ -85,6 +115,8 @@
 .md-nav { font-size: 13px; }
 .md-nav__title { font-family: var(--font-mono); font-size: 10px; font-weight: 500;
   letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-3); }
+.md-nav--primary > .md-nav__title { color: var(--text-3); background: transparent;
+  box-shadow: none; height: auto; padding-top: 1.2rem; }
 .md-nav--primary .md-nav__item--section > .md-nav__link,
 .md-nav--primary .md-nav__item--section > label.md-nav__link {
   font-family: var(--font-mono); font-size: 10px; font-weight: 500;
@@ -182,13 +214,6 @@
 .md-typeset .tabbed-set > label { font-family: var(--font-mono); font-size: 12px;
   text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-3); }
 .md-typeset .tabbed-set > input:checked + label { color: var(--accent); border-color: var(--accent); }
-
-/* ===== Search =============================================== */
-.md-search__form { background: var(--surface); border: 1px solid var(--line); border-radius: 0; }
-.md-search__input { color: var(--text); }
-.md-search__output, .md-search-result__meta { background: var(--bg); color: var(--text-2); }
-.md-search-result__article { border-bottom: 1px solid var(--line); }
-.md-search-result mark { color: var(--accent); }
 
 /* ===== Footer ============================================== */
 .md-footer-meta { border-top: 1px solid var(--line); }
