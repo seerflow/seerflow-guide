@@ -115,8 +115,15 @@
 .md-nav { font-size: 13px; }
 .md-nav__title { font-family: var(--font-mono); font-size: 10px; font-weight: 500;
   letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-3); }
-.md-nav--primary > .md-nav__title { color: var(--text-3); background: transparent;
-  box-shadow: none; height: auto; padding-top: 1.2rem; }
+/* mobile drawer header keeps the title (solid bg so it never shows-through) */
+.md-nav--primary > .md-nav__title { color: var(--text); background: var(--surface);
+  box-shadow: none; }
+/* desktop: drop the redundant sticky "Seerflow Guide" title (mockup sidebar has none;
+   the header bar already shows the wordmark). Add the mockup's top padding instead. */
+@media screen and (min-width: 76.25em) {
+  .md-nav--primary > .md-nav__title { display: none; }
+  .md-sidebar--primary .md-nav--primary { padding-top: 1.5rem; }
+}
 .md-nav--primary .md-nav__item--section > .md-nav__link,
 .md-nav--primary .md-nav__item--section > label.md-nav__link {
   font-family: var(--font-mono); font-size: 10px; font-weight: 500;
