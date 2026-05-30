@@ -33,7 +33,7 @@
     return {
       paper_bgcolor: 'rgba(0,0,0,0)',
       plot_bgcolor: 'rgba(0,0,0,0)',
-      font: { color: fg, family: 'Inter, system-ui, sans-serif' },
+      font: { color: fg, family: 'Geist, ui-sans-serif, system-ui, sans-serif' },
       margin: { l: 60, r: 20, t: 20, b: 50 },
       xaxis: {
         gridcolor: border,
@@ -53,7 +53,7 @@
       hoverlabel: {
         bgcolor: panelBg,
         bordercolor: border,
-        font: { color: panelFg, family: 'Inter, system-ui, sans-serif', size: 12 },
+        font: { color: panelFg, family: 'Geist, ui-sans-serif, system-ui, sans-serif', size: 12 },
         align: 'left',
       },
       showlegend: true,
@@ -176,9 +176,9 @@
         x: data.tactics,
         type: 'heatmap',
         colorscale: [
-          [0, 'rgba(107,114,128,0.15)'],
-          [0.5, '#fbbf24'],
-          [1, '#dc2626'],
+          [0, 'rgba(0,0,0,0)'],
+          [0.5, getCssVar('--sf-threshold') || '#ea580c'],
+          [1, getCssVar('--sf-anomaly') || '#dc2626'],
         ],
         showscale: true,
         hoverongaps: false,
