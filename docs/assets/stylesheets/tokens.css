@@ -75,14 +75,14 @@
   --line-2:    oklch(0.815 0.008 95);
   --text:      oklch(0.205 0.014 250);
   --text-2:    oklch(0.405 0.012 250);
-  --text-3:    oklch(0.555 0.010 250);
+  --text-3:    oklch(0.510 0.010 250);
   --mute:      oklch(0.640 0.008 250);
   --accent:    oklch(0.480 0.180 283);
   --accent-2:  oklch(0.395 0.180 283);
   --accent-ink:oklch(0.985 0.003 95);
-  --warn:      oklch(0.605 0.165 65);
+  --warn:      oklch(0.540 0.165 65);
   --crit:      oklch(0.555 0.215 26);
-  --info:      oklch(0.555 0.150 235);
+  --info:      oklch(0.520 0.150 235);
 
   /* light hex mirror */
   --sf-hex-bg: #fbfaf8;
@@ -92,10 +92,10 @@
   --sf-hex-line-2: #c4c2bd;
   --sf-hex-text: #12181d;
   --sf-hex-text-2: #444a4f;
-  --sf-hex-text-3: #6f7479;
+  --sf-hex-text-3: #62676c;
   --sf-hex-accent: #5546bd;
   --sf-hex-accent-2: #402aa1;
-  --sf-hex-warn: #c26700;
+  --sf-hex-warn: #ad5300;
   --sf-hex-crit: #d41824;
-  --sf-hex-info: #007dbd;
+  --sf-hex-info: #0073b2;
 }

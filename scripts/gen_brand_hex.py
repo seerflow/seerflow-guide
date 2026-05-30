@@ -18,15 +18,21 @@ DARK = {
     "warn": (0.815, 0.155, 80), "crit": (0.725, 0.195, 25),
     "info": (0.795, 0.115, 235),
 }
+# Light values for warn/info/text-3 are darkened vs the brand source so small
+# uppercase mono labels (admonition titles, table headers) clear WCAG AA (4.5:1)
+# on the light surfaces. Dark scheme already passes, so it is unchanged.
 LIGHT = {
     "bg": (0.985, 0.003, 95), "surface": (0.965, 0.004, 95),
     "surface-2": (0.935, 0.005, 95), "line": (0.895, 0.006, 95),
     "line-2": (0.815, 0.008, 95), "text": (0.205, 0.014, 250),
-    "text-2": (0.405, 0.012, 250), "text-3": (0.555, 0.010, 250),
+    "text-2": (0.405, 0.012, 250), "text-3": (0.510, 0.010, 250),
     "accent": (0.480, 0.180, 283), "accent-2": (0.395, 0.180, 283),
-    "warn": (0.605, 0.165, 65), "crit": (0.555, 0.215, 26),
-    "info": (0.555, 0.150, 235),
+    "warn": (0.540, 0.165, 65), "crit": (0.555, 0.215, 26),
+    "info": (0.520, 0.150, 235),
 }
+
+# CSS-only tokens (no JS/canvas consumer → intentionally excluded from the hex
+# mirror): --surface-3, --mute, --accent-ink. Add here if a chart ever needs them.
 
 
 def _lin_to_srgb(c: float) -> float:
