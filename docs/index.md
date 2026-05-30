@@ -42,17 +42,21 @@ Running infrastructure and want log intelligence?
 
 ## How Seerflow works
 
-```mermaid
-graph TD
-    A[Log Sources] --> B[Receivers]
-    B --> C[Parsing & Drain3]
-    C --> D[Entity Extraction]
-    D --> E[Detection Ensemble]
-    E --> F[Correlation Engine]
-    F --> G[Alerting]
-    G --> H[Feedback Loop]
-    H -->|Threshold Adjustment| E
-```
+Logs flow through a streaming pipeline. Each stage adds context: raw lines become structured
+events, events resolve to entities, entities accrue risk, and risk crosses thresholds into alerts.
+
+<div class="sf-flow">
+<div class="sf-flow__row">
+<div class="sf-flow__box"><span class="sf-flow__n">01</span><span class="sf-flow__label">Sources</span></div>
+<div class="sf-flow__box"><span class="sf-flow__n">02</span><span class="sf-flow__label">Receivers</span></div>
+<div class="sf-flow__box"><span class="sf-flow__n">03</span><span class="sf-flow__label">Parse · Drain3</span></div>
+<div class="sf-flow__box"><span class="sf-flow__n">04</span><span class="sf-flow__label">Entities</span></div>
+<div class="sf-flow__box"><span class="sf-flow__n">05</span><span class="sf-flow__label">Detect</span></div>
+<div class="sf-flow__box"><span class="sf-flow__n">06</span><span class="sf-flow__label">Correlate</span></div>
+<div class="sf-flow__box is-accent"><span class="sf-flow__n">07</span><span class="sf-flow__label">Alert</span></div>
+</div>
+<p class="sf-flow__feedback"><span class="sf-loop">↺</span> Feedback: alert outcomes tune detector thresholds</p>
+</div>
 
 | Component | Purpose |
 |-----------|---------|
