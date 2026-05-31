@@ -71,7 +71,7 @@
 .md-header__title .md-header__ellipsis { display: flex; align-items: center; }
 .md-header__title .md-header__topic { position: static; display: flex; align-items: center;
   opacity: 1; transform: none; pointer-events: auto; }
-.sf-wordmark { font-family: var(--font-display); font-weight: 600; font-size: 1.02rem;
+.sf-wordmark { font-family: var(--font-mono); font-weight: 700; font-size: 1rem;
   letter-spacing: -0.01em; color: var(--text); }
 .sf-guide-eyebrow { font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.14em;
   font-size: 11px; color: var(--text-3);
