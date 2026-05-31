@@ -36,9 +36,7 @@
       {% endif %}
     {% endif %}
     <div class="sf-header-links">
-      {% if config.extra.homepage %}
-        <a class="sf-header-link" href="https://seerflow.dev" target="_blank" rel="noopener">seerflow.dev&nbsp;↗</a>
-      {% endif %}
+      <a class="sf-header-link" href="https://seerflow.dev" target="_blank" rel="noopener">seerflow.dev&nbsp;↗</a>
       {% if config.repo_url %}
         <a class="sf-header-link" href="{{ config.repo_url }}" target="_blank" rel="noopener">GitHub&nbsp;↗</a>
       {% endif %}
@@ -61,3 +59,15 @@
     {% endif %}
   {% endif %}
 </header>
+<script>
+  (function () {
+    var want = "Search the guide";
+    function setPh() {
+      var i = document.querySelector(".md-search__input");
+      if (i && i.placeholder !== want) i.placeholder = want;
+    }
+    document.addEventListener("DOMContentLoaded", setPh);
+    setPh();
+    var n = 0, t = setInterval(function () { setPh(); if (++n > 20) clearInterval(t); }, 200);
+  })();
+</script>

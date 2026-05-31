@@ -42,20 +42,19 @@ Running infrastructure and want log intelligence?
 
 ## How Seerflow works
 
-Logs flow through a streaming pipeline. Each stage adds context: raw lines become structured
-events, events resolve to entities, entities accrue risk, and risk crosses thresholds into alerts.
+Eight stages, one process. Feedback from analyst response loops back into the detection thresholds.
 
 <div class="sf-flow">
 <div class="sf-flow__row">
-<div class="sf-flow__box"><span class="sf-flow__n">01</span><span class="sf-flow__label">Sources</span></div>
-<div class="sf-flow__box"><span class="sf-flow__n">02</span><span class="sf-flow__label">Receivers</span></div>
-<div class="sf-flow__box"><span class="sf-flow__n">03</span><span class="sf-flow__label">Parse · Drain3</span></div>
-<div class="sf-flow__box"><span class="sf-flow__n">04</span><span class="sf-flow__label">Entities</span></div>
-<div class="sf-flow__box"><span class="sf-flow__n">05</span><span class="sf-flow__label">Detect</span></div>
-<div class="sf-flow__box"><span class="sf-flow__n">06</span><span class="sf-flow__label">Correlate</span></div>
-<div class="sf-flow__box is-accent"><span class="sf-flow__n">07</span><span class="sf-flow__label">Alert</span></div>
+<div class="sf-flow__box"><span class="sf-flow__n">A</span><span class="sf-flow__label">Log Sources</span></div>
+<div class="sf-flow__box"><span class="sf-flow__n">B</span><span class="sf-flow__label">Receivers</span></div>
+<div class="sf-flow__box"><span class="sf-flow__n">C</span><span class="sf-flow__label">Parsing · Drain3</span></div>
+<div class="sf-flow__box"><span class="sf-flow__n">D</span><span class="sf-flow__label">Entity Extraction</span></div>
+<div class="sf-flow__box"><span class="sf-flow__n">E</span><span class="sf-flow__label">Detection Ensemble</span></div>
+<div class="sf-flow__box"><span class="sf-flow__n">F</span><span class="sf-flow__label">Correlation Engine</span></div>
+<div class="sf-flow__box"><span class="sf-flow__n">G</span><span class="sf-flow__label">Alerting</span></div>
 </div>
-<p class="sf-flow__feedback"><span class="sf-loop">↺</span> Feedback: alert outcomes tune detector thresholds</p>
+<p class="sf-flow__feedback">Feedback loop H · Threshold adjustment <span class="sf-loop">↩</span></p>
 </div>
 
 | Component | Purpose |
