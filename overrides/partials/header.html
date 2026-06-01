@@ -69,5 +69,14 @@
     document.addEventListener("DOMContentLoaded", setPh);
     setPh();
     var n = 0, t = setInterval(function () { setPh(); if (++n > 20) clearInterval(t); }, 200);
+    document.addEventListener("keydown", function (e) {
+      if ((e.metaKey || e.ctrlKey) && (e.key === "k" || e.key === "K")) {
+        e.preventDefault();
+        var box = document.getElementById("__search");
+        if (box) { box.checked = true; }
+        var inp = document.querySelector(".md-search__input");
+        if (inp) { inp.focus(); }
+      }
+    });
   })();
 </script>

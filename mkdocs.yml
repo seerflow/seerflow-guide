@@ -18,15 +18,15 @@ theme:
       primary: custom
       accent: custom
       toggle:
-        icon: material/brightness-4
-        name: Switch to light mode
+        icon: material/weather-night
+        name: Dark mode
     - media: "(prefers-color-scheme: light)"
       scheme: default
       primary: custom
       accent: custom
       toggle:
-        icon: material/brightness-7
-        name: Switch to dark mode
+        icon: material/white-balance-sunny
+        name: Light mode
   features:
     - navigation.sections
     - navigation.expand
