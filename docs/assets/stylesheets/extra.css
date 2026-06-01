@@ -98,7 +98,8 @@
   .md-search__form:hover { background: var(--surface-2); }
   .md-search__input { font-size: 12.5px; height: 28px; padding-left: 2rem; }
   .md-search__input::placeholder { color: var(--text-3); }
-  .md-search__icon[for="__search"] { color: var(--text-3); width: .9rem; height: .9rem; top: .35rem; left: .55rem; }
+  .md-search__icon[for="__search"] { color: var(--text-3); width: 1rem; height: 1rem; top: 7px; left: 9px; }
+  .md-search__icon[for="__search"] svg { width: 14px; height: 14px; }
   /* expanded query: overlay leftward instead of pushing links off-screen */
   [data-md-toggle="search"]:checked ~ .md-header .md-search__form { width: 26rem; position: relative; z-index: 3; }
   [data-md-toggle="search"]:checked ~ .md-header .md-search { overflow: visible; }
