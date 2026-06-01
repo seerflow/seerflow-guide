@@ -26,13 +26,15 @@
   {% endif %}
 
   {% if config.repo_url and page and page.file %}
+    {#- Docs live in the guide repo, not the product repo (config.repo_url). -#}
+    {% set docs_repo = "https://github.com/seerflow/seerflow-guide" %}
     {% set src = "docs/" ~ page.file.src_uri %}
     <div class="sf-rail">
       <div class="sf-rail__title">Contribute</div>
       <ul class="sf-rail__list">
-        <li><a href="{{ config.repo_url }}/edit/main/{{ src }}" target="_blank" rel="noopener">Edit this page <span class="sf-rail__ext">↗</span></a></li>
-        <li><a href="{{ config.repo_url }}/issues/new" target="_blank" rel="noopener">Report an issue <span class="sf-rail__ext">↗</span></a></li>
-        <li><a href="{{ config.repo_url }}/blob/main/{{ src }}" target="_blank" rel="noopener">View source <span class="sf-rail__ext">↗</span></a></li>
+        <li><a href="{{ docs_repo }}/edit/main/{{ src }}" target="_blank" rel="noopener">Edit this page <span class="sf-rail__ext">↗</span></a></li>
+        <li><a href="{{ docs_repo }}/issues/new" target="_blank" rel="noopener">Report an issue <span class="sf-rail__ext">↗</span></a></li>
+        <li><a href="{{ docs_repo }}/blob/main/{{ src }}" target="_blank" rel="noopener">View source <span class="sf-rail__ext">↗</span></a></li>
       </ul>
     </div>
     <div class="sf-rail">
