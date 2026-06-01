@@ -1,0 +1,45 @@
+{#-
+  Forked from Material's partials/toc.html to append the brand secondary-rail
+  blocks from the mockup: CONTRIBUTE (edit / report / view source) and
+  REPOSITORY, shown under the table of contents.
+-#}
+{% set title = lang.t("toc") %}
+{% if config.mdx_configs.toc and config.mdx_configs.toc.title %}
+  {% set title = config.mdx_configs.toc.title %}
+{% endif %}
+<nav class="md-nav md-nav--secondary" aria-label="{{ title | e }}">
+  {% set toc = page.toc %}
+  {% set first = toc | first %}
+  {% if first and first.level == 1 %}
+    {% set toc = first.children %}
+  {% endif %}
+  {% if toc %}
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      {{ title }}
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      {% for toc_item in toc %}
+        {% include "partials/toc-item.html" %}
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  {% if config.repo_url and page and page.file %}
+    {% set src = "docs/" ~ page.file.src_uri %}
+    <div class="sf-rail">
+      <div class="sf-rail__title">Contribute</div>
+      <ul class="sf-rail__list">
+        <li><a href="{{ config.repo_url }}/edit/main/{{ src }}" target="_blank" rel="noopener">Edit this page <span class="sf-rail__ext">↗</span></a></li>
+        <li><a href="{{ config.repo_url }}/issues/new" target="_blank" rel="noopener">Report an issue <span class="sf-rail__ext">↗</span></a></li>
+        <li><a href="{{ config.repo_url }}/blob/main/{{ src }}" target="_blank" rel="noopener">View source <span class="sf-rail__ext">↗</span></a></li>
+      </ul>
+    </div>
+    <div class="sf-rail">
+      <div class="sf-rail__title">Repository</div>
+      <ul class="sf-rail__list">
+        <li><a class="sf-rail__repo" href="{{ config.repo_url }}" target="_blank" rel="noopener">{{ config.repo_name | d("seerflow/seerflow", true) }} <span class="sf-rail__ext">↗</span></a></li>
+      </ul>
+    </div>
+  {% endif %}
+</nav>

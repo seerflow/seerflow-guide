@@ -60,6 +60,9 @@
   .md-sidebar--primary { width: 17rem; }
   .md-sidebar--secondary { width: 15.5rem; }
 }
+/* mockup rails have no visible scrollbar track */
+.md-sidebar__scrollwrap { scrollbar-width: none; }
+.md-sidebar__scrollwrap::-webkit-scrollbar { width: 0; height: 0; }
 
 /* ===== Header (52px, matches Dashboard mockup Topbar) ======== */
 .md-header { background: color-mix(in oklch, var(--bg) 88%, transparent);
@@ -83,9 +86,17 @@
 .sf-header-links { display: flex; align-items: center; gap: 16px; margin: 0 14px; }
 .sf-header-link { font-size: 12.5px; color: var(--text-2); text-decoration: none; white-space: nowrap; }
 .sf-header-link:hover { color: var(--accent); }
-/* palette toggle on the far right */
-.md-header [data-md-component="palette"] { color: var(--text-2); }
-.md-header [data-md-component="palette"] .md-header__button:hover { color: var(--accent); }
+/* palette toggle = two-button moon/sun pill (mockup SFThemeToggle) */
+.md-header .sf-palette { display: inline-flex; align-items: center; gap: 0; padding: 3px;
+  height: 30px; box-sizing: border-box; margin-left: 6px; margin-right: .25rem;
+  border: 1px solid var(--line); background: var(--surface); }
+.sf-palette input { position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none; }
+.sf-palette .sf-palette__btn { display: inline-flex; align-items: center; justify-content: center;
+  width: auto; height: 22px; padding: 0 9px; margin: 0; border-radius: 0; cursor: pointer;
+  color: var(--text-3); background: transparent; transition: color .12s, background .12s; }
+.sf-palette .sf-palette__btn svg { width: 14px; height: 14px; }
+.sf-palette .sf-palette__btn:hover { color: var(--text); }
+.sf-palette input:checked + .sf-palette__btn { background: var(--surface-2); color: var(--text); }
 @media screen and (max-width: 76.1875em) {
   .sf-guide-eyebrow, .sf-header-links { display: none; }
 }
@@ -100,9 +111,16 @@
   .md-search__input::placeholder { color: var(--text-3); }
   .md-search__icon[for="__search"] { color: var(--text-3); width: 1rem; height: 1rem; top: 7px; left: 9px; }
   .md-search__icon[for="__search"] svg { width: 14px; height: 14px; }
+  /* ⌘K hint pinned right of the resting field (mockup DBTopbar) */
+  .md-search__form { position: relative; }
+  .md-search__input { padding-right: 2.4rem; }
+  .md-search__form::after { content: "⌘K"; position: absolute; right: 9px; top: 50%;
+    transform: translateY(-50%); font-family: var(--font-mono); font-size: 10.5px;
+    color: var(--text-3); pointer-events: none; z-index: 2; }
   /* expanded query: overlay leftward instead of pushing links off-screen */
   [data-md-toggle="search"]:checked ~ .md-header .md-search__form { width: 26rem; position: relative; z-index: 3; }
   [data-md-toggle="search"]:checked ~ .md-header .md-search { overflow: visible; }
+  [data-md-toggle="search"]:checked ~ .md-header .md-search__form::after { display: none; }
 }
 .md-search__form { background: var(--surface); border: 1px solid var(--line); border-radius: 0; }
 .md-search__input { color: var(--text); }
@@ -147,6 +165,16 @@
 .md-nav--secondary .md-nav__link { font-size: 12.5px; color: var(--text-2);
   border-left: 2px solid var(--line); padding: 2px 0 2px 12px; }
 .md-nav--secondary .md-nav__link--active { color: var(--text); font-weight: 500; border-left-color: var(--accent); }
+/* contribute / repository rails appended under the TOC (mockup) */
+.sf-rail { border-top: 1px solid var(--line); margin-top: 28px; padding-top: 20px; }
+.sf-rail__title { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--text-3); margin-bottom: 12px; }
+.sf-rail__list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.md-typeset .sf-rail__list li { margin: 0; font-size: 12.5px; }
+.sf-rail__list a { color: var(--text-2); text-decoration: none; font-size: 12.5px; }
+.sf-rail__list a:hover { color: var(--accent); }
+.sf-rail__ext { color: var(--text-3); }
+.sf-rail__repo { font-family: var(--font-mono); font-size: 11px; color: var(--accent); }
 
 /* ===== Type scale (mockup px) ================================ */
 .md-typeset h1 { font-size: clamp(2rem, 4.5vw, 3rem); font-weight: 600; letter-spacing: -0.03em;
@@ -266,6 +294,11 @@ pre.mermaid .messageText, pre.mermaid .noteText, pre.mermaid text.actor { font-s
   letter-spacing: -0.02em; margin: 8px 0 2px; }
 .md-typeset .sf-card p { font-size: 13px; line-height: 1.6; color: var(--text-3); margin: 4px 0 0; max-width: none; }
 .sf-grid.cols-3 .sf-card .sf-card-title { font-size: 16px; }
+/* card reading-path lists: bold term (not an indigo link) + muted description */
+.md-typeset .sf-card ol { margin: 20px 0 0; padding-left: 22px; max-width: none; }
+.md-typeset .sf-card ol li { font-size: 13.5px; line-height: 1.85; color: var(--text-2); }
+.md-typeset .sf-card ol a { color: var(--text); font-weight: 600; text-decoration: none; }
+.md-typeset .sf-card ol a:hover { color: var(--accent); text-decoration: none; }
 
 /* Badges */
 .sf-badge { display: inline-flex; align-items: center; gap: .35em; font-family: var(--font-mono);

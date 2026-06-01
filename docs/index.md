@@ -15,12 +15,14 @@ with LLMs for edge cases and root cause analysis.
 
 ## Who is this guide for?
 
+Two reading paths — pick yours. Both end at the same place: a well-tuned Seerflow in production.
+
 <div class="sf-grid cols-2" markdown>
 <div class="sf-card" markdown>
 <span class="sf-card-label">Path 01</span>
 <span class="sf-card-title">Security Operator</span>
 
-Deploying or tuning Seerflow? Go here:
+Deploying or tuning Seerflow.
 
 1. [Architecture](architecture/index.md) — pipeline and data flow
 2. [Detection Deep Dives](detection/index.md) — understand each detector
@@ -31,7 +33,7 @@ Deploying or tuning Seerflow? Go here:
 <span class="sf-card-label">Path 02</span>
 <span class="sf-card-title">SRE / DevOps</span>
 
-Running infrastructure and want log intelligence?
+Running infra and wanting log intelligence.
 
 1. [Ops Primer](ops-primer/index.md) — operational intelligence concepts
 2. [Architecture](architecture/index.md) — how Seerflow processes logs

@@ -1,0 +1,19 @@
+{#-
+  Forked from Material's partials/palette.html for the brand two-button pill:
+  both moon (dark) and sun (light) visible side by side in one bordered box,
+  the active scheme highlighted. Each label targets its OWN input so a click
+  selects that scheme directly (Material's stock partial cycles to the next).
+-#}
+<form class="md-header__option sf-palette" data-md-component="palette">
+  {% for option in config.theme.palette %}
+    {% set scheme  = option.scheme  | d("default", true) %}
+    {% set primary = option.primary | d("indigo", true) %}
+    {% set accent  = option.accent  | d("indigo", true) %}
+    <input class="md-option" data-md-color-media="{{ option.media }}" data-md-color-scheme="{{ scheme | replace(' ', '-') }}" data-md-color-primary="{{ primary | replace(' ', '-') }}" data-md-color-accent="{{ accent | replace(' ', '-') }}" {% if option.toggle %} aria-label="{{ option.toggle.name }}" {% else %} aria-hidden="true" {% endif %} type="radio" name="__palette" id="__palette_{{ loop.index0 }}">
+    {% if option.toggle %}
+      <label class="sf-palette__btn md-icon" title="{{ option.toggle.name }}" for="__palette_{{ loop.index0 }}">
+        {% include ".icons/" ~ option.toggle.icon ~ ".svg" %}
+      </label>
+    {% endif %}
+  {% endfor %}
+</form>
