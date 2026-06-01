@@ -92,14 +92,16 @@
 
 /* ===== Search box (mockup DBTopbar: compact ~200px field, 30px tall) === */
 @media screen and (min-width: 60em) {
-  .md-search { padding: 0; }
+  .md-search { padding: 0; width: 12rem; margin-right: .75rem; }
   .md-search__form { background: var(--surface); border: 1px solid var(--line); border-radius: 0;
-    width: 13rem; height: 30px; transition: width .2s, background .2s; }
+    width: 100%; height: 30px; transition: background .2s; }
   .md-search__form:hover { background: var(--surface-2); }
-  [data-md-toggle="search"]:checked ~ .md-header .md-search__form { width: 22rem; background: var(--surface); }
   .md-search__input { font-size: 12.5px; height: 28px; padding-left: 2rem; }
   .md-search__input::placeholder { color: var(--text-3); }
   .md-search__icon[for="__search"] { color: var(--text-3); width: .9rem; height: .9rem; top: .35rem; left: .55rem; }
+  /* expanded query: overlay leftward instead of pushing links off-screen */
+  [data-md-toggle="search"]:checked ~ .md-header .md-search__form { width: 26rem; position: relative; z-index: 3; }
+  [data-md-toggle="search"]:checked ~ .md-header .md-search { overflow: visible; }
 }
 .md-search__form { background: var(--surface); border: 1px solid var(--line); border-radius: 0; }
 .md-search__input { color: var(--text); }
