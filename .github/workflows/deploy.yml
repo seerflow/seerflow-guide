@@ -31,7 +31,11 @@ jobs:
       - name: Check links
         uses: lycheeverse/lychee-action@v2
         with:
-          args: --no-progress --root-dir site/ --exclude 'docs\.seerflow\.dev' site/
+          # The action does not auto-read .lychee.toml, so pass accept codes
+          # explicitly. 429 = GitHub rate-limiting the per-page Contribute-rail
+          # edit/blob URLs (~70 unique requests/build) — not broken links;
+          # genuine 404s still fail. Lower concurrency to reduce throttling.
+          args: --no-progress --max-concurrency 4 --accept '200,204,206,301,302,304,308,403,429' --root-dir site/ --exclude 'docs\.seerflow\.dev' site/
           fail: true
 
       - name: Upload artifact
