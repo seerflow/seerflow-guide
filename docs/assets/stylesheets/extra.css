@@ -253,10 +253,12 @@
    the boxed inline-code wraps awkwardly and reads busy in dense tables */
 .md-typeset table:not([class]) :is(td, th) code {
   background: transparent; border: 0; padding: 0; color: var(--text); font-size: 12px; }
-/* in-table links = indigo mono reference, no underline, no pill (mockup) */
-.md-typeset table:not([class]) td a { color: var(--accent); text-decoration: none; }
-.md-typeset table:not([class]) td a:hover { color: var(--accent-2); }
-.md-typeset table:not([class]) td a code { color: var(--accent); }
+/* in-table links, no underline/pill (mockup): plain-text links read as bold
+   white page refs; code-wrapped links (config identifiers) stay indigo mono */
+.md-typeset table:not([class]) td a { color: var(--text); font-weight: 600; text-decoration: none; }
+.md-typeset table:not([class]) td a:hover { color: var(--accent); }
+.md-typeset table:not([class]) td a code { color: var(--accent); font-weight: 400; }
+.md-typeset table:not([class]) td a:hover code { color: var(--accent-2); }
 
 /* ===== Tabbed =============================================== */
 .md-typeset .tabbed-set > label { font-family: var(--font-mono); font-size: 12px;
@@ -356,4 +358,24 @@ pre.mermaid .messageText, pre.mermaid .noteText, pre.mermaid text.actor { font-s
   .sf-flow__row { grid-template-columns: repeat(2, 1fr); gap: 10px; }
   .sf-flow__box:not(:last-child)::after { display: none; }
   .md-typeset .sf-flow__feedback { justify-content: flex-start; }
+}
+
+/* ===== Attacker-path timeline (mockup "THE ATTACKER'S PATH · 7 STAGES") = */
+.md-typeset .sf-stages { border: 1px solid var(--line); background: var(--surface);
+  padding: 24px 26px; margin: 16px 0 22px; max-width: none; }
+.sf-stages__title { display: block; font-family: var(--font-mono); font-size: 10.5px;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-3); margin-bottom: 12px; }
+.sf-stages__row { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0; }
+.sf-stage { padding: 10px 8px 12px; border-right: 1px solid var(--line); }
+.sf-stage:last-child { border-right: 0; }
+.sf-stage__t { display: block; font-family: var(--font-mono); font-size: 9.5px;
+  letter-spacing: 0.08em; color: var(--accent); }
+.sf-stage__l { display: block; font-size: 12px; font-weight: 500; color: var(--text);
+  margin-top: 6px; letter-spacing: -0.005em; }
+.sf-stage__d { display: block; font-family: var(--font-mono); font-size: 10px;
+  color: var(--text-3); margin-top: 3px; line-height: 1.45; }
+@media screen and (max-width: 60em) {
+  .sf-stages__row { grid-template-columns: repeat(2, 1fr); }
+  .sf-stage { border-bottom: 1px solid var(--line); }
+  .sf-stage:nth-child(2n) { border-right: 0; }
 }
