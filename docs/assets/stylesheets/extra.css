@@ -379,3 +379,25 @@ pre.mermaid .messageText, pre.mermaid .noteText, pre.mermaid text.actor { font-s
   .sf-stage { border-bottom: 1px solid var(--line); }
   .sf-stage:nth-child(2n) { border-right: 0; }
 }
+
+/* ===== Detection "How It Works" flow (mockup FlowBox 3-tier) ====== */
+.md-typeset .sf-dflow { border: 1px solid var(--line); background: var(--surface);
+  padding: 30px 26px; margin: 12px 0 22px; max-width: none; }
+.sf-dflow__row { display: flex; align-items: stretch; gap: 10px; }
+.sf-dflow__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.md-typeset .sf-dflow__down { text-align: center; color: var(--text-3); margin: 14px 0; }
+.sf-dflow__arr { display: flex; align-items: center; color: var(--text-3); font-size: 14px; flex-shrink: 0; }
+.sf-dbox { flex: 1; border: 1px solid var(--line-2); background: var(--bg); padding: 12px 14px; text-align: center; }
+.sf-dbox.is-accent { border-color: var(--accent); }
+.sf-dbox__id { display: block; font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.1em; color: var(--text-3); }
+.sf-dbox.is-accent .sf-dbox__id { color: var(--accent); }
+.sf-dbox__l { display: block; font-size: 12.5px; color: var(--text); margin-top: 4px; font-weight: 500; letter-spacing: -0.005em; }
+.sf-dflow__grid .sf-dbox__l { font-weight: 600; }
+.sf-dbox__k { display: block; font-family: var(--font-mono); font-size: 10px; color: var(--accent); margin-top: 3px; letter-spacing: 0.06em; }
+@media screen and (max-width: 60em) {
+  .sf-dflow__row, .sf-dflow__grid { flex-wrap: wrap; grid-template-columns: repeat(2, 1fr); }
+}
+
+/* scenario card caption (mockup detection running-scenarios note) */
+.md-typeset .sf-scenarios__note { font-family: var(--font-mono); font-size: 11px;
+  color: var(--text-3); margin: 8px 0 0; }

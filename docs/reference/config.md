@@ -738,6 +738,9 @@ interpolation. Interpolation happens at load time, before validation.
           min_severity: 3
     ```
 
+!!! warning "Secrets"
+    Never commit plaintext credentials. Every secret-bearing string (PostgreSQL URL, Slack webhook, PagerDuty key, SMTP password, Twilio token, …) should be referenced via `${ENV_VAR}` interpolation, never hardcoded in `seerflow.yaml`.
+
 ---
 
 ## Configuration Examples
