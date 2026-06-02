@@ -48,7 +48,7 @@ graph LR
     SSH["SSH log:<br/><i>Failed password for alice</i>"] --> N((alice<br/><small>uuid5: a1b2...c3d4</small>))
     SUDO["sudo log:<br/><i>alice ran apt install</i>"] --> N
     WEB["web log:<br/><i>alice accessed /admin</i>"] --> N
-    style N fill:#4285f4,color:#fff
+    style N fill:#5546bd,color:#fff
 ```
 
 ### Username Normalization

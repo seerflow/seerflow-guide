@@ -58,7 +58,7 @@ graph LR
     C[api-gateway] --> D
     E[batch-job] --> D
     F[monitoring] --> D
-    style D fill:#4285f4,color:#fff
+    style D fill:#5546bd,color:#fff
 ```
 
 `prod-db` has high PageRank because five different services point to it. The more incoming connections from important nodes, the higher the score.
@@ -112,7 +112,7 @@ Community crossing is Seerflow's most intuitive graph-structural alert: *this en
         H --> T4[target-4]
         H --> T5[target-5]
         H --> T6[target-6]
-        style H fill:#e53935,color:#fff
+        style H fill:#d41824,color:#fff
     ```
 
     One node reaching many targets — could be port scanning or credential spraying.
@@ -126,7 +126,7 @@ Community crossing is Seerflow's most intuitive graph-structural alert: *this en
         S3[10.0.0.5] --> T
         S4[172.16.0.8] --> T
         S5[185.220.1.9] --> T
-        style T fill:#fa7b17,color:#fff
+        style T fill:#ad5300,color:#fff
     ```
 
     Many nodes reaching one target — could be distributed brute force.
@@ -174,12 +174,12 @@ graph LR
     A3 -->|scan| T3[target-3]
     A3 -->|scan| T4[target-4]
 
-    style A1 fill:#e53935,color:#fff
-    style A2 fill:#e53935,color:#fff
-    style A3 fill:#e53935,color:#fff
+    style A1 fill:#d41824,color:#fff
+    style A2 fill:#d41824,color:#fff
+    style A3 fill:#d41824,color:#fff
 
-    linkStyle 4 stroke:#e53935,stroke-width:3
-    linkStyle 5 stroke:#e53935,stroke-width:3
+    linkStyle 4 stroke:#d41824,stroke-width:3
+    linkStyle 5 stroke:#d41824,stroke-width:3
 ```
 
 - **alice** crosses from dev into production → community crossing alert
@@ -233,7 +233,7 @@ For the full configuration reference, see [Configuration Reference →](../refer
 
 Explore a simulated Seerflow entity graph. Click nodes to see entity details, use the dropdown to switch between scenarios, and toggle entity types with the checkboxes.
 
-<iframe src="../assets/entity-graph-explorer.html" width="100%" height="700" style="border: 1px solid var(--md-default-fg-color--lightest); border-radius: 8px;" loading="lazy"></iframe>
+<iframe src="../assets/entity-graph-explorer.html" width="100%" height="700" style="border: 1px solid var(--sf-line, var(--md-default-fg-color--lightest)); border-radius: 0;" loading="lazy"></iframe>
 
 **Scenarios:**
 
