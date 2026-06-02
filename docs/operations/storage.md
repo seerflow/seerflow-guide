@@ -35,8 +35,8 @@ flowchart TB
     EntityStore -.-> PG
     GraphStore -.-> PG
 
-    style SQLite fill:#3b82f6,color:#fff,stroke:#60a5fa
-    style PG fill:#6b7280,color:#fff,stroke:#9ca3af,stroke-dasharray:5 5
+    style SQLite fill:#5546bd,color:#fff,stroke:#7c79d7
+    style PG fill:#444a4f,color:#fff,stroke:#82878c,stroke-dasharray:5 5
 ```
 
 One config line switches the event/alert/model/entity stores at once:

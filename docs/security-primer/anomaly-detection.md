@@ -68,8 +68,8 @@ graph TD
     E --> F["<b>Blended Score</b><br/>0.0 – 1.0"]
     F --> G["<b>Alert</b><br/>Webhook · PagerDuty"]:::alert
 
-    classDef input fill:#2e7d32,stroke:#1b5e20,color:#fff
-    classDef alert fill:#c62828,stroke:#b71c1c,color:#fff
+    classDef input fill:#402aa1,stroke:#2f1f78,color:#fff
+    classDef alert fill:#d41824,stroke:#a01018,color:#fff
 ```
 
 ### What each stage does

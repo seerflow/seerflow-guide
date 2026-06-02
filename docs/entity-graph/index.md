@@ -85,7 +85,7 @@ graph LR
     H1 -->|has_ip| IP[10.0.0.5]
     IP -->|has_ip| H2[db-primary]
     P[reverse-shell] -->|spawned_on| H2
-    style P fill:#e53935,color:#fff
+    style P fill:#d41824,color:#fff
 ```
 
 Individual events are data points; the graph reveals **patterns** — lateral movement, privilege escalation, data exfiltration — that only emerge when you see relationships across events.

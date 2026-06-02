@@ -47,8 +47,8 @@ graph LR
     D["nginx-lb<br/><small>p99 latency 2s</small>"]:::alert --> A
     E["pod-api-7f3a<br/><small>OOM killed</small>"]:::alert --> A
 
-    classDef alert fill:#c62828,stroke:#b71c1c,color:#fff
-    classDef normal fill:#2e7d32,stroke:#1b5e20,color:#fff
+    classDef alert fill:#d41824,stroke:#a01018,color:#fff
+    classDef normal fill:#402aa1,stroke:#2f1f78,color:#fff
 ```
 
 Four nodes in alert state, all connected through `api-gateway`. One node (`redis-cache`) is healthy --- which is itself useful information --- it narrows the problem to the database path. The graph makes this visible at a glance.

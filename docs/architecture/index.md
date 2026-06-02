@@ -41,12 +41,12 @@ graph TD
 
     A ==> B ==> C ==> D ==> E ==> F
 
-    style A fill:#1565c0,stroke:#0d47a1,color:#fff
-    style B fill:#e65100,stroke:#bf360c,color:#fff
-    style C fill:#6a1b9a,stroke:#4a148c,color:#fff
-    style D fill:#2e7d32,stroke:#1b5e20,color:#fff
-    style E fill:#c62828,stroke:#b71c1c,color:#fff
-    style F fill:#f57f17,stroke:#e65100,color:#fff
+    style A fill:#5546bd,stroke:#402aa1,color:#fff
+    style B fill:#ad5300,stroke:#804000,color:#fff
+    style C fill:#402aa1,stroke:#2f1f78,color:#fff
+    style D fill:#402aa1,stroke:#2f1f78,color:#fff
+    style E fill:#d41824,stroke:#a01018,color:#fff
+    style F fill:#ad5300,stroke:#ad5300,color:#fff
 ```
 
 - **Receivers** ingest logs from syslog servers (`auth.log`, `kern.log`), application log files (`/var/log/*.log`), OpenTelemetry Collectors (forwarding CloudWatch, GCP Logging, Azure Monitor), and webhook endpoints (GitHub, Kubernetes, custom apps). A bounded asyncio queue (10,000 events max) absorbs bursts and applies backpressure at 80% utilization.

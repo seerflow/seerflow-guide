@@ -32,7 +32,7 @@ flowchart TD
     Start --> Performance{High memory<br/>or CPU?}
     Performance -->|Yes| PerfTune[Tune LRU caps<br/>and score_interval]
 
-    classDef action fill:#10b981,stroke:#059669,color:#fff
+    classDef action fill:#402aa1,stroke:#402aa1,color:#fff
     class Detector,Dedup,DspotRisk,Feedback,Correlation,Weights,PerfTune action
 ```
 

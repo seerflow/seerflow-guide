@@ -129,9 +129,9 @@ graph TD
     S2 -->|No| NM
     C -->|Both matched| A["ALERT: Privileged User<br/>Has Been Created<br/>Severity: HIGH"]:::alert
 
-    classDef input fill:#e3f2fd,stroke:#1565c0,color:#0d47a1
-    classDef alert fill:#c62828,stroke:#b71c1c,color:#fff
-    classDef skip fill:#e0e0e0,stroke:#9e9e9e,color:#616161
+    classDef input fill:#eae9e6,stroke:#5546bd,color:#402aa1
+    classDef alert fill:#d41824,stroke:#a01018,color:#fff
+    classDef skip fill:#eae9e6,stroke:#82878c,color:#62676c
 ```
 
 The result is a **high-severity alert**: "Privileged User Has Been Created." Because the rule carries ATT&CK tags, the alert automatically inherits those classifications — Privilege Escalation, Persistence, T1136.001, T1098. Downstream systems (and humans) immediately know what category of attack behavior this represents.
