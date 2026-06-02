@@ -319,6 +319,11 @@ pre.mermaid .messageText, pre.mermaid .noteText, pre.mermaid text.actor { font-s
 .md-typeset .sf-btn.primary { background: var(--accent); color: var(--accent-ink); font-weight: 600; }
 .md-typeset .sf-btn.primary:hover { background: var(--accent-2); color: var(--accent-ink); }
 .md-typeset .sf-btn.secondary { background: transparent; color: var(--text); border-color: var(--line-2); }
+/* outlined indigo (mockup Source-code link): transparent bg, accent border+text */
+.md-typeset .sf-btn.outline { background: transparent; color: var(--accent); border-color: var(--accent);
+  font-size: 13.5px; text-decoration: none; }
+.md-typeset .sf-btn.outline:hover { background: color-mix(in oklch, var(--accent) 12%, transparent);
+  color: var(--accent); }
 
 /* ===== Home pipeline diagram (mockup FlowBox) =============== */
 .md-typeset .sf-flow { border: 1px solid var(--line); background: var(--surface);
