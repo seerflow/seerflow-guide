@@ -2,32 +2,53 @@
 
 Seerflow runs multiple streaming ML detectors in parallel — each catching a different type of anomaly (content novelty, volume deviation, mean shifts, sequence anomalies). Their scores are blended via weighted average and tested against an adaptive EVT-based threshold.
 
-!!! example "Security: Compromised Service Account"
-    A stolen `svc-deploy` credential is used for lateral movement. Each detector catches a different aspect: HST flags novel SSH patterns, Holt-Winters catches the 3 AM volume spike, CUSUM detects the sustained auth failure shift, and Markov flags the impossible command sequence. Follow this scenario through each detector's deep-dive page to see how the ensemble provides defense in depth.
+<div class="sf-grid cols-2" markdown>
+<div class="sf-card" markdown>
+<span class="sf-card-label">Security</span>
+<span class="sf-card-title">Compromised Service Account</span>
 
-!!! example "Operations: Memory Leak Cascade"
-    A v2.3.1 deploy introduces a memory leak → OOM kills → connection pool exhaustion → cascading timeouts. HST flags novel stack traces, Holt-Winters catches connection count divergence, CUSUM detects the error rate shift, and Markov flags abnormal restart sequences. Follow this scenario through each page to see how multiple signals converge.
+A stolen `svc-deploy` credential is used for lateral movement. Each detector catches a different aspect: HST flags novel SSH patterns, Holt-Winters catches the 3 AM volume spike, CUSUM detects the sustained auth-failure shift, and Markov flags the impossible command sequence.
+</div>
+<div class="sf-card" markdown>
+<span class="sf-card-label">Operations</span>
+<span class="sf-card-title">Memory Leak Cascade</span>
+
+A v2.3.1 deploy introduces a memory leak → OOM kills → connection-pool exhaustion → cascading timeouts. HST flags novel stack traces, Holt-Winters catches connection-count divergence, CUSUM detects the error-rate shift, and Markov flags abnormal restart sequences.
+</div>
+</div>
+
+<p class="sf-scenarios__note">Follow either scenario through each detector's deep-dive page to see how the ensemble provides defense in depth.</p>
 
 ## How It Works
 
-```mermaid
-flowchart LR
-    E[SeerflowEvent] --> D3[Drain3\nTemplate]
-    D3 --> FE[Feature\nExtraction]
-    FE --> HST[HST\nContent]
-    FE --> HW[Holt-Winters\nVolume]
-    FE --> CU[CUSUM\nChange-point]
-    FE --> MK[Markov\nSequence]
-    HST --> BL[Blended\nScore]
-    HW --> BL
-    CU --> BL
-    MK --> BL
-    BL --> DS[DSPOT\nThreshold]
-    DS -->|Exceeds| AL[Alert]
-    DS -->|Normal| NR[No Alert]
-```
+Each `SeerflowEvent` is first parsed by Drain3 into a log template, then numeric features are extracted from that template and the surrounding context. Four detectors score the event **independently and in parallel** — each watching a different signal type.
 
-Each `SeerflowEvent` is first parsed by Drain3 into a log template, then numeric features are extracted from that template and the surrounding context. Four detectors score the event **independently and in parallel** — each watching a different signal type. Their raw scores are z-score normalized using a per-detector Welford online accumulator, then combined into a single blended score via weighted average. When two or more detectors converge (all flagging elevated z-scores at the same time), the blended score is amplified — 1.5× when at least half converge, 2× when at least two-thirds converge. Finally, DSPOT applies an EVT-derived adaptive threshold to decide whether the blended score constitutes an anomaly.
+<div class="sf-dflow">
+<div class="sf-dflow__row">
+<div class="sf-dbox"><span class="sf-dbox__id">EV</span><span class="sf-dbox__l">SeerflowEvent</span></div>
+<span class="sf-dflow__arr">→</span>
+<div class="sf-dbox"><span class="sf-dbox__id">D3</span><span class="sf-dbox__l">Drain3 Template</span></div>
+<span class="sf-dflow__arr">→</span>
+<div class="sf-dbox"><span class="sf-dbox__id">FE</span><span class="sf-dbox__l">Feature Extraction</span></div>
+</div>
+<div class="sf-dflow__down">↓</div>
+<div class="sf-dflow__grid">
+<div class="sf-dbox"><span class="sf-dbox__l">HST</span><span class="sf-dbox__k">Content</span></div>
+<div class="sf-dbox"><span class="sf-dbox__l">Holt-Winters</span><span class="sf-dbox__k">Volume</span></div>
+<div class="sf-dbox"><span class="sf-dbox__l">CUSUM</span><span class="sf-dbox__k">Change-point</span></div>
+<div class="sf-dbox"><span class="sf-dbox__l">Markov</span><span class="sf-dbox__k">Sequence</span></div>
+</div>
+<div class="sf-dflow__down">↓</div>
+<div class="sf-dflow__row">
+<div class="sf-dbox"><span class="sf-dbox__id">BL</span><span class="sf-dbox__l">Blended Score</span></div>
+<span class="sf-dflow__arr">→</span>
+<div class="sf-dbox"><span class="sf-dbox__id">DS</span><span class="sf-dbox__l">DSPOT Threshold</span></div>
+<span class="sf-dflow__arr">→</span>
+<div class="sf-dbox is-accent"><span class="sf-dbox__id">AL</span><span class="sf-dbox__l">Alert / No Alert</span></div>
+</div>
+</div>
+
+Their raw scores are z-score normalized using a per-detector Welford online accumulator, then combined into a single blended score via weighted average. When two or more detectors converge (all flagging elevated z-scores at the same time), the blended score is amplified — 1.5× when at least half converge, 2× when at least two-thirds converge. Finally, DSPOT applies an EVT-derived adaptive threshold to decide whether the blended score constitutes an anomaly.
 
 ## Detector Summary
 
