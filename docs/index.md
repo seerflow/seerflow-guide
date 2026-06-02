@@ -95,6 +95,6 @@ Real scenarios, config samples, expected output.
 
 ## Source code
 
-Seerflow is open source.
+Seerflow is open source under AGPL-3.0.
 
-[github.com/seerflow/seerflow](https://github.com/seerflow/seerflow){ .sf-btn .primary }
+[github.com/seerflow/seerflow ↗](https://github.com/seerflow/seerflow){ .sf-btn .outline }
