@@ -52,6 +52,8 @@ Their raw scores are z-score normalized using a per-detector Welford online accu
 
 ## Detector Summary
 
+<div class="sf-dsum" markdown>
+
 | Detector | Signal Type | What It Catches | Memory | Warmup | Deep Dive |
 |----------|-------------|-----------------|--------|--------|-----------|
 | HST | Content | Novel patterns in feature space | ~50 KB | None (scores immediately) | [Half-Space Trees](hst.md) |
@@ -59,7 +61,10 @@ Their raw scores are z-score normalized using a per-detector Welford online accu
 | CUSUM | Change-point | Sustained mean shifts | ~200 B | 30 min | [CUSUM](cusum.md) |
 | Markov | Sequence | Low-probability event transitions | ~10 KB/entity | 100 events/entity | [Markov Chains](markov.md) |
 
-DSPOT is the **threshold layer**, not a detector — it receives the blended score and applies an adaptive upper/lower threshold derived from Extreme Value Theory. See [DSPOT](dspot.md) for details.
+</div>
+
+!!! note
+    **DSPOT is the threshold layer, not a detector.** It receives the blended score and applies an adaptive upper/lower threshold derived from Extreme Value Theory. See [DSPOT](dspot.md) for details.
 
 ## Model Persistence
 
@@ -79,6 +84,8 @@ Each unique `source_type` value (e.g., `"nginx"`, `"auth"`, `"k8s-pod"`) gets it
 
 **Memory budget per source (approximate):**
 
+<div class="sf-kv" markdown>
+
 | Component | Per-source footprint |
 |-----------|----------------------|
 | HST | ~50 KB |
@@ -86,6 +93,8 @@ Each unique `source_type` value (e.g., `"nginx"`, `"auth"`, `"k8s-pod"`) gets it
 | CUSUM | ~200 B |
 | DSPOT | ~8 KB |
 | Markov | ~10 KB × tracked entities |
+
+</div>
 
 At defaults: 256 sources × ~70 KB base = **~18 MB**, plus Markov entity overhead (varies by workload).
 
