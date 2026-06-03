@@ -194,6 +194,9 @@
 .md-typeset a { color: var(--accent); text-decoration: none; text-underline-offset: 3px; }
 .md-typeset a:hover { color: var(--accent-2); text-decoration: underline;
   text-decoration-thickness: 1px; text-decoration-color: var(--accent-2); }
+/* glossary abbreviations: drop the dotted underline (mockup shows terms plain);
+   native title tooltip + help cursor stay for the definition affordance */
+.md-typeset abbr { border-bottom: none; text-decoration: none; cursor: help; }
 .md-typeset hr { border-bottom: 1px solid var(--line); }
 .md-typeset blockquote { border-left: 2px solid var(--line-2); color: var(--text-3); }
 
