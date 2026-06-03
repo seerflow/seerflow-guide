@@ -189,9 +189,11 @@
 .md-typeset h4 { font-size: 14px; font-weight: 600; color: var(--text); }
 .md-typeset p, .md-typeset li { font-size: 15px; line-height: 1.65; color: var(--text-2); }
 .md-typeset p { margin: 0 0 16px; }
-.md-typeset a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px;
-  text-decoration-thickness: 1px; text-decoration-color: color-mix(in oklch, var(--accent) 45%, transparent); }
-.md-typeset a:hover { color: var(--accent-2); text-decoration-color: var(--accent-2); }
+/* links are accent-colored, NOT underlined at rest (mockup); underline on
+   hover for affordance. Also de-underlines toc.permalink ¶ anchors. */
+.md-typeset a { color: var(--accent); text-decoration: none; text-underline-offset: 3px; }
+.md-typeset a:hover { color: var(--accent-2); text-decoration: underline;
+  text-decoration-thickness: 1px; text-decoration-color: var(--accent-2); }
 .md-typeset hr { border-bottom: 1px solid var(--line); }
 .md-typeset blockquote { border-left: 2px solid var(--line-2); color: var(--text-3); }
 
