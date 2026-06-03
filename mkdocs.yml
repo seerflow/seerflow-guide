@@ -3,6 +3,7 @@ site_url: https://docs.seerflow.dev
 site_description: "Comprehensive guide to Seerflow — streaming log intelligence"
 repo_url: https://github.com/seerflow/seerflow
 repo_name: seerflow/seerflow
+copyright: "© 2026 Seerflow Contributors · Seerflow is AGPL-3.0"
 
 theme:
   name: material
