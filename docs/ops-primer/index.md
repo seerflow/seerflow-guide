@@ -38,11 +38,15 @@ You'll understand:
 
 These sections build on each other. Start at the top and work down:
 
+<div class="sf-reading" markdown>
+
 | # | Section | What You'll Learn |
 |---|---------|------------------|
 | 1 | [Failure Patterns](failure-patterns.md) | Common infrastructure and application failure signatures in logs |
 | 2 | [Deployment Risk](deployment-risk.md) | How deployments change baselines and what canary signals look like |
 | 3 | [Ops Correlation](ops-correlation.md) | Cross-source correlation that turns scattered symptoms into root-cause alerts |
+
+</div>
 
 !!! tip "The Running Example"
     A single operational scenario threads through every section: **a team deploys v2.3.1 of their API service, and within 30 minutes, four log sources show escalating problems.** Application error rates climb from 1% to 8%. The database reports connection pool exhaustion. The reverse proxy shows latency spiking from 200ms to 2 seconds. And finally, the OS kernel logs an OOM kill.

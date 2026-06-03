@@ -213,10 +213,20 @@
 .md-typeset .admonition, .md-typeset details {
   background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--accent);
   font-size: 13.5px; margin: 24px 0; }
+/* mockup Callout: mono tone eyebrow over body, NO icon, neutral box border +
+   only the left rail tone-colored. Use the [data-md-color-scheme] prefix to
+   beat Material's per-type border-color + logical padding-inline-start. */
 [data-md-color-scheme] .md-typeset .admonition-title,
 [data-md-color-scheme] .md-typeset summary {
   background: transparent; font-family: var(--font-mono); text-transform: uppercase;
-  letter-spacing: 0.12em; font-size: 10px; font-weight: 600; color: var(--text); }
+  letter-spacing: 0.12em; font-size: 10px; font-weight: 600; color: var(--text);
+  margin: 12px 0 6px; padding: 0; padding-inline-start: 0; }
+.md-typeset .admonition-title::before, .md-typeset summary::before { display: none; }
+[data-md-color-scheme] .md-typeset .admonition,
+[data-md-color-scheme] .md-typeset details {
+  padding: 2px 18px 6px; border-top-color: var(--line);
+  border-right-color: var(--line); border-bottom-color: var(--line); }
+.md-typeset .admonition > :last-child, .md-typeset details > :last-child { margin-bottom: 8px; }
 .md-typeset .admonition.note, .md-typeset details.note,
 .md-typeset .admonition.abstract, .md-typeset .admonition.tip,
 .md-typeset .admonition.success, .md-typeset .admonition.example { border-left-color: var(--accent); }
@@ -259,6 +269,9 @@
 .md-typeset table:not([class]) td a:hover { color: var(--accent); }
 .md-typeset table:not([class]) td a code { color: var(--accent); font-weight: 400; }
 .md-typeset table:not([class]) td a:hover code { color: var(--accent-2); }
+/* reading-order / chapter-index tables: accent mono leading number (mockup #) */
+.md-typeset .sf-reading td:first-child { color: var(--accent); font-family: var(--font-mono);
+  font-weight: 400; font-size: 12.5px; }
 
 /* ===== Tabbed =============================================== */
 .md-typeset .tabbed-set > label { font-family: var(--font-mono); font-size: 12px;

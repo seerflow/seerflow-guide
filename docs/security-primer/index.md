@@ -19,6 +19,8 @@ By the end of this chapter, you'll understand:
 
 These sections build on each other. Start at the top and work down:
 
+<div class="sf-reading" markdown>
+
 | # | Section | What you'll learn |
 |---|---------|------------------|
 | 1 | [What is a SIEM?](siem-basics.md) | Log aggregation, detection, and alerting |
@@ -27,6 +29,8 @@ These sections build on each other. Start at the top and work down:
 | 4 | [IOCs & Entities](iocs-entities.md) | The digital fingerprints attackers leave behind |
 | 5 | [Sigma Rules](sigma-rules.md) | Portable detection rules that find known threats |
 | 6 | [Anomaly Detection](anomaly-detection.md) | Machine learning that finds unknown threats |
+
+</div>
 
 ## The running example
 
