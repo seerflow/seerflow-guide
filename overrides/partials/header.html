@@ -20,8 +20,10 @@
     <div class="md-header__title" data-md-component="header-title">
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
-          <span class="md-ellipsis sf-wordmark">Seerflow</span>
-          <span class="sf-guide-eyebrow">The&nbsp;Guide</span>
+          <a class="sf-wordmark-link" href="{{ config.extra.homepage | d(nav.homepage.url, true) | url }}" title="{{ config.site_name | e }}">
+            <span class="md-ellipsis sf-wordmark">Seerflow</span>
+            <span class="sf-guide-eyebrow">The&nbsp;Guide</span>
+          </a>
         </div>
       </div>
     </div>
